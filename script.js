@@ -5,29 +5,21 @@ let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 
+// قائمة العبارات التشجيعية التي طلبتها
 const quotes = [
     "الطب رسالة، وأنت قدها يا دكتور ملهم! 🩺",
     "كل دقيقة مذاكرة هي خطوة نحو لقب 'جراح'. ✨",
     "تذكر دائماً لماذا بدأت.. العالم ينتظر مهاراتك. 🌍",
     "المعاناة مؤقتة، لكن اللقب أبدي. 💪",
-    "أدرس اليوم لتعالج غداً.. استمر يا بطل! 💉",
-    "الناجحون لا يتوقفون عندما يتعبون، يتوقفون عندما ينتهون. 🔥"
+    "أدرس اليوم لتعالج غداً.. استمر يا بطل! 💉"
 ];
 
-function changeQuote() {
-    const randomIndex = Math.floor(Math.random() * quotes.length);
-    document.getElementById('motivationQuote').innerText = quotes[randomIndex];
-}
-
-// استدعاء الدالة عند تحميل الصفحة لأول مرة
-window.addEventListener('load', changeQuote);
-// تحديث الشاشة عند التحميل
 window.onload = () => {
     updatePointsDisplay();
     displayDate();
     startGraduationCountdown();
+    changeQuote();
     
-    // استعادة القيم من المتصفح ووضعها في الخانات
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
     document.getElementById('colorPicker').value = savedColor;
@@ -36,26 +28,97 @@ window.onload = () => {
     resetTimer(); 
 };
 
-// --- تفعيل زر "تأكيد الإعدادات" ليعمل فورا وبصمت ---
-document.getElementById('mainSaveBtn').addEventListener('click', () => {
-    // 1. تحديث وحفظ اللون
-    const newColor = document.getElementById('colorPicker').value;
-    document.documentElement.style.setProperty('--primary', newColor);
-    localStorage.setItem('themeColor', newColor);
+// --- دالة تشغيل المنبه بأعلى صوت ممكن (مضخم برمي) ---
+function playHighVolumeAlarm() {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     
-    // 2. تحديث وحفظ تاريخ التخرج
-    graduationDate = document.getElementById('gradDateInput').value;
-    localStorage.setItem('gradDate', graduationDate);
-    
-    // 3. إعادة ضبط المؤقت بناءً على الدقائق الجديدة (إذا لم يكن يعمل)
-    if (!isRunning) {
-        resetTimer();
-    }
-    
-    // ملاحظة: تم حذف الـ alert هنا ليكون التنفيذ فورياً وصامتاً
-});
+    // توليد نغمة حادة جداً ومنبهة
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
 
-// --- عداد التخرج التنازلي ---
+    oscillator.type = 'sawtooth'; // نغمة "منشارية" مسموعة جداً
+    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); 
+    
+    // --- هنا نرفع الصوت برمجياً (5 يعني 5 أضعاف القوة العادية) ---
+    gainNode.gain.setValueAtTime(5, audioContext.currentTime); 
+
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+
+    oscillator.start();
+    setTimeout(() => oscillator.stop(), 3000); // يستمر لـ 3 ثواني
+}
+
+function changeQuote() {
+    const qElem = document.getElementById('motivationQuote');
+    if(qElem) qElem.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+}
+
+// --- نظام المؤقت المعدل مع الإيقاف المؤقت ---
+function toggleTimer() {
+    const btn = document.getElementById('startBtn');
+    if (!isRunning) {
+        isRunning = true;
+        btn.innerText = "إيقاف مؤقت";
+        btn.style.borderColor = "#ff4444";
+        
+        timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                isRunning = false;
+                btn.innerText = "ابدأ المهمة";
+                btn.style.borderColor = "var(--primary)";
+                
+                playHighVolumeAlarm(); // تشغيل المنبه الجبار
+                addPoints();
+                changeQuote();
+            } else {
+                timeLeft--;
+                updateTimerDisplay();
+            }
+        }, 1000);
+    } else {
+        clearInterval(timer);
+        isRunning = false;
+        btn.innerText = "استئناف";
+        btn.style.borderColor = "var(--primary)";
+    }
+}
+
+function resetTimer() {
+    clearInterval(timer);
+    isRunning = false;
+    const btn = document.getElementById('startBtn');
+    if(btn) btn.innerText = "ابدأ المهمة";
+    
+    const mins = document.getElementById('minsInput').value || 25;
+    timeLeft = mins * 60;
+    updateTimerDisplay();
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    const display = document.getElementById('pomoDisplay');
+    if(display) display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+// بقية الدوال كما هي مع تعديل دالة النقاط
+function addPoints() {
+    const minsWorked = parseInt(document.getElementById('minsInput').value) || 0;
+    points += (minsWorked * 3); // 3 نقاط لكل دقيقة كما طلبت
+    savePoints();
+}
+
+function savePoints() {
+    localStorage.setItem('userPoints', points);
+    updatePointsDisplay();
+}
+
+function updatePointsDisplay() {
+    document.getElementById('userPoints').innerText = points;
+}
+
 function startGraduationCountdown() {
     setInterval(() => {
         const now = new Date().getTime();
@@ -69,107 +132,15 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
-// --- نظام المؤقت (Pomodoro) ---
-// دالة التحكم الشاملة (تشغيل / إيقاف مؤقت)
-function toggleTimer() {
-    const btn = document.getElementById('startBtn');
-    
-    if (!isRunning) {
-        // إذا كان متوقفاً -> ابدأ التشغيل
-        isRunning = true;
-        btn.innerText = "إيقاف مؤقت";
-        btn.style.borderColor = "#ff4444"; // تغيير اللون للأحمر للتنبيه
+document.getElementById('mainSaveBtn').addEventListener('click', () => {
+    const newColor = document.getElementById('colorPicker').value;
+    document.documentElement.style.setProperty('--primary', newColor);
+    localStorage.setItem('themeColor', newColor);
+    graduationDate = document.getElementById('gradDateInput').value;
+    localStorage.setItem('gradDate', graduationDate);
+    if (!isRunning) resetTimer();
+});
 
-        timer = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                isRunning = false;
-                btn.innerText = "ابدأ المهمة";
-                btn.style.borderColor = "var(--primary)";
-                
-                // تشغيل المنبه
-                const audio = document.getElementById('alarmSound');
-                if(audio) audio.play();
-                
-                addPoints();
-            } else {
-                timeLeft--;
-                updateTimerDisplay();
-            }
-        }, 1000);
-    } else {
-        // إذا كان يعمل -> أوقف مؤقتاً
-        clearInterval(timer);
-        isRunning = false;
-        btn.innerText = "استئناف";
-        btn.style.borderColor = "var(--primary)";
-    }
-}
-
-// تعديل دالة إعادة الضبط لتصفير النص أيضاً
-function resetTimer() {
-    clearInterval(timer);
-    isRunning = false;
-
-    changeQuote();
-    // إيقاف المنبه إذا كان يعمل
-    const audio = document.getElementById('alarmSound');
-    if(audio) {
-        audio.pause();
-        audio.currentTime = 0;
-    }
-
-    // إعادة نص الزر للحالة الأصلية
-    const btn = document.getElementById('startBtn');
-    if(btn) {
-        btn.innerText = "ابدأ المهمة";
-        btn.style.borderColor = "var(--primary)";
-    }
-
-    const mins = document.getElementById('minsInput').value || 25;
-    timeLeft = mins * 60;
-    updateTimerDisplay();
-}
-
-function updateTimerDisplay() {
-    const m = Math.floor(timeLeft / 60);
-    const s = timeLeft % 60;
-    document.getElementById('pomoDisplay').innerText = 
-        `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-}
-
-// --- نظام النقاط والمحل ---
-function addPoints() {
-    const minsWorked = parseInt(document.getElementById('minsInput').value);
-    points += (minsWorked * 3);
-    savePoints();
-}
-
-function buyBreak(min) {
-    const cost = min * 3;
-    if (points >= cost) {
-        points -= cost;
-        savePoints();
-    } else {
-        alert("عذراً دكتور، النقاط غير كافية! 🩺");
-    }
-}
-
-function savePoints() {
-    localStorage.setItem('userPoints', points);
-    updatePointsDisplay();
-}
-
-function updatePointsDisplay() {
-    document.getElementById('userPoints').innerText = points;
-}
-
-function resetPoints() {
-    points = 0;
-    savePoints();
-}
-
-// --- التاريخ وقائمة المهام ---
 function displayDate() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('ar-EG', options);
