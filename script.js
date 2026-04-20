@@ -2,7 +2,7 @@
 let timer;
 let timeLeft = 25 * 60;
 
-// 2. دالة تحديث التايمر الكبير
+// 2. دالة تحديث التايمر الكبير (الشاشة)
 function updateTimerDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -12,7 +12,7 @@ function updateTimerDisplay() {
     }
 }
 
-// 3. دالة تحديث عداد حلم التخرج
+// 3. دالة تحديث عداد التخرج
 function updateGraduationCountdown() {
     const targetDate = localStorage.getItem('graduationDate');
     if (!targetDate) return;
@@ -32,43 +32,8 @@ function updateGraduationCountdown() {
     }
 }
 
-// 4. زرار "تأكيد الإعدادات" السحري (بيصلح الألوان والتاريخ والدقائق فوراً)
-document.querySelector('.btn-save').onclick = function(e) {
-    e.preventDefault();
-
-    const minsInput = document.querySelector('.minutes-input') || document.querySelector('input[type="number"]');
-    const gradInput = document.getElementById('gradDate');
-    const colorInput = document.getElementById('colorPicker');
-
-    // حفظ وتطبيق اللون فوراً
-    if (colorInput) {
-        const newColor = colorInput.value;
-        document.documentElement.style.setProperty('--primary', newColor);
-        localStorage.setItem('themeColor', newColor);
-    }
-
-    // حفظ وتطبيق تاريخ التخرج فوراً
-    if (gradInput && gradInput.value) {
-        localStorage.setItem('graduationDate', gradInput.value);
-        updateGraduationCountdown();
-    }
-
-    // حفظ وتحديث الدقائق فوراً (بدون ريفريش)
-    if (minsInput) {
-        const newMins = minsInput.value;
-        timeLeft = parseInt(newMins) * 60;
-        updateTimerDisplay();
-        localStorage.setItem('savedMins', newMins);
-    }
-
-    // رسالة شيك للدكتور
-    const originalText = this.innerText;
-    this.innerText = "تم الضبط يا دكتور ✅";
-    setTimeout(() => { this.innerText = originalText; }, 2000);
-};
-
-// 5. أزرار التايمر (ابدأ وإعادة ضبط)
-window.startTimer = function() {
+// 4. وظائف الأزرار (ابدأ وإعادة ضبط)
+function startTimer() {
     if (timer) return;
     timer = setInterval(() => {
         if (timeLeft > 0) {
@@ -77,43 +42,74 @@ window.startTimer = function() {
         } else {
             clearInterval(timer);
             timer = null;
-            alert("وقت الراحة يا دكتور!");
+            alert("انتهت المهمة يا دكتور!");
         }
     }, 1000);
-};
+}
 
-window.resetTimer = function() {
+function resetTimer() {
     clearInterval(timer);
     timer = null;
     const saved = localStorage.getItem('savedMins') || 25;
     timeLeft = parseInt(saved) * 60;
     updateTimerDisplay();
-};
+}
 
-// 6. تحميل كل حاجة أول ما الصفحة تفتح
+// 5. زرار "تأكيد الإعدادات" (تحديث لحظي لكل شيء)
+document.addEventListener('DOMContentLoaded', () => {
+    const saveBtn = document.querySelector('.btn-save');
+    if (saveBtn) {
+        saveBtn.onclick = function(e) {
+            e.preventDefault();
+            const minsInput = document.querySelector('.minutes-input') || document.querySelector('input[type="number"]');
+            const gradInput = document.getElementById('gradDate');
+            const colorInput = document.getElementById('colorPicker');
+
+            // تحديث الدقائق
+            if (minsInput) {
+                timeLeft = parseInt(minsInput.value) * 60;
+                localStorage.setItem('savedMins', minsInput.value);
+                updateTimerDisplay();
+            }
+            // تحديث التاريخ
+            if (gradInput && gradInput.value) {
+                localStorage.setItem('graduationDate', gradInput.value);
+                updateGraduationCountdown();
+            }
+            // تحديث اللون
+            if (colorInput) {
+                document.documentElement.style.setProperty('--primary', colorInput.value);
+                localStorage.setItem('themeColor', colorInput.value);
+            }
+            
+            this.innerText = "تم الحفظ ✅";
+            setTimeout(() => { this.innerText = "تأكيد الإعدادات"; }, 2000);
+        };
+    }
+
+    // ربط الأزرار السفلية (ابدأ وإعادة ضبط)
+    const startBtn = document.querySelector('.btn-start') || document.querySelector('button:contains("ابدأ")');
+    const resetBtn = document.querySelector('.btn-reset') || document.querySelector('button:contains("إعادة")');
+    
+    // لو مفيش كلاسات، هنربطهم بالترتيب أو من خلال الـ HTML مباشرة
+    if (startBtn) startBtn.onclick = startTimer;
+    if (resetBtn) resetBtn.onclick = resetTimer;
+});
+
+// 6. التحميل عند فتح الصفحة
 window.onload = function() {
-    // تحميل اللون
     const savedColor = localStorage.getItem('themeColor');
-    if (savedColor) {
-        document.documentElement.style.setProperty('--primary', savedColor);
-        if(document.getElementById('colorPicker')) document.getElementById('colorPicker').value = savedColor;
-    }
+    if (savedColor) document.documentElement.style.setProperty('--primary', savedColor);
 
-    // تحميل التاريخ
     const savedDate = localStorage.getItem('graduationDate');
-    if (savedDate && document.getElementById('gradDate')) {
-        document.getElementById('gradDate').value = savedDate;
-    }
+    if (savedDate && document.getElementById('gradDate')) document.getElementById('gradDate').value = savedDate;
 
-    // تحميل الدقائق
     const savedMins = localStorage.getItem('savedMins');
     if (savedMins) {
         timeLeft = parseInt(savedMins) * 60;
-        const minsInput = document.querySelector('.minutes-input') || document.querySelector('input[type="number"]');
-        if (minsInput) minsInput.value = savedMins;
+        updateTimerDisplay();
     }
 
-    updateTimerDisplay();
     updateGraduationCountdown();
     setInterval(updateGraduationCountdown, 1000);
 };
