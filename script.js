@@ -105,44 +105,43 @@ setInterval(() => {
         document.getElementById("countdown").innerHTML = "<h3>مبروك التخرج! 🎉</h3>";
     }
 }, 1000);
-// --- كود حفظ التاريخ واللون والريفريش التلقائي ---
 document.querySelector('.btn-save').onclick = function(e) {
-    e.preventDefault(); // منع أي سلوك افتراضي قديم
+    e.preventDefault();
 
-    // 1. جلب القيم من الخانات
     const gradInput = document.getElementById('gradDate');
     const colorInput = document.getElementById('colorPicker');
-    
+    const minsInput = document.querySelector('.minutes-input'); // خانة الدقائق
+
     const selectedDate = gradInput ? gradInput.value : null;
     const selectedColor = colorInput ? colorInput.value : null;
+    const selectedMins = minsInput ? minsInput.value : null;
 
-    // 2. حفظ البيانات في ذاكرة المتصفح
-    if (selectedDate) {
-        localStorage.setItem('graduationDate', selectedDate);
-    }
+    // حفظ التاريخ
+    if (selectedDate) localStorage.setItem('graduationDate', selectedDate);
     
-    if (selectedColor) {
-        localStorage.setItem('themeColor', selectedColor);
+    // حفظ اللون
+    if (selectedColor) localStorage.setItem('themeColor', selectedColor);
+
+    // حفظ الدقائق وتحديث التايمر فوراً
+    if (selectedMins) {
+        localStorage.setItem('savedMins', selectedMins);
     }
 
-    // 3. ريفريش تلقائي للصفحة بعد الحفظ مباشرة
-    // استنينا 100 مللي ثانية بس عشان نتأكد إن المتصفح كتب البيانات
+    // ريفريش سريع جداً عشان يطبق الدقائق الجديدة في التايمر الكبير
     setTimeout(() => {
         location.reload();
-    }, 100);
+    }, 50); 
 };
 
-// كود للتأكد إن الخانات بتعرض البيانات المحفوظة أول ما الصفحة تفتح
-window.addEventListener('DOMContentLoaded', (event) => {
-    const savedDate = localStorage.getItem('graduationDate');
-    const savedColor = localStorage.getItem('themeColor');
-
-    if (savedDate && document.getElementById('gradDate')) {
-        document.getElementById('gradDate').value = savedDate;
-    }
-    
-    if (savedColor && document.getElementById('colorPicker')) {
-        document.getElementById('colorPicker').value = savedColor;
-        document.documentElement.style.setProperty('--primary', savedColor);
+// كود إضافي عشان التايمر يقرأ الدقائق الجديدة أول ما الصفحة تفتح
+window.addEventListener('DOMContentLoaded', () => {
+    const savedMins = localStorage.getItem('savedMins');
+    if (savedMins && document.getElementById('pomoDisplay')) {
+        // تحديث شكل التايمر الكبير بالدقائق الجديدة
+        document.getElementById('pomoDisplay').innerText = `${savedMins.padStart(2, '0')}:00`;
+        // تحديث قيمة الخانة الصغيرة برضه عشان متتغيرش
+        if(document.querySelector('.minutes-input')) {
+            document.querySelector('.minutes-input').value = savedMins;
+        }
     }
 });
