@@ -14,7 +14,74 @@ function updateUI() {
     if (coinDisplay) coinDisplay.innerText = coins;
     localStorage.setItem('userCoins', coins);
 
-    // تحديث التايمر (الدقائق : الثواني)
+    // // 1. المتغيرات الأساسية
+let timer = null;
+let timeLeft = (parseInt(localStorage.getItem('savedMins')) || 25) * 60;
+let coins = parseInt(localStorage.getItem('userCoins')) || 1000;
+
+// 2. دالة التحديث (عشان الأرقام تظهر)
+function updateUI() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    
+    // ربط التايمر (تأكد أن الـ ID في الـ HTML هو pomoDisplay)
+    const display = document.getElementById('pomoDisplay');
+    if (display) {
+        display.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    }
+
+    // ربط النقاط (تأكد أن الـ ID في الـ HTML هو coinCount)
+    const coinDisplay = document.getElementById('coinCount');
+    if (coinDisplay) {
+        coinDisplay.innerText = coins;
+    }
+    localStorage.setItem('userCoins', coins);
+}
+
+// 3. وظيفة زرار "ابدأ المهمة"
+window.startTimer = function() {
+    console.log("تم الضغط على ابدأ"); // للتأكد في الكونسول
+    if (timer) return; 
+
+    timer = setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+            updateUI();
+        } else {
+            clearInterval(timer);
+            timer = null;
+            alert("عاش يا دكتور! الجلسة انتهت.");
+        }
+    }, 1000);
+};
+
+// 4. وظيفة زرار "إعادة ضبط"
+window.resetTimer = function() {
+    clearInterval(timer);
+    timer = null;
+    const saved = parseInt(localStorage.getItem('savedMins')) || 25;
+    timeLeft = saved * 60;
+    updateUI();
+};
+
+// 5. زرار الإعدادات (تأكيد)
+const saveBtn = document.querySelector('.btn-save');
+if (saveBtn) {
+    saveBtn.onclick = function(e) {
+        e.preventDefault();
+        const minsInput = document.querySelector('.minutes-input');
+        if (minsInput && minsInput.value) {
+            const newMins = parseInt(minsInput.value);
+            localStorage.setItem('savedMins', newMins);
+            timeLeft = newMins * 60;
+            updateUI();
+            alert("تم تحديث الوقت!");
+        }
+    };
+}
+
+// 6. تشغيل UI عند فتح الصفحة
+window.onload = updateUI;تحديث التايمر (الدقائق : الثواني)
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
     const pomoDisplay = document.getElementById('pomoDisplay');
