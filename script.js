@@ -86,18 +86,55 @@ document.addEventListener('click', function(e) {
 });
 
 // --- 7. زر تأكيد الإعدادات (تغيير الوقت واللون) ---
-const saveBtn = document.querySelector('.btn-save');
-if (saveBtn) {
-    saveBtn.onclick = function(e) {
-        e.preventDefault();
-        const minsInput = document.querySelector('.minutes-input');
-        const colorInput = document.getElementById('colorPicker');
+// استبدل الجزء رقم 7 في ملف script.js بهذا الكود
+const saveBtn = document.querySelector('.btn-save') || document.querySelector('.confirm-btn');
 
+if (saveBtn) {
+    saveBtn.addEventListener('click', function(e) {
+        e.preventDefault(); // منع أي سلوك افتراضي
+        
+        // 1. جلب العناصر
+        const minsInput = document.getElementById('minsInput') || document.querySelector('.minutes-input');
+        const colorInput = document.getElementById('colorPicker');
+        const gradDateInput = document.getElementById('gradDateInput');
+
+        // 2. حفظ وقت الدراسة
         if (minsInput && minsInput.value) {
             const newMins = parseInt(minsInput.value);
             localStorage.setItem('savedMins', newMins);
-            timeLeft = newMins * 60;
+            
+            // تحديث الوقت فوراً لو التايمر مش شغال
+            if (!timer) {
+                timeLeft = newMins * 60;
+            }
         }
+        
+        // 3. حفظ اللون وتطبيقه
+        if (colorInput) {
+            const newColor = colorInput.value;
+            localStorage.setItem('themeColor', newColor);
+            document.documentElement.style.setProperty('--primary', newColor);
+        }
+
+        // 4. حفظ تاريخ التخرج
+        if (gradDateInput && gradDateInput.value) {
+            localStorage.setItem('gradDate', gradDateInput.value);
+        }
+
+        // 5. تحديث الشاشة
+        updateUI();
+
+        // 6. تأثير بصري للزرار
+        const originalText = this.innerText;
+        this.innerText = "تم الحفظ ✅";
+        this.style.borderColor = "#00ff88"; // تأكيد بصري باللون الأخضر
+        
+        setTimeout(() => {
+            this.innerText = originalText;
+            this.style.borderColor = ""; // إعادة اللون الأصلي
+        }, 2000);
+    });
+}
         
         if (colorInput) {
             localStorage.setItem('themeColor', colorInput.value);
