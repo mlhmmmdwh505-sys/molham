@@ -54,15 +54,15 @@ function startGraduationCountdown() {
 }
 
 // --- نظام المؤقت (Pomodoro) ---
-// دالة التشغيل والإيقاف المؤقت
+// دالة التحكم الشاملة (تشغيل / إيقاف مؤقت)
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     
     if (!isRunning) {
-        // حالة البدء
+        // إذا كان متوقفاً -> ابدأ التشغيل
         isRunning = true;
         btn.innerText = "إيقاف مؤقت";
-        btn.style.borderColor = "#ff4444"; // تغيير الإطار للأحمر عند التشغيل
+        btn.style.borderColor = "#ff4444"; // تغيير اللون للأحمر للتنبيه
 
         timer = setInterval(() => {
             if (timeLeft <= 0) {
@@ -71,6 +71,7 @@ function toggleTimer() {
                 btn.innerText = "ابدأ المهمة";
                 btn.style.borderColor = "var(--primary)";
                 
+                // تشغيل المنبه
                 const audio = document.getElementById('alarmSound');
                 if(audio) audio.play();
                 
@@ -81,7 +82,7 @@ function toggleTimer() {
             }
         }, 1000);
     } else {
-        // حالة الإيقاف المؤقت
+        // إذا كان يعمل -> أوقف مؤقتاً
         clearInterval(timer);
         isRunning = false;
         btn.innerText = "استئناف";
@@ -89,46 +90,17 @@ function toggleTimer() {
     }
 }
 
-// دالة إعادة الضبط (الحل النهائي للمشكلة)
+// تعديل دالة إعادة الضبط لتصفير النص أيضاً
 function resetTimer() {
-    // 1. وقف التايمر تماماً
     clearInterval(timer);
     isRunning = false;
-
-    // 2. تغيير نص الزر إلى "ابدأ المهمة" فوراً
-    const btn = document.getElementById('startBtn');
-    if (btn) {
-        btn.innerText = "ابدأ المهمة";
-        btn.style.borderColor = "var(--primary)";
-    }
-
-    // 3. تصفير الصوت
+    
+    // إيقاف المنبه إذا كان يعمل
     const audio = document.getElementById('alarmSound');
-    if (audio) {
+    if(audio) {
         audio.pause();
         audio.currentTime = 0;
     }
-
-    // 4. إعادة ضبط الوقت من الخانة
-    const minsValue = document.getElementById('minsInput').value || 25;
-    timeLeft = minsValue * 60;
-    updateTimerDisplay();
-}
-    // 3. إعادة نص الزر إلى الحالة الأصلية وتغيير لونه للون الثيم
-    const btn = document.getElementById('startBtn');
-    if (btn) {
-        btn.innerText = "ابدأ المهمة";
-        btn.style.borderColor = "var(--primary)"; // يعود للون الأزرق (أو لون الثيم المختار)
-    }
-
-    // 4. إعادة ضبط الوقت بناءً على القيمة المدخلة في خانة الدقائق
-    const minsInput = document.getElementById('minsInput');
-    const mins = minsInput ? minsInput.value : 25;
-    timeLeft = mins * 60;
-    
-    // 5. تحديث الشاشة لتظهر الوقت الجديد (مثلاً 25:00)
-    updateTimerDisplay();
-}
 
     // إعادة نص الزر للحالة الأصلية
     const btn = document.getElementById('startBtn');
@@ -193,17 +165,4 @@ function addTask() {
     li.innerHTML = `<span>${input.value}</span><button onclick="this.parentElement.remove()" style="min-width:auto; background:none!important; border:none!important;">❌</button>`;
     document.getElementById('taskList').appendChild(li);
     input.value = '';
-}
-function resetTimer() {
-    clearInterval(timer);
-    isRunning = false;
-    
-    // إيقاف الصوت وإعادته للبداية
-    const audio = document.getElementById('alarmSound');
-    audio.pause();
-    audio.currentTime = 0;
-    
-    const mins = document.getElementById('minsInput').value || 25;
-    timeLeft = mins * 60;
-    updateTimerDisplay();
 }
