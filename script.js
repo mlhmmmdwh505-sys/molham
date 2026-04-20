@@ -105,3 +105,21 @@ window.onload = () => {
     const savedColor = localStorage.getItem('themeColor');
     if (savedColor) document.documentElement.style.setProperty('--primary', savedColor);
 };
+// --- كود زرار السلة لتصفير النقاط ---
+const trashBtn = document.querySelector('.fa-trash') || document.querySelector('.coins i') || document.querySelector('.coins img');
+
+if (trashBtn) {
+    trashBtn.parentElement.onclick = function() {
+        // تأكيد من الدكتور الأول عشان النقاط ماتروحش غلط
+        if (confirm("هل تريد تصفير نقاطك يا دكتور ملهم؟")) {
+            coins = 0; // تصفير المتغير
+            localStorage.setItem('userCoins', 0); // تصفير الذاكرة
+            
+            // تحديث الرقم في الشاشة فوراً
+            const coinSpan = document.querySelector('.coins span') || document.querySelector('.coin-count');
+            if (coinSpan) coinSpan.innerText = "0";
+            
+            alert("تم تصفير النقاط بنجاح 🗑️");
+        }
+    };
+}
