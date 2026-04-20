@@ -110,7 +110,8 @@ function toggleTimer() {
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
-    
+
+    changeQuote();
     // إيقاف المنبه إذا كان يعمل
     const audio = document.getElementById('alarmSound');
     if(audio) {
