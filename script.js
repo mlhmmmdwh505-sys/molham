@@ -72,6 +72,8 @@ function startGraduationCountdown() {
 // --- نظام المؤقت (Pomodoro) ---
 // دالة التحكم الشاملة (تشغيل / إيقاف مؤقت)
 function toggleTimer() {
+    // تجهيز الصوت عند أول ضغطة ليتخطى حماية المتصفح
+document.getElementById('alarmSound').load();
     const btn = document.getElementById('startBtn');
     
     if (!isRunning) {
