@@ -92,15 +92,32 @@ function toggleTimer() {
 
 // تعديل دالة إعادة الضبط لتصفير النص أيضاً
 function resetTimer() {
+    // 1. إيقاف العد التنازلي تماماً
     clearInterval(timer);
     isRunning = false;
     
-    // إيقاف المنبه إذا كان يعمل
+    // 2. إيقاف صوت المنبه وإعادته للبداية (إن وجد)
     const audio = document.getElementById('alarmSound');
-    if(audio) {
+    if (audio) {
         audio.pause();
         audio.currentTime = 0;
     }
+
+    // 3. إعادة نص الزر إلى الحالة الأصلية وتغيير لونه للون الثيم
+    const btn = document.getElementById('startBtn');
+    if (btn) {
+        btn.innerText = "ابدأ المهمة";
+        btn.style.borderColor = "var(--primary)"; // يعود للون الأزرق (أو لون الثيم المختار)
+    }
+
+    // 4. إعادة ضبط الوقت بناءً على القيمة المدخلة في خانة الدقائق
+    const minsInput = document.getElementById('minsInput');
+    const mins = minsInput ? minsInput.value : 25;
+    timeLeft = mins * 60;
+    
+    // 5. تحديث الشاشة لتظهر الوقت الجديد (مثلاً 25:00)
+    updateTimerDisplay();
+}
 
     // إعادة نص الزر للحالة الأصلية
     const btn = document.getElementById('startBtn');
