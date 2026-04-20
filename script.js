@@ -57,11 +57,20 @@ function startGraduationCountdown() {
 function startTimer() {
     if (isRunning) return;
     isRunning = true;
+    
     timer = setInterval(() => {
         if (timeLeft <= 0) {
             clearInterval(timer);
             isRunning = false;
+            
+            // تشغيل المنبه
+            const audio = document.getElementById('alarmSound');
+            audio.play(); 
+            
             addPoints();
+            
+            // تنبيه اختياري بسيط (بدون رسائل مزعجة إذا أردت)
+            console.log("انتهت الجلسة!"); 
         } else {
             timeLeft--;
             updateTimerDisplay();
