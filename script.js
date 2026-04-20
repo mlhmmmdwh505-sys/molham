@@ -87,7 +87,7 @@ function updateTimerDisplay() {
 // --- نظام النقاط والمحل ---
 function addPoints() {
     const minsWorked = parseInt(document.getElementById('minsInput').value);
-    points += (minsWorked * 15);
+    points += (minsWorked * 3);
     savePoints();
 }
 
