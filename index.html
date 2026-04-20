@@ -17,24 +17,26 @@
 
         <div class="date-tag" id="dateDisplay"></div>
 
-        <header>
-            <h1>لوحة تحكم الجراح 🩺</h1>
-           <div class="settings-bar">
-    <div class="input-group">
-        <label>اللون</label>
-        <input type="color" id="colorPicker" value="#6366f1">
+<header>
+    <h1>لوحة تحكم د. ملهم ممدوح 🩺</h1>
+    <p class="welcome-msg">مرحباً بك، دكتور ملهم ✨</p>
+    
+    <div class="settings-bar">
+        <div class="input-group">
+            <label>اللون</label>
+            <input type="color" id="colorPicker" value="#6366f1">
+        </div>
+        <div class="input-group">
+            <label>الدقائق</label>
+            <input type="number" id="pomoMinutes" value="25">
+        </div>
+        <div class="input-group">
+            <label>تاريخ التخرج</label>
+            <input type="date" id="gradDate">
+        </div>
+        <button onclick="applySettings()" class="btn-save">تأكيد الإعدادات 🩺</button>
     </div>
-    <div class="input-group">
-        <label>الدقائق</label>
-        <input type="number" id="pomoMinutes" value="25">
-    </div>
-    <div class="input-group">
-        <label>تاريخ التخرج</label>
-        <input type="date" id="gradDate" value="2036-06-30">
-    </div>
-    <button onclick="applySettings()" class="btn-save">تأكيد 🩺</button>
-</div>
-        </header>
+</header>
 
         <div class="dashboard-grid">
             <aside class="side-col">
