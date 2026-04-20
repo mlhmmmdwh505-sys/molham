@@ -105,21 +105,26 @@ window.onload = () => {
     const savedColor = localStorage.getItem('themeColor');
     if (savedColor) document.documentElement.style.setProperty('--primary', savedColor);
 };
-// --- كود زرار السلة لتصفير النقاط ---
-const trashBtn = document.querySelector('.fa-trash') || document.querySelector('.coins i') || document.querySelector('.coins img');
-
-if (trashBtn) {
-    trashBtn.parentElement.onclick = function() {
-        // تأكيد من الدكتور الأول عشان النقاط ماتروحش غلط
+// --- كود تصفير النقاط (النسخة القوية) ---
+document.addEventListener('click', function(e) {
+    // 1. بندور لو اللي اتداس عليه هو السلة أو الحاوية بتاعتها
+    if (e.target.closest('.fa-trash') || e.target.closest('.delete-btn') || e.target.id === 'resetPoints') {
+        
         if (confirm("هل تريد تصفير نقاطك يا دكتور ملهم؟")) {
-            coins = 0; // تصفير المتغير
-            localStorage.setItem('userCoins', 0); // تصفير الذاكرة
+            // تصفير الحساب
+            coins = 0; 
+            localStorage.setItem('userCoins', 0);
             
-            // تحديث الرقم في الشاشة فوراً
-            const coinSpan = document.querySelector('.coins span') || document.querySelector('.coin-count');
-            if (coinSpan) coinSpan.innerText = "0";
+            // تحديث الرقم في الشاشة (بندور على أي عنصر شايل رقم النقاط)
+            const coinDisplay = document.querySelector('.coins span') || 
+                                document.querySelector('.coin-count') || 
+                                document.querySelector('.points-value');
+                                
+            if (coinDisplay) {
+                coinDisplay.innerText = "0";
+            }
             
-            alert("تم تصفير النقاط بنجاح 🗑️");
+            alert("تم التصفير! ابدأ من جديد يا بطل 🗑️");
         }
-    };
-}
+    }
+});
