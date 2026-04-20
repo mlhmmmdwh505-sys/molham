@@ -37,16 +37,16 @@ function playHighVolumeAlarm() {
     const gainNode = audioContext.createGain();
 
     oscillator.type = 'sawtooth'; // نغمة "منشارية" مسموعة جداً
-    oscillator.frequency.setValueAtTime(500, audioContext.currentTime); 
+    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); 
     
     // --- هنا نرفع الصوت برمجياً (5 يعني 5 أضعاف القوة العادية) ---
-    gainNode.gain.setValueAtTime(5, audioContext.currentTime); 
+    gainNode.gain.setValueAtTime(7, audioContext.currentTime); 
 
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
     oscillator.start();
-    setTimeout(() => oscillator.stop(), 100); // يستمر لـ 3 ثواني
+    setTimeout(() => oscillator.stop(), 500); // يستمر لـ 3 ثواني
 }
 
 function changeQuote() {
@@ -154,16 +154,27 @@ function addTask() {
     document.getElementById('taskList').appendChild(li);
     input.value = '';
 }
-
-// دالة الشراء التي ستفحص النقاط وتظهر الرسالة
-function buyItem(cost, itemName) {
+// دالة شراء الاستراحة والتحقق من النقاط
+function buyBreak(duration) {
+    // حساب التكلفة: 15 نقطة لكل دقيقة استراحة كما هو مكتوب في واجهة المتجر عندك
+    const cost = duration * 15; 
+    
     if (points >= cost) {
-        points -= cost; 
+        // إذا كانت النقاط كافية
+        points -= cost;
         savePoints(); // تحديث الرصيد في المتصفح والشاشة
-        alert(`تم شراء "${itemName}" بنجاح! استمتع يا دكتور. 🎉`);
+        alert(`تم شراء استراحة لمدة ${duration} دقائق بنجاح! استمتع بوقتك يا دكتور. ☕`);
     } else {
-        // هذه هي الرسالة التي طلبتها
+        // الرسالة التي تظهر عند نقص النقاط
         const missing = cost - points;
-        alert(`عذراً يا دكتور، رصيدك غير كافٍ. تحتاج إلى ${missing} نقطة إضافية لشراء "${itemName}". استمر في المذاكرة! 💪`);
+        alert(`عذراً يا دكتور ملهم، رصيدك غير كافٍ. تحتاج إلى ${missing} نقطة إضافية لشراء هذه الاستراحة. استمر في المذاكرة! 💪`);
+    }
+}
+
+// دالة تصفير النقاط (لأنك واضع زر حذف بجانب النقاط)
+function resetPoints() {
+    if(confirm("هل تريد فعلاً تصفير جميع نقاطك يا دكتور؟")) {
+        points = 0;
+        savePoints();
     }
 }
