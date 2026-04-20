@@ -19,17 +19,21 @@
 
         <header>
             <h1>لوحة تحكم الجراح 🩺</h1>
-            <div class="settings-bar">
-                <div class="input-group">
-                    <label>اللون</label>
-                    <input type="color" id="colorPicker" value="#6366f1">
-                </div>
-                <div class="input-group">
-                    <label>الدقائق</label>
-                    <input type="number" id="pomoMinutes" value="25">
-                </div>
-                <button onclick="applySettings()" class="btn-save">تأكيد 🩺</button>
-            </div>
+           <div class="settings-bar">
+    <div class="input-group">
+        <label>اللون</label>
+        <input type="color" id="colorPicker" value="#6366f1">
+    </div>
+    <div class="input-group">
+        <label>الدقائق</label>
+        <input type="number" id="pomoMinutes" value="25">
+    </div>
+    <div class="input-group">
+        <label>تاريخ التخرج</label>
+        <input type="date" id="gradDate" value="2036-06-30">
+    </div>
+    <button onclick="applySettings()" class="btn-save">تأكيد 🩺</button>
+</div>
         </header>
 
         <div class="dashboard-grid">
