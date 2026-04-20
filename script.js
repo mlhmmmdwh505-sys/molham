@@ -113,3 +113,25 @@ window.onload = function() {
     updateGraduationCountdown();
     setInterval(updateGraduationCountdown, 1000);
 };
+// --- كود تشغيل متجر الطاقة (شراء الدقائق) ---
+document.querySelectorAll('.item').forEach(button => {
+    button.onclick = function() {
+        // 1. استخراج عدد الدقائق من النص (مثلاً "5 دق" هياخد منها رقم 5)
+        const text = this.innerText;
+        const minutesToAdd = parseInt(text.match(/\d+/)[0]);
+
+        if (!isNaN(minutesToAdd)) {
+            // 2. زيادة الوقت الحالي
+            timeLeft += (minutesToAdd * 60);
+
+            // 3. تحديث الشاشة فوراً
+            updateTimerDisplay();
+
+            // 4. حركة جمالية عشان تحس إنك اشتريت فعلاً
+            this.style.transform = "scale(0.9)";
+            setTimeout(() => { this.style.transform = "scale(1.05)"; }, 100);
+            
+            console.log(`تم إضافة ${minutesToAdd} دقيقة لرصيدك يا دكتور`);
+        }
+    };
+});
