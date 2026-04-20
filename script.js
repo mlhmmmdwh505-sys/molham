@@ -105,28 +105,30 @@ setInterval(() => {
         document.getElementById("countdown").innerHTML = "<h3>مبروك التخرج! 🎉</h3>";
     }
 }, 1000);
-function updateCountdown() {
-    const targetDate = localStorage.getItem('graduationDate');
-    if (!targetDate) return;
+// --- كود تحديث وحفظ تاريخ التخرج ---
+document.querySelector('.btn-save').onclick = function() {
+    // 1. قراءة التاريخ من الخانة اللي اخترتها
+    const gradInput = document.getElementById('gradDate');
+    const selectedDate = gradInput.value;
 
-    const target = new Date(targetDate).getTime();
-    const now = new Date().getTime();
-    const diff = target - now;
-
-    if (diff > 0) {
-        const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
-        const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 365.25)) / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-        // التحديث باستخدام لغة عالمية عشان الخط يظبط والأرقام تتحرك
-        document.getElementById("years").innerText = years.toString().padStart(2, '0');
-        document.getElementById("days").innerText = days.toString().padStart(2, '0');
-        document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+    if (selectedDate) {
+        // 2. حفظ التاريخ في ذاكرة المتصفح
+        localStorage.setItem('graduationDate', selectedDate);
+        
+        // 3. رسالة تأكيد ليك
+        alert("تم تحديث موعد التخرج يا دكتور! سيتم إعادة تحميل الصفحة لتحديث العداد.");
+        
+        // 4. إعادة تحميل عشان العداد يقرأ التاريخ الجديد
+        location.reload();
+    } else {
+        alert("من فضلك اختر التاريخ أولاً");
     }
-}
+};
 
-// تشغيل العداد كل ثانية
-setInterval(updateCountdown, 1000);
-updateCountdown(); // تشغيل فوري أول ما الصفحة تفتح
+// كود إضافي للتأكد إن العداد بيقرأ من الذاكرة أول ما تفتح
+window.addEventListener('load', function() {
+    const savedDate = localStorage.getItem('graduationDate');
+    if (savedDate && document.getElementById('gradDate')) {
+        document.getElementById('gradDate').value = savedDate;
+    }
+});
