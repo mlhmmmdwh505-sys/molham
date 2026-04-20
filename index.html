@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta name="verifywebsiteownership" content="tgf8hWSVWpGMEXVmzfc2SXcru"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Surgeon Dashboard | لوحة تحكم الجراح</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="glass-card">
+        <div class="mini-score">
+            <span>💰 <span id="userPoints">0</span></span>
+            <button onclick="resetPoints()" class="reset-mini" title="تصفير النقاط">🗑️</button>
+        </div>
+
+        <div class="date-tag" id="dateDisplay"></div>
+
+        <header>
+            <h1>لوحة تحكم الجراح 🩺</h1>
+            <div class="settings-bar">
+                <div class="input-group">
+                    <label>اللون</label>
+                    <input type="color" id="colorPicker" value="#6366f1">
+                </div>
+                <div class="input-group">
+                    <label>الدقائق</label>
+                    <input type="number" id="pomoMinutes" value="25">
+                </div>
+                <button onclick="applySettings()" class="btn-save">تأكيد 🩺</button>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            <aside class="side-col">
+                <section class="info-card">
+                    <h3>⏳ حلم التخرج</h3>
+                    <div id="countdown" class="modern-timer">
+                        <div class="unit"><span id="years">00</span><label>سنة</label></div>
+                        <div class="unit"><span id="days">00</span><label>يوم</label></div>
+                        <div class="unit"><span id="hours">00</span><label>ساعة</label></div>
+                    </div>
+                </section>
+
+                <section class="info-card store-card">
+                    <h3>☕ متجر الطاقة (1د = 15ن)</h3>
+                    <div class="store-grid">
+                        <div class="item" onclick="buyBreak(5)">5 دق <small>75ن</small></div>
+                        <div class="item" onclick="buyBreak(10)">10 دق <small>150ن</small></div>
+                        <div class="item" onclick="buyBreak(15)">15 دق <small>225ن</small></div>
+                    </div>
+                </section>
+            </aside>
+
+            <main class="main-col">
+                <section class="info-card focus-card">
+                    <div id="pomoDisplay">25:00</div>
+                    <div class="pomo-actions">
+                        <button onclick="startPomo()" class="btn-main">ابدأ المهمة</button>
+                        <button onclick="resetPomo()">إعادة ضبط</button>
+                    </div>
+                </section>
+
+                <section class="info-card tasks-card">
+                    <div class="input-section">
+                        <input type="text" id="taskInput" placeholder="أضف مهمة طبية جديدة (عملية، مراجعة)...">
+                        <button onclick="addTask()" class="btn-add">+</button>
+                    </div>
+                    <ul id="taskList" class="custom-scroll"></ul>
+                </section>
+            </main>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
