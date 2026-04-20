@@ -40,13 +40,13 @@ function playHighVolumeAlarm() {
     oscillator.frequency.setValueAtTime(880, audioContext.currentTime); 
     
     // --- هنا نرفع الصوت برمجياً (5 يعني 5 أضعاف القوة العادية) ---
-    gainNode.gain.setValueAtTime(10, audioContext.currentTime); 
+    gainNode.gain.setValueAtTime(7, audioContext.currentTime); 
 
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
     oscillator.start();
-    setTimeout(() => oscillator.stop(), 900); // يستمر لـ 3 ثواني
+    setTimeout(() => oscillator.stop(), 500); // يستمر لـ 3 ثواني
 }
 
 function changeQuote() {
