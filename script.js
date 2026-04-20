@@ -54,28 +54,64 @@ function startGraduationCountdown() {
 }
 
 // --- نظام المؤقت (Pomodoro) ---
-function startTimer() {
-    if (isRunning) return;
-    isRunning = true;
+// دالة التحكم الشاملة (تشغيل / إيقاف مؤقت)
+function toggleTimer() {
+    const btn = document.getElementById('startBtn');
     
-    timer = setInterval(() => {
-        if (timeLeft <= 0) {
-            clearInterval(timer);
-            isRunning = false;
-            
-            // تشغيل المنبه
-            const audio = document.getElementById('alarmSound');
-            audio.play(); 
-            
-            addPoints();
-            
-            // تنبيه اختياري بسيط (بدون رسائل مزعجة إذا أردت)
-            console.log("انتهت الجلسة!"); 
-        } else {
-            timeLeft--;
-            updateTimerDisplay();
-        }
-    }, 1000);
+    if (!isRunning) {
+        // إذا كان متوقفاً -> ابدأ التشغيل
+        isRunning = true;
+        btn.innerText = "إيقاف مؤقت";
+        btn.style.borderColor = "#ff4444"; // تغيير اللون للأحمر للتنبيه
+
+        timer = setInterval(() => {
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                isRunning = false;
+                btn.innerText = "ابدأ المهمة";
+                btn.style.borderColor = "var(--primary)";
+                
+                // تشغيل المنبه
+                const audio = document.getElementById('alarmSound');
+                if(audio) audio.play();
+                
+                addPoints();
+            } else {
+                timeLeft--;
+                updateTimerDisplay();
+            }
+        }, 1000);
+    } else {
+        // إذا كان يعمل -> أوقف مؤقتاً
+        clearInterval(timer);
+        isRunning = false;
+        btn.innerText = "استئناف";
+        btn.style.borderColor = "var(--primary)";
+    }
+}
+
+// تعديل دالة إعادة الضبط لتصفير النص أيضاً
+function resetTimer() {
+    clearInterval(timer);
+    isRunning = false;
+    
+    // إيقاف المنبه إذا كان يعمل
+    const audio = document.getElementById('alarmSound');
+    if(audio) {
+        audio.pause();
+        audio.currentTime = 0;
+    }
+
+    // إعادة نص الزر للحالة الأصلية
+    const btn = document.getElementById('startBtn');
+    if(btn) {
+        btn.innerText = "ابدأ المهمة";
+        btn.style.borderColor = "var(--primary)";
+    }
+
+    const mins = document.getElementById('minsInput').value || 25;
+    timeLeft = mins * 60;
+    updateTimerDisplay();
 }
 
 function resetTimer() {
