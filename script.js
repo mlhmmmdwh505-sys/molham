@@ -88,8 +88,24 @@ function toggleTimer() {
                 btn.style.borderColor = "var(--primary)";
                 
                 // تشغيل المنبه
-                const audio = document.getElementById('alarmSound');
-                if(audio) audio.play();
+                // دالة لتشغيل الصوت بأقصى قوة
+function playHighVolumeAlarm() {
+    const audio = document.getElementById('alarmSound');
+    if (!audio) return;
+
+    // إنشاء سياق صوتي (Audio Context)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const source = audioCtx.createMediaElementSource(audio);
+    const gainNode = audioCtx.createGain();
+
+    // ارفع الرقم ده لزيادة القوة (مثلاً 5 يعني 500% من القوة الأصلية)
+    gainNode.gain.value = 5; 
+
+    source.connect(gainNode);
+    gainNode.connect(audioCtx.destination);
+
+    audio.play();
+}
                 
                 addPoints();
             } else {
