@@ -10,41 +10,49 @@ window.onload = () => {
     updatePointsDisplay();
     displayDate();
     startGraduationCountdown();
+    
+    // استعادة القيم المحفوظة في الواجهة
     document.getElementById('gradDateInput').value = graduationDate;
-    resetTimer(); // لضبط الوقت الأولي بناءً على المدخلات
+    const savedColor = localStorage.getItem('themeColor') || "#6366f1";
+    document.getElementById('colorPicker').value = savedColor;
+    document.documentElement.style.setProperty('--primary', savedColor);
+    
+    resetTimer(); 
 };
 
-// --- نظام التاريخ والوقت العلوي ---
+// --- التحديث الفوري (بدون زر حفظ) ---
+
+// 1. تحديث اللون فوراً عند اختياره
+document.getElementById('colorPicker').addEventListener('input', (e) => {
+    const newColor = e.target.value;
+    document.documentElement.style.setProperty('--primary', newColor);
+    localStorage.setItem('themeColor', newColor);
+});
+
+// 2. تحديث تاريخ التخرج فوراً عند تغييره
+document.getElementById('gradDateInput').addEventListener('change', (e) => {
+    graduationDate = e.target.value;
+    localStorage.setItem('gradDate', graduationDate);
+});
+
+// 3. تحديث وقت المؤقت فوراً عند تغيير الدقائق
+document.getElementById('minsInput').addEventListener('input', () => {
+    if (!isRunning) resetTimer();
+});
+
+// --- بقية الدوال الوظيفية ---
+
 function displayDate() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('ar-EG', options);
 }
 
-// --- إعدادات اللوحة (حفظ اللون والتاريخ والدقائق) ---
-document.getElementById('mainSaveBtn').addEventListener('click', () => {
-    // حفظ اللون
-    const newColor = document.getElementById('colorPicker').value;
-    document.documentElement.style.setProperty('--primary', newColor);
-    
-    // حفظ تاريخ التخرج
-    graduationDate = document.getElementById('gradDateInput').value;
-    localStorage.setItem('gradDate', graduationDate);
-    
-    // إعادة ضبط المؤقت بناءً على الدقائق الجديدة
-    resetTimer();
-    
-    alert("تم حفظ الإعدادات بنجاح! 🩺");
-});
-
-// --- عداد التخرج التنازلي ---
 function startGraduationCountdown() {
     setInterval(() => {
         const now = new Date().getTime();
         const gap = new Date(graduationDate).getTime() - now;
-
         if (gap > 0) {
             const second = 1000, minute = second * 60, hour = minute * 60, day = hour * 24, year = day * 365;
-
             document.getElementById('years').innerText = Math.floor(gap / year);
             document.getElementById('days').innerText = Math.floor((gap % year) / day);
             document.getElementById('hours').innerText = Math.floor((gap % day) / hour);
@@ -52,17 +60,14 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
-// --- نظام المؤقت (Pomodoro) ---
 function startTimer() {
     if (isRunning) return;
     isRunning = true;
-
     timer = setInterval(() => {
         if (timeLeft <= 0) {
             clearInterval(timer);
             isRunning = false;
-            addPoints(); // إضافة نقاط عند الانتهاء
-            alert("أحسنت يا دكتور! انتهت الجلسة وتم إضافة النقاط.");
+            addPoints();
         } else {
             timeLeft--;
             updateTimerDisplay();
@@ -85,9 +90,8 @@ function updateTimerDisplay() {
         `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
-// --- نظام النقاط والمحل ---
 function addPoints() {
-    const minsWorked = document.getElementById('minsInput').value;
+    const minsWorked = parseInt(document.getElementById('minsInput').value);
     points += (minsWorked * 15);
     savePoints();
 }
@@ -97,9 +101,8 @@ function buyBreak(min) {
     if (points >= cost) {
         points -= cost;
         savePoints();
-        alert(`تم شراء استراحة لمدة ${min} دقائق. استمتع!`);
     } else {
-        alert("النقاط غير كافية، استمر في المذاكرة! 💪");
+        alert("النقاط غير كافية! 🩺");
     }
 }
 
@@ -113,22 +116,15 @@ function updatePointsDisplay() {
 }
 
 function resetPoints() {
-    if(confirm("هل تريد تصفير نقاطك حقاً؟")) {
-        points = 0;
-        savePoints();
-    }
+    points = 0;
+    savePoints();
 }
 
-// --- قائمة المهام ---
 function addTask() {
     const input = document.getElementById('taskInput');
-    if (input.value === '') return;
-
+    if (input.value.trim() === '') return;
     const li = document.createElement('li');
-    li.innerHTML = `
-        <span>${input.value}</span>
-        <button onclick="this.parentElement.remove()" style="min-width:auto; background:none!important; border:none!important;">❌</button>
-    `;
+    li.innerHTML = `<span>${input.value}</span><button onclick="this.parentElement.remove()" style="min-width:auto; background:none!important; border:none!important;">❌</button>`;
     document.getElementById('taskList').appendChild(li);
     input.value = '';
 }
