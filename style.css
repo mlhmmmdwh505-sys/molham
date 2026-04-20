@@ -99,3 +99,20 @@ li { background: rgba(255,255,255,0.03); padding: 12px 20px; border-radius: 15px
 .store-grid { display: flex; gap: 10px; margin-top: 15px; }
 .item { flex: 1; background: rgba(34, 197, 94, 0.05); padding: 12px; border-radius: 20px; cursor: pointer; border: 1px solid transparent; transition: 0.3s; }
 .item:hover { border-color: #22c55e; background: rgba(34, 197, 94, 0.1); transform: scale(1.05); }
+/* أضف هذا التنسيق لخانة التاريخ */
+input[type="date"] {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--primary);
+    border-radius: 50px;
+    color: white;
+    padding: 8px 15px;
+    font-family: 'Cairo', sans-serif;
+    outline: none;
+    cursor: pointer;
+}
+
+/* لتحسين مظهر أيقونة التقويم داخل الخانة */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* يجعل الأيقونة بيضاء لتناسب الستايل الغامق */
+    cursor: pointer;
+}
