@@ -60,15 +60,6 @@ window.onload = function() {
         } else { alert("نقاطك لا تكفي.. استمر في المذاكرة!"); }
     };
 
-    // العداد التنازلي للسنوات
-    const target = new Date("June 30, 2036").getTime();
-    setInterval(() => {
-        const diff = target - new Date().getTime();
-        document.getElementById("years").innerText = Math.floor(diff / (1000*60*60*24*365.25)).toString().padStart(2, '0');
-        document.getElementById("days").innerText = Math.floor((diff % (1000*60*60*24*365.25)) / (1000*60*60*24)).toString().padStart(2, '0');
-        document.getElementById("hours").innerText = Math.floor((diff % (1000*60*60*24)) / (1000*60*60)).toString().padStart(2, '0');
-    }, 1000);
-
     window.addTask = function() {
         const inp = document.getElementById("taskInput");
         if(!inp.value) return;
