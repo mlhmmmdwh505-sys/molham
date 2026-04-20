@@ -5,6 +5,22 @@ let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 
+const quotes = [
+    "الطب رسالة، وأنت قدها يا دكتور ملهم! 🩺",
+    "كل دقيقة مذاكرة هي خطوة نحو لقب 'جراح'. ✨",
+    "تذكر دائماً لماذا بدأت.. العالم ينتظر مهاراتك. 🌍",
+    "المعاناة مؤقتة، لكن اللقب أبدي. 💪",
+    "أدرس اليوم لتعالج غداً.. استمر يا بطل! 💉",
+    "الناجحون لا يتوقفون عندما يتعبون، يتوقفون عندما ينتهون. 🔥"
+];
+
+function changeQuote() {
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    document.getElementById('motivationQuote').innerText = quotes[randomIndex];
+}
+
+// استدعاء الدالة عند تحميل الصفحة لأول مرة
+window.addEventListener('load', changeQuote);
 // تحديث الشاشة عند التحميل
 window.onload = () => {
     updatePointsDisplay();
