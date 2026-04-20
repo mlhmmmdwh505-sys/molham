@@ -11,7 +11,7 @@ window.onload = () => {
     displayDate();
     startGraduationCountdown();
     
-    // استعادة القيم المحفوظة في الواجهة
+    // استعادة القيم من المتصفح ووضعها في الخانات
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
     document.getElementById('colorPicker').value = savedColor;
@@ -20,33 +20,26 @@ window.onload = () => {
     resetTimer(); 
 };
 
-// --- التحديث الفوري (بدون زر حفظ) ---
-
-// 1. تحديث اللون فوراً عند اختياره
-document.getElementById('colorPicker').addEventListener('input', (e) => {
-    const newColor = e.target.value;
+// --- تفعيل زر "تأكيد الإعدادات" ليعمل فورا وبصمت ---
+document.getElementById('mainSaveBtn').addEventListener('click', () => {
+    // 1. تحديث وحفظ اللون
+    const newColor = document.getElementById('colorPicker').value;
     document.documentElement.style.setProperty('--primary', newColor);
     localStorage.setItem('themeColor', newColor);
-});
-
-// 2. تحديث تاريخ التخرج فوراً عند تغييره
-document.getElementById('gradDateInput').addEventListener('change', (e) => {
-    graduationDate = e.target.value;
+    
+    // 2. تحديث وحفظ تاريخ التخرج
+    graduationDate = document.getElementById('gradDateInput').value;
     localStorage.setItem('gradDate', graduationDate);
+    
+    // 3. إعادة ضبط المؤقت بناءً على الدقائق الجديدة (إذا لم يكن يعمل)
+    if (!isRunning) {
+        resetTimer();
+    }
+    
+    // ملاحظة: تم حذف الـ alert هنا ليكون التنفيذ فورياً وصامتاً
 });
 
-// 3. تحديث وقت المؤقت فوراً عند تغيير الدقائق
-document.getElementById('minsInput').addEventListener('input', () => {
-    if (!isRunning) resetTimer();
-});
-
-// --- بقية الدوال الوظيفية ---
-
-function displayDate() {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('ar-EG', options);
-}
-
+// --- عداد التخرج التنازلي ---
 function startGraduationCountdown() {
     setInterval(() => {
         const now = new Date().getTime();
@@ -60,6 +53,7 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
+// --- نظام المؤقت (Pomodoro) ---
 function startTimer() {
     if (isRunning) return;
     isRunning = true;
@@ -90,6 +84,7 @@ function updateTimerDisplay() {
         `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
+// --- نظام النقاط والمحل ---
 function addPoints() {
     const minsWorked = parseInt(document.getElementById('minsInput').value);
     points += (minsWorked * 15);
@@ -102,7 +97,7 @@ function buyBreak(min) {
         points -= cost;
         savePoints();
     } else {
-        alert("النقاط غير كافية! 🩺");
+        alert("عذراً دكتور، النقاط غير كافية! 🩺");
     }
 }
 
@@ -118,6 +113,12 @@ function updatePointsDisplay() {
 function resetPoints() {
     points = 0;
     savePoints();
+}
+
+// --- التاريخ وقائمة المهام ---
+function displayDate() {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('ar-EG', options);
 }
 
 function addTask() {
