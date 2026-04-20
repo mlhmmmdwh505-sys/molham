@@ -92,7 +92,7 @@ function addPoints() {
 }
 
 function buyBreak(min) {
-    const cost = min * 15;
+    const cost = min * 3;
     if (points >= cost) {
         points -= cost;
         savePoints();
