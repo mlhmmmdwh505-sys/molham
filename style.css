@@ -110,7 +110,24 @@ input[type="date"] {
     outline: none;
     cursor: pointer;
 }
+/* ده الكود اللي بيثبت الأرقام ويمنع الرعشة */
+#years, #days, #hours, #pomoDisplay, .minutes-display, span {
+    font-family: 'Orbitron', sans-serif !important;
+    direction: ltr !important; 
+    unicode-bidi: bidi-override !important;
+    display: inline-block;
+    
+    /* السطور دي هي اللي بتثبت الرقم في مكانه */
+    font-variant-numeric: tabular-nums; 
+    min-width: 1.5ch; 
+    text-align: center;
+}
 
+/* لتايمر المذاكرة الكبير عشان يفضل ثابت في نص الشاشة */
+#pomoDisplay {
+    min-width: 160px; 
+    text-align: center;
+}
 /* لتحسين مظهر أيقونة التقويم داخل الخانة */
 input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1); /* يجعل الأيقونة بيضاء لتناسب الستايل الغامق */
