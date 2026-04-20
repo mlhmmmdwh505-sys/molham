@@ -54,15 +54,15 @@ function startGraduationCountdown() {
 }
 
 // --- نظام المؤقت (Pomodoro) ---
-// دالة التحكم الشاملة (تشغيل / إيقاف مؤقت)
+// دالة التشغيل والإيقاف المؤقت
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     
     if (!isRunning) {
-        // إذا كان متوقفاً -> ابدأ التشغيل
+        // حالة البدء
         isRunning = true;
         btn.innerText = "إيقاف مؤقت";
-        btn.style.borderColor = "#ff4444"; // تغيير اللون للأحمر للتنبيه
+        btn.style.borderColor = "#ff4444"; // تغيير الإطار للأحمر عند التشغيل
 
         timer = setInterval(() => {
             if (timeLeft <= 0) {
@@ -71,7 +71,6 @@ function toggleTimer() {
                 btn.innerText = "ابدأ المهمة";
                 btn.style.borderColor = "var(--primary)";
                 
-                // تشغيل المنبه
                 const audio = document.getElementById('alarmSound');
                 if(audio) audio.play();
                 
@@ -82,7 +81,7 @@ function toggleTimer() {
             }
         }, 1000);
     } else {
-        // إذا كان يعمل -> أوقف مؤقتاً
+        // حالة الإيقاف المؤقت
         clearInterval(timer);
         isRunning = false;
         btn.innerText = "استئناف";
@@ -90,19 +89,31 @@ function toggleTimer() {
     }
 }
 
-// تعديل دالة إعادة الضبط لتصفير النص أيضاً
+// دالة إعادة الضبط (الحل النهائي للمشكلة)
 function resetTimer() {
-    // 1. إيقاف العد التنازلي تماماً
+    // 1. وقف التايمر تماماً
     clearInterval(timer);
     isRunning = false;
-    
-    // 2. إيقاف صوت المنبه وإعادته للبداية (إن وجد)
+
+    // 2. تغيير نص الزر إلى "ابدأ المهمة" فوراً
+    const btn = document.getElementById('startBtn');
+    if (btn) {
+        btn.innerText = "ابدأ المهمة";
+        btn.style.borderColor = "var(--primary)";
+    }
+
+    // 3. تصفير الصوت
     const audio = document.getElementById('alarmSound');
     if (audio) {
         audio.pause();
         audio.currentTime = 0;
     }
 
+    // 4. إعادة ضبط الوقت من الخانة
+    const minsValue = document.getElementById('minsInput').value || 25;
+    timeLeft = minsValue * 60;
+    updateTimerDisplay();
+}
     // 3. إعادة نص الزر إلى الحالة الأصلية وتغيير لونه للون الثيم
     const btn = document.getElementById('startBtn');
     if (btn) {
