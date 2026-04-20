@@ -31,31 +31,43 @@ window.onload = () => {
 };
 
 // 4. دالة التحكم في التايمر (ابدأ / إيقاف مؤقت)
-function toggleTimer() {
+// دالة لتوليد صوت تنبيه من المتصفح مباشرة (بدون روابط)
+function playEmergencyAlarm() {
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
+
+    oscillator.type = 'sine'; // نوع الصوت
+    oscillator.frequency.setValueAtTime(880, context.currentTime); // تردد عالي (صوت حاد)
+    
+    gainNode.gain.setValueAtTime(1, context.currentTime); // أعلى مستوى صوت
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(context.destination);
+
+    oscillator.start();
+    // يتوقف الصوت بعد ثانيتين
+    setTimeout(() => oscillator.stop(), 2000);
+}
+
+// تعديل جزء انتهاء الوقت داخل toggleTimer
+// ابحث عن (timeLeft <= 0) وضع هذا الكود:
+if (timeLeft <= 0) {
+    clearInterval(timer);
+    isRunning = false;
+    
     const btn = document.getElementById('startBtn');
-    const audio = document.getElementById('alarmSound');
-
-    if (!isRunning) {
-        // بدء التشغيل
-        isRunning = true;
-        btn.innerText = "إيقاف مؤقت";
-        btn.style.borderColor = "#ff4444";
-        if(audio) audio.load(); // تجهيز الصوت لتخطي حماية المتصفح
-
-        timer = setInterval(() => {
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                isRunning = false;
-                btn.innerText = "ابدأ المهمة";
-                btn.style.borderColor = "var(--primary)";
+    btn.innerText = "ابدأ المهمة";
+    btn.style.borderColor = "var(--primary)";
+    
+    // تشغيل الصوت المضمون
+    playEmergencyAlarm();
+    
+    // تغيير العبارة والنقاط
+    if(typeof changeQuote === "function") changeQuote();
+    addPoints();
+}
                 
-                // تشغيل المنبه بأقصى صوت
-                if(audio) {
-                    audio.volume = 1.0;
-                    audio.play();
-                }
-                
-                addPoints();
                 changeQuote();
             } else {
                 timeLeft--;
