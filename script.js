@@ -79,3 +79,38 @@ window.onload = function() {
     };
     document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
 };
+// استبدل كود العداد التنازلي القديم بهذا الكود الجديد والمطور
+let targetDate = localStorage.getItem("graduationDate") || "2036-06-30";
+document.getElementById('gradDate').value = targetDate;
+
+window.applySettings = function() {
+    const color = document.getElementById('colorPicker').value;
+    document.documentElement.style.setProperty('--primary', color);
+    
+    timeLeft = document.getElementById('pomoMinutes').value * 60;
+    
+    // حفظ وتحديث تاريخ التخرج الجديد
+    targetDate = document.getElementById('gradDate').value;
+    localStorage.setItem("graduationDate", targetDate);
+    
+    updateDisplay();
+    alert("تم حفظ الإعدادات بنجاح يا دكتور! ✨");
+};
+
+setInterval(() => {
+    const target = new Date(targetDate).getTime();
+    const now = new Date().getTime();
+    const diff = target - now;
+
+    if (diff > 0) {
+        const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+        const days = Math.floor((diff % (1000 * 60 * 60 * 24 * 365.25)) / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+
+        document.getElementById("years").innerText = years.toString().padStart(2, '0');
+        document.getElementById("days").innerText = days.toString().padStart(2, '0');
+        document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+    } else {
+        document.getElementById("countdown").innerHTML = "<h3>مبروك التخرج! 🎉</h3>";
+    }
+}, 1000);
