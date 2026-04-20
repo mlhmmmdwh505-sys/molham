@@ -37,16 +37,16 @@ function playHighVolumeAlarm() {
     const gainNode = audioContext.createGain();
 
     oscillator.type = 'sawtooth'; // نغمة "منشارية" مسموعة جداً
-    oscillator.frequency.setValueAtTime(880, audioContext.currentTime); 
+    oscillator.frequency.setValueAtTime(500, audioContext.currentTime); 
     
     // --- هنا نرفع الصوت برمجياً (5 يعني 5 أضعاف القوة العادية) ---
-    gainNode.gain.setValueAtTime(7, audioContext.currentTime); 
+    gainNode.gain.setValueAtTime(6, audioContext.currentTime); 
 
     oscillator.connect(gainNode);
     gainNode.connect(audioContext.destination);
 
     oscillator.start();
-    setTimeout(() => oscillator.stop(), 500); // يستمر لـ 3 ثواني
+    setTimeout(() => oscillator.stop(), 150); // يستمر لـ 3 ثواني
 }
 
 function changeQuote() {
