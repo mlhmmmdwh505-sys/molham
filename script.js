@@ -1,59 +1,19 @@
-// --- 1. المتغيرات ---
+// 1. الحالة والبيانات
 let timer = null;
 let coins = parseInt(localStorage.getItem('userCoins')) || 0;
-let savedMins = parseInt(localStorage.getItem('savedMins')) || 25;
-let timeLeft = savedMins * 60;
+let timeLeft = (parseInt(localStorage.getItem('savedMins')) || 25) * 60;
 
-// --- 2. تحديث الشاشة ---
+// 2. تحديث الشاشة
 function updateUI() {
-    // تحديث التايمر
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
     document.getElementById('pomoDisplay').innerText = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-    
-    // تحديث الرصيد
     document.getElementById('coinCount').innerText = coins;
     localStorage.setItem('userCoins', coins);
 }
 
-// --- 3. حل مشكلة زر التاكيد (الإصلاح الجذري) ---
-document.getElementById('mainSaveBtn').addEventListener('click', function() {
-    const minsVal = document.getElementById('minsInput').value;
-    const colorVal = document.getElementById('colorPicker').value;
-    const dateVal = document.getElementById('gradDateInput').value;
-
-    // حفظ الوقت وتحديثه فوراً
-    if (minsVal) {
-        localStorage.setItem('savedMins', minsVal);
-        if (!timer) { // لو التايمر مش شغال، حدث الرقم فوراً
-            timeLeft = parseInt(minsVal) * 60;
-        }
-    }
-
-    // حفظ وتطبيق اللون
-    if (colorVal) {
-        localStorage.setItem('themeColor', colorVal);
-        document.documentElement.style.setProperty('--primary', colorVal);
-    }
-
-    // حفظ التاريخ
-    if (dateVal) {
-        localStorage.setItem('gradDate', dateVal);
-    }
-
-    updateUI(); // الإنعاش اللحظي للشاشة
-    
-    // تغيير شكل الزرار للتأكيد
-    this.innerText = "تم الحفظ ✅";
-    this.classList.add('saved-active');
-    setTimeout(() => {
-        this.innerText = "تأكيد الإعدادات";
-        this.classList.remove('saved-active');
-    }, 2000);
-});
-
-// --- 4. التايمر وحسبة الـ 3 نقاط ---
-function startTimer() {
+// 3. وظائف التايمر (دقيقة = 3 نقاط)
+document.getElementById('startBtn').addEventListener('click', () => {
     if (timer) return;
     const sessionMins = Math.floor(timeLeft / 60);
     timer = setInterval(() => {
@@ -63,45 +23,78 @@ function startTimer() {
         } else {
             clearInterval(timer);
             timer = null;
-            coins += (sessionMins * 3); // 3 نقاط لكل دقيقة
+            coins += (sessionMins * 3); // الحسبة المطلوبة
             updateUI();
-            alert(`مبروك يا دكتور ملهم! حصلت على ${sessionMins * 3} نقطة`);
+            alert(`مبروك يا دكتور! حصلت على ${sessionMins * 3} نقطة`);
         }
     }, 1000);
-}
+});
 
-function resetTimer() {
+document.getElementById('resetBtn').addEventListener('click', () => {
     clearInterval(timer);
     timer = null;
     timeLeft = (parseInt(localStorage.getItem('savedMins')) || 25) * 60;
     updateUI();
-}
+});
 
-// --- 5. شراء الراحة (15 نقطة للدقيقة) ---
-function buyRest(mins) {
-    const cost = mins * 15;
-    if (coins >= cost) {
-        coins -= cost;
-        timeLeft += (mins * 60);
-        updateUI();
-    } else {
-        alert("رصيدك لا يكفي يا دكتور");
+// 4. حفظ الإعدادات (حل مشكلة الفيديو)
+document.getElementById('saveConfigBtn').addEventListener('click', function() {
+    const mVal = document.getElementById('minsInput').value;
+    const cVal = document.getElementById('colorPicker').value;
+    const dVal = document.getElementById('gradDateInput').value;
+
+    if (mVal) {
+        localStorage.setItem('savedMins', mVal);
+        if (!timer) timeLeft = parseInt(mVal) * 60;
     }
-}
+    if (cVal) {
+        localStorage.setItem('themeColor', cVal);
+        document.documentElement.style.setProperty('--primary', cVal);
+    }
+    if (dVal) localStorage.setItem('gradDate', dVal);
 
-// --- 6. تشغيل النظام عند الفتح ---
-window.onload = function() {
+    updateUI();
+    this.innerText = "تم الحفظ ✅";
+    setTimeout(() => this.innerText = "تأكيد الإعدادات 🩺", 2000);
+});
+
+// 5. متجر الطاقة (شراء راحة بـ 15 نقطة)
+document.querySelectorAll('.buy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const mins = parseInt(btn.getAttribute('data-mins'));
+        const cost = mins * 15;
+        if (coins >= cost) {
+            coins -= cost;
+            timeLeft += (mins * 60);
+            updateUI();
+        } else {
+            alert("رصيدك لا يكفي يا دكتور!");
+        }
+    });
+});
+
+// 6. إدارة المهام وتصفير النقاط
+document.getElementById('addTaskBtn').addEventListener('click', () => {
+    const input = document.getElementById('taskInput');
+    if (!input.value) return;
+    const li = document.createElement('li');
+    li.innerHTML = `${input.value} <button onclick="this.parentElement.remove()">✕</button>`;
+    document.getElementById('taskList').appendChild(li);
+    input.value = '';
+});
+
+document.getElementById('resetPointsBtn').addEventListener('click', () => {
+    if (confirm("تصفير النقاط؟")) { coins = 0; updateUI(); }
+});
+
+// 7. عند التحميل
+window.onload = () => {
     const color = localStorage.getItem('themeColor');
     if (color) document.documentElement.style.setProperty('--primary', color);
-    
-    const savedDate = localStorage.getItem('gradDate');
-    if (savedDate) document.getElementById('gradDateInput').value = savedDate;
-
     updateUI();
     setInterval(updateGradTimer, 1000);
 };
 
-// حساب عداد التخرج
 function updateGradTimer() {
     const gDate = localStorage.getItem('gradDate');
     if (!gDate) return;
