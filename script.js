@@ -105,30 +105,44 @@ setInterval(() => {
         document.getElementById("countdown").innerHTML = "<h3>مبروك التخرج! 🎉</h3>";
     }
 }, 1000);
-// --- كود تحديث وحفظ تاريخ التخرج ---
-document.querySelector('.btn-save').onclick = function() {
-    // 1. قراءة التاريخ من الخانة اللي اخترتها
-    const gradInput = document.getElementById('gradDate');
-    const selectedDate = gradInput.value;
+// --- كود حفظ التاريخ واللون والريفريش التلقائي ---
+document.querySelector('.btn-save').onclick = function(e) {
+    e.preventDefault(); // منع أي سلوك افتراضي قديم
 
+    // 1. جلب القيم من الخانات
+    const gradInput = document.getElementById('gradDate');
+    const colorInput = document.getElementById('colorPicker');
+    
+    const selectedDate = gradInput ? gradInput.value : null;
+    const selectedColor = colorInput ? colorInput.value : null;
+
+    // 2. حفظ البيانات في ذاكرة المتصفح
     if (selectedDate) {
-        // 2. حفظ التاريخ في ذاكرة المتصفح
         localStorage.setItem('graduationDate', selectedDate);
-        
-        // 3. رسالة تأكيد ليك
-        alert("تم تحديث موعد التخرج يا دكتور! سيتم إعادة تحميل الصفحة لتحديث العداد.");
-        
-        // 4. إعادة تحميل عشان العداد يقرأ التاريخ الجديد
-        location.reload();
-    } else {
-        alert("من فضلك اختر التاريخ أولاً");
     }
+    
+    if (selectedColor) {
+        localStorage.setItem('themeColor', selectedColor);
+    }
+
+    // 3. ريفريش تلقائي للصفحة بعد الحفظ مباشرة
+    // استنينا 100 مللي ثانية بس عشان نتأكد إن المتصفح كتب البيانات
+    setTimeout(() => {
+        location.reload();
+    }, 100);
 };
 
-// كود إضافي للتأكد إن العداد بيقرأ من الذاكرة أول ما تفتح
-window.addEventListener('load', function() {
+// كود للتأكد إن الخانات بتعرض البيانات المحفوظة أول ما الصفحة تفتح
+window.addEventListener('DOMContentLoaded', (event) => {
     const savedDate = localStorage.getItem('graduationDate');
+    const savedColor = localStorage.getItem('themeColor');
+
     if (savedDate && document.getElementById('gradDate')) {
         document.getElementById('gradDate').value = savedDate;
+    }
+    
+    if (savedColor && document.getElementById('colorPicker')) {
+        document.getElementById('colorPicker').value = savedColor;
+        document.documentElement.style.setProperty('--primary', savedColor);
     }
 });
