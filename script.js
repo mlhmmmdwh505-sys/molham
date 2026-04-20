@@ -114,14 +114,6 @@ function resetTimer() {
     updateTimerDisplay();
 }
 
-function resetTimer() {
-    clearInterval(timer);
-    isRunning = false;
-    const mins = document.getElementById('minsInput').value || 25;
-    timeLeft = mins * 60;
-    updateTimerDisplay();
-}
-
 function updateTimerDisplay() {
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
