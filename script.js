@@ -104,7 +104,7 @@ function playHighVolumeAlarm() {
     source.connect(gainNode);
     gainNode.connect(audioCtx.destination);
 
-    audio.play();
+    playHighVolumeAlarm();
 }
                 
                 addPoints();
