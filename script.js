@@ -154,15 +154,17 @@ function addTask() {
     document.getElementById('taskList').appendChild(li);
     input.value = '';
 }
-// دالة لمحاولة شراء شيء ما (مثلاً استراحة أو مكافأة)
-function purchaseItem(cost, itemName) {
+
+// --- دالة الشراء والتحقق من النقاط ---
+function buyItem(cost, itemName) {
     if (points >= cost) {
-        points -= cost; // خصم النقاط
-        savePoints();   // تحديث التخزين والعرض
-        alert(`تم شراء ${itemName} بنجاح! استمتع يا دكتور. 🎉`);
+        // إذا كانت النقاط كافية
+        points -= cost; 
+        savePoints(); // تحديث الرصيد في المتصفح والشاشة
+        alert(`تم شراء "${itemName}" بنجاح! استمتع يا دكتور. 🎉`);
     } else {
-        // هذه هي الرسالة التي ستحذر المستخدم إذا لم يملك نقاط كافية
-        const missingPoints = cost - points;
-        alert(`عذراً يا دكتور، رصيدك غير كافٍ. تحتاج إلى ${missingPoints} نقطة إضافية لشراء ${itemName}. استمر في المذاكرة! 💪`);
+        // إذا كانت النقاط غير كافية (الرسالة التي طلبتها)
+        const missing = cost - points;
+        alert(`عذراً يا دكتور ملهم، رصيدك غير كافٍ. تحتاج إلى ${missing} نقطة إضافية لشراء "${itemName}". استمر في المذاكرة! 💪`);
     }
 }
