@@ -129,3 +129,16 @@ function addTask() {
     document.getElementById('taskList').appendChild(li);
     input.value = '';
 }
+function resetTimer() {
+    clearInterval(timer);
+    isRunning = false;
+    
+    // إيقاف الصوت وإعادته للبداية
+    const audio = document.getElementById('alarmSound');
+    audio.pause();
+    audio.currentTime = 0;
+    
+    const mins = document.getElementById('minsInput').value || 25;
+    timeLeft = mins * 60;
+    updateTimerDisplay();
+}
