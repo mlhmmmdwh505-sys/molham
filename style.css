@@ -133,3 +133,42 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(1); /* يجعل الأيقونة بيضاء لتناسب الستايل الغامق */
     cursor: pointer;
 }
+/* --- تنسيق خانة اختيار اللون (إزالة المربع الأبيض) --- */
+#colorPicker {
+    -webkit-appearance: none; /* إزالة الشكل الافتراضي للمتصفح */
+    -moz-appearance: none;
+    appearance: none;
+    width: 60px;
+    height: 35px;
+    background-color: transparent; /* إزالة الخلفية البيضاء الأساسية */
+    border: 1px solid var(--primary); /* جعل الإطار بنفس لون السيم */
+    border-radius: 50px; /* جعل الحواف مستديرة لتناسب التصميم */
+    cursor: pointer;
+    padding: 0;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+/* أهم جزء: إزالة الفراغ الأبيض الداخلي في متصفحات Chrome و Edge */
+#colorPicker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+#colorPicker::-webkit-color-swatch {
+    border: none;
+    border-radius: 0; /* لجعل اللون يملأ الخانة بالكامل */
+}
+
+/* إزالة الفراغ لمستخدمي Firefox */
+#colorPicker::-moz-color-swatch {
+    border: none;
+}
+
+/* --- تعديل إضافي لضمان محاذاة العناصر في settings-bar --- */
+.setting-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #94a3b8;
+    font-size: 14px;
+}
