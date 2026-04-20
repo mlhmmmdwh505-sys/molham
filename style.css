@@ -110,22 +110,22 @@ input[type="date"] {
     outline: none;
     cursor: pointer;
 }
-/* ده الكود اللي بيثبت الأرقام ويمنع الرعشة */
-#years, #days, #hours, #pomoDisplay, .minutes-display, span {
+/* --- كود منع الرعشة وتثبيت الأرقام --- */
+#years, #days, #hours, #pomoDisplay, .unit span, .minutes-display, .item span {
     font-family: 'Orbitron', sans-serif !important;
     direction: ltr !important; 
     unicode-bidi: bidi-override !important;
     display: inline-block;
     
-    /* السطور دي هي اللي بتثبت الرقم في مكانه */
+    /* السطرين دول بيخلوا الأرقام ثابتة ومستقيمة */
     font-variant-numeric: tabular-nums; 
     min-width: 1.5ch; 
     text-align: center;
 }
 
-/* لتايمر المذاكرة الكبير عشان يفضل ثابت في نص الشاشة */
+/* تثبيت مساحة عداد المذاكرة الكبير */
 #pomoDisplay {
-    min-width: 160px; 
+    min-width: 180px; 
     text-align: center;
 }
 /* لتحسين مظهر أيقونة التقويم داخل الخانة */
