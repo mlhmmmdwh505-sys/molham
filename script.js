@@ -5,7 +5,7 @@ let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 
-// قائمة العبارات التشجيعية التي طلبتها
+// قائمة العبارات التشجيعية
 const quotes = [
     "الطب رسالة، وأنت قدها يا دكتور ملهم! 🩺",
     "كل دقيقة مذاكرة هي خطوة نحو لقب 'جراح'. ✨",
@@ -14,6 +14,7 @@ const quotes = [
     "أدرس اليوم لتعالج غداً.. استمر يا بطل! 💉"
 ];
 
+// تحديث الشاشة عند التحميل
 window.onload = () => {
     updatePointsDisplay();
     displayDate();
@@ -28,25 +29,21 @@ window.onload = () => {
     resetTimer(); 
 };
 
-// --- دالة تشغيل المنبه بأعلى صوت ممكن (مضخم برمي) ---
-function playHighVolumeAlarm() {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // توليد نغمة حادة جداً ومنبهة
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
+// --- دالة تشغيل المنبه (بدون روابط خارجية لضمان العمل) ---
+function playAlarm() {
+    const context = new (window.AudioContext || window.webkitAudioContext)();
+    const oscillator = context.createOscillator();
+    const gainNode = context.createGain();
 
-    oscillator.type = 'sawtooth'; // نغمة "منشارية" مسموعة جداً
-    oscillator.frequency.setValueAtTime(500, audioContext.currentTime); 
-    
-    // --- هنا نرفع الصوت برمجياً (5 يعني 5 أضعاف القوة العادية) ---
-    gainNode.gain.setValueAtTime(5, audioContext.currentTime); 
+    oscillator.type = 'sawtooth'; 
+    oscillator.frequency.setValueAtTime(500, context.currentTime); 
+    gainNode.gain.setValueAtTime(5, context.currentTime); 
 
     oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
+    gainNode.connect(context.destination);
 
     oscillator.start();
-    setTimeout(() => oscillator.stop(), 300); // يستمر لـ 3 ثواني
+    setTimeout(() => oscillator.stop(), 500); // يصفر لمدة ثانيتين
 }
 
 function changeQuote() {
@@ -54,7 +51,7 @@ function changeQuote() {
     if(qElem) qElem.innerText = quotes[Math.floor(Math.random() * quotes.length)];
 }
 
-// --- نظام المؤقت المعدل مع الإيقاف المؤقت ---
+// --- نظام التحكم في المؤقت (تشغيل / إيقاف مؤقت) ---
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     if (!isRunning) {
@@ -69,8 +66,8 @@ function toggleTimer() {
                 btn.innerText = "ابدأ المهمة";
                 btn.style.borderColor = "var(--primary)";
                 
-                playHighVolumeAlarm(); // تشغيل المنبه الجبار
-                addPoints();
+                playAlarm(); // تشغيل المنبه
+                addPoints(); 
                 changeQuote();
             } else {
                 timeLeft--;
@@ -85,6 +82,7 @@ function toggleTimer() {
     }
 }
 
+// دالة إعادة الضبط
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
@@ -96,17 +94,16 @@ function resetTimer() {
     updateTimerDisplay();
 }
 
+// بقية الدوال (تحديث الشاشة، النقاط، التاريخ) كما هي في ملفك الأصلي
 function updateTimerDisplay() {
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
-    const display = document.getElementById('pomoDisplay');
-    if(display) display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
-// بقية الدوال كما هي مع تعديل دالة النقاط
 function addPoints() {
     const minsWorked = parseInt(document.getElementById('minsInput').value) || 0;
-    points += (minsWorked * 3); // 3 نقاط لكل دقيقة كما طلبت
+    points += (minsWorked * 3); // الدقيقة بـ 3 نقاط
     savePoints();
 }
 
@@ -153,28 +150,4 @@ function addTask() {
     li.innerHTML = `<span>${input.value}</span><button onclick="this.parentElement.remove()" style="min-width:auto; background:none!important; border:none!important;">❌</button>`;
     document.getElementById('taskList').appendChild(li);
     input.value = '';
-}
-// دالة شراء الاستراحة والتحقق من النقاط
-function buyBreak(duration) {
-    // حساب التكلفة: 15 نقطة لكل دقيقة استراحة كما هو مكتوب في واجهة المتجر عندك
-    const cost = duration * 15; 
-    
-    if (points >= cost) {
-        // إذا كانت النقاط كافية
-        points -= cost;
-        savePoints(); // تحديث الرصيد في المتصفح والشاشة
-        alert(`تم شراء استراحة لمدة ${duration} دقائق بنجاح! استمتع بوقتك يا دكتور. ☕`);
-    } else {
-        // الرسالة التي تظهر عند نقص النقاط
-        const missing = cost - points;
-        alert(`عذراً يا دكتور ملهم، رصيدك غير كافٍ. تحتاج إلى ${missing} نقطة إضافية لشراء هذه الاستراحة. استمر في المذاكرة! 💪`);
-    }
-}
-
-// دالة تصفير النقاط (لأنك واضع زر حذف بجانب النقاط)
-function resetPoints() {
-    if(confirm("هل تريد فعلاً تصفير جميع نقاطك يا دكتور؟")) {
-        points = 0;
-        savePoints();
-    }
 }
