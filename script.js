@@ -46,7 +46,7 @@ function playHighVolumeAlarm() {
     gainNode.connect(audioContext.destination);
 
     oscillator.start();
-    setTimeout(() => oscillator.stop(), 150); // يستمر لـ 3 ثواني
+    setTimeout(() => oscillator.stop(), 300); // يستمر لـ 3 ثواني
 }
 
 function changeQuote() {
