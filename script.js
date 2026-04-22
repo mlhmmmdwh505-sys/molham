@@ -104,19 +104,22 @@ function purchasePoints(amount) {
 }
 
 function buyBreak(min) {
-    const cost = min * 3; 
+    // السعر الجديد: الدقيقة بـ 15 نقطة (15 * 5 = 75 نقطة)
+    const cost = min * 15; 
+    
     if (points >= cost) {
         points -= cost;
         savePoints();
         
-        // تحويل التايمر لوقت الاستراحة
+        // تحويل التايمر لوقت الاستراحة فوراً
         clearInterval(timer);
         isRunning = false;
         timeLeft = min * 60;
         updateTimerDisplay();
-        alert(`استمتع باستراحة ${min} دقائق يا دكتور! ☕`);
+        
+        alert(`تم شراء استراحة لمدة ${min} دقائق.. استمتع يا دكتور! ☕`);
     } else {
-        alert("النقاط غير كافية! 🩺");
+        alert("عذراً دكتور، نقاطك لا تكفي! تحتاج لجمع المزيد من النقاط بالمذاكرة. 💪");
     }
 }
 
