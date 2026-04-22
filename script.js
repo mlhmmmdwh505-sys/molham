@@ -38,7 +38,7 @@ function playAlarm() {
 
         oscillator.type = 'sawtooth'; 
         oscillator.frequency.setValueAtTime(400, context.currentTime); 
-        gainNode.gain.setValueAtTime(3, context.currentTime); 
+        gainNode.gain.setValueAtTime(5, context.currentTime); 
 
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
@@ -92,7 +92,7 @@ function resetTimer() {
 
 // --- 6. نظام النقاط والمتجر (شحن وشراء) ---
 function addPoints() {
-    const minsWorked = parseInt(document.getElementById('minsInput').value) || 25;
+    const minsWorked = parseInt(document.getElementById('minsInput').value) || 1;
     points += (minsWorked * 3); 
     savePoints();
 }
