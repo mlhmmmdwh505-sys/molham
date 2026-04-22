@@ -1,11 +1,11 @@
-// --- المتغيرات الأساسية ---
+// --- 1. المتغيرات الأساسية واستعادة البيانات ---
 let timer;
 let timeLeft;
 let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 
-// قائمة العبارات التشجيعية
+// --- 2. قائمة العبارات التشجيعية ---
 const quotes = [
     "الطب رسالة، وأنت قدها يا دكتور ملهم! 🩺",
     "كل دقيقة مذاكرة هي خطوة نحو لقب 'جراح'. ✨",
@@ -14,13 +14,14 @@ const quotes = [
     "أدرس اليوم لتعالج غداً.. استمر يا بطل! 💉"
 ];
 
-// تحديث الشاشة عند التحميل
+// --- 3. تهيئة الصفحة عند التحميل ---
 window.onload = () => {
     updatePointsDisplay();
     displayDate();
     startGraduationCountdown();
     changeQuote();
     
+    // استعادة الإعدادات المحفوظة
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
     document.getElementById('colorPicker').value = savedColor;
@@ -29,35 +30,38 @@ window.onload = () => {
     resetTimer(); 
 };
 
-// --- دالة تشغيل المنبه (بدون روابط خارجية لضمان العمل) ---
+// --- 4. دالة المنبه (توليد صوت نقي وقوي برمجياً) ---
 function playAlarm() {
-    const context = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
+    try {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const oscillator = context.createOscillator();
+        const gainNode = context.createGain();
 
-    oscillator.type = 'sawtooth'; 
-    oscillator.frequency.setValueAtTime(500, context.currentTime); 
-    gainNode.gain.setValueAtTime(5, context.currentTime); 
+        oscillator.type = 'sawtooth'; // نغمة حادة مسموعة
+        oscillator.frequency.setValueAtTime(880, context.currentTime); 
+        
+        // رفع مستوى الصوت برمجياً
+        gainNode.gain.setValueAtTime(1, context.currentTime); 
 
-    oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
+        oscillator.connect(gainNode);
+        gainNode.connect(context.destination);
 
-    oscillator.start();
-    setTimeout(() => oscillator.stop(), 500); // يصفر لمدة ثانيتين
+        oscillator.start();
+        setTimeout(() => oscillator.stop(), 3000); // تنبيه لمدة 3 ثوانٍ
+    } catch (e) {
+        console.error("المتصفح منع تشغيل الصوت تلقائياً.");
+    }
 }
 
-function changeQuote() {
-    const qElem = document.getElementById('motivationQuote');
-    if(qElem) qElem.innerText = quotes[Math.floor(Math.random() * quotes.length)];
-}
-
-// --- نظام التحكم في المؤقت (تشغيل / إيقاف مؤقت) ---
+// --- 5. نظام التحكم في المؤقت (تشغيل / إيقاف مؤقت) ---
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
+    
     if (!isRunning) {
+        // حالة البدء أو الاستئناف
         isRunning = true;
         btn.innerText = "إيقاف مؤقت";
-        btn.style.borderColor = "#ff4444";
+        btn.style.borderColor = "#ff4444"; // تغيير اللون للأحمر عند التشغيل
         
         timer = setInterval(() => {
             if (timeLeft <= 0) {
@@ -67,14 +71,15 @@ function toggleTimer() {
                 btn.style.borderColor = "var(--primary)";
                 
                 playAlarm(); // تشغيل المنبه
-                addPoints(); 
-                changeQuote();
+                addPoints(); // إضافة النقاط
+                changeQuote(); // تغيير العبارة التشجيعية
             } else {
                 timeLeft--;
                 updateTimerDisplay();
             }
         }, 1000);
     } else {
+        // حالة الإيقاف المؤقت
         clearInterval(timer);
         isRunning = false;
         btn.innerText = "استئناف";
@@ -82,86 +87,21 @@ function toggleTimer() {
     }
 }
 
-// دالة إعادة الضبط
+// --- 6. دالة إعادة الضبط ---
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
-    const btn = document.getElementById('startBtn');
-    if(btn) btn.innerText = "ابدأ المهمة";
     
-    const mins = document.getElementById('minsInput').value || 25;
+    const btn = document.getElementById('startBtn');
+    if (btn) {
+        btn.innerText = "ابدأ المهمة";
+        btn.style.borderColor = "var(--primary)";
+    }
+
+    const minsInput = document.getElementById('minsInput');
+    const mins = minsInput ? minsInput.value : 25;
     timeLeft = mins * 60;
     updateTimerDisplay();
 }
 
-// بقية الدوال (تحديث الشاشة، النقاط، التاريخ) كما هي في ملفك الأصلي
-function updateTimerDisplay() {
-    const m = Math.floor(timeLeft / 60);
-    const s = timeLeft % 60;
-    document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-}
-
-function addPoints() {
-    const minsWorked = parseInt(document.getElementById('minsInput').value) || 0;
-    points += (minsWorked * 3); // الدقيقة بـ 3 نقاط
-    savePoints();
-}
-
-// دالة حفظ النقاط
-function savePoints() {
-    localStorage.setItem('userPoints', points);
-    updatePointsDisplay();
-}
-
-// دالة تحديث الشاشة
-function updatePointsDisplay() {
-    const pointsElement = document.getElementById('userPoints');
-    if (pointsElement) {
-        pointsElement.innerText = points;
-    }
-}
-
-// دالة تصفير النقاط (الحل لطلبك)
-function resetPoints() {
-    // إظهار رسالة تأكيد حتى لا تضيع النقاط بالخطأ
-    if (confirm("هل أنت متأكد من رغبتك في تصفير جميع نقاطك يا دكتور ملهم؟ 🩺")) {
-        points = 0; // تصفير المتغير
-        localStorage.removeItem('userPoints'); // مسحها من ذاكرة الجهاز
-        updatePointsDisplay(); // تحديث الشاشة فوراً
-    }
-}
-function startGraduationCountdown() {
-    setInterval(() => {
-        const now = new Date().getTime();
-        const gap = new Date(graduationDate).getTime() - now;
-        if (gap > 0) {
-            const second = 1000, minute = second * 60, hour = minute * 60, day = hour * 24, year = day * 365;
-            document.getElementById('years').innerText = Math.floor(gap / year);
-            document.getElementById('days').innerText = Math.floor((gap % year) / day);
-            document.getElementById('hours').innerText = Math.floor((gap % day) / hour);
-        }
-    }, 1000);
-}
-
-document.getElementById('mainSaveBtn').addEventListener('click', () => {
-    const newColor = document.getElementById('colorPicker').value;
-    document.documentElement.style.setProperty('--primary', newColor);
-    localStorage.setItem('themeColor', newColor);
-    graduationDate = document.getElementById('gradDateInput').value;
-    localStorage.setItem('gradDate', graduationDate);
-    if (!isRunning) resetTimer();
-});
-
-function displayDate() {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('ar-EG', options);
-}
-
-function addTask() {
-    const input = document.getElementById('taskInput');
-    if (input.value.trim() === '') return;
-    const li = document.createElement('li');
-    li.innerHTML = `<span>${input.value}</span><button onclick="this.parentElement.remove()" style="min-width:auto; background:none!important; border:none!important;">❌</button>`;
-    document.getElementById('taskList').appendChild(li);
-    input.value = '';
-}
+// --- 7. نظام النقاط الم
