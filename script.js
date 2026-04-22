@@ -38,14 +38,14 @@ function playAlarm() {
         const gainNode = context.createGain();
 
         oscillator.type = 'sawtooth'; 
-        oscillator.frequency.setValueAtTime(880, context.currentTime); 
-        gainNode.gain.setValueAtTime(1, context.currentTime); 
+        oscillator.frequency.setValueAtTime(400, context.currentTime); 
+        gainNode.gain.setValueAtTime(5, context.currentTime); 
 
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
 
         oscillator.start();
-        setTimeout(() => oscillator.stop(), 3000); 
+        setTimeout(() => oscillator.stop(), 150); 
     } catch (e) {
         console.error("المتصفح منع تشغيل الصوت تلقائياً.");
     }
