@@ -37,14 +37,14 @@ function playAlarm() {
         const gainNode = context.createGain();
 
         oscillator.type = 'sawtooth'; 
-        oscillator.frequency.setValueAtTime(500, context.currentTime); 
-        gainNode.gain.setValueAtTime(5, context.currentTime); 
+        oscillator.frequency.setValueAtTime(400, context.currentTime); 
+        gainNode.gain.setValueAtTime(3, context.currentTime); 
 
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
 
         oscillator.start();
-        setTimeout(() => oscillator.stop(), 300); 
+        setTimeout(() => oscillator.stop(), 150); 
     } catch (e) { console.log("Audio Blocked"); }
 }
 
