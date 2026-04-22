@@ -97,7 +97,7 @@ function resetTimer() {
 
 // --- 6. نظام النقاط والمحل (الحسبة التي طلبتها) ---
 
-function addPoints() {
+function addPoints(minsWorked) {
     const minsInput = document.getElementById('minsInput');
     const minsWorked = (minsInput && minsInput.value) ? parseInt(minsInput.value) : 25;
     
