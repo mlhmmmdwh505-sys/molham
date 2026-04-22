@@ -107,15 +107,29 @@ function addPoints() {
     savePoints();
 }
 
+// دالة حفظ النقاط
 function savePoints() {
     localStorage.setItem('userPoints', points);
     updatePointsDisplay();
 }
 
+// دالة تحديث الشاشة
 function updatePointsDisplay() {
-    document.getElementById('userPoints').innerText = points;
+    const pointsElement = document.getElementById('userPoints');
+    if (pointsElement) {
+        pointsElement.innerText = points;
+    }
 }
 
+// دالة تصفير النقاط (الحل لطلبك)
+function resetPoints() {
+    // إظهار رسالة تأكيد حتى لا تضيع النقاط بالخطأ
+    if (confirm("هل أنت متأكد من رغبتك في تصفير جميع نقاطك يا دكتور ملهم؟ 🩺")) {
+        points = 0; // تصفير المتغير
+        localStorage.removeItem('userPoints'); // مسحها من ذاكرة الجهاز
+        updatePointsDisplay(); // تحديث الشاشة فوراً
+    }
+}
 function startGraduationCountdown() {
     setInterval(() => {
         const now = new Date().getTime();
