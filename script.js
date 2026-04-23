@@ -4,6 +4,7 @@ let timeLeft;
 let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
+let endTime;
 
 // --- 2. قائمة العبارات التشجيعية ---
 const quotes = [
@@ -58,28 +59,29 @@ function toggleTimer() {
     if (!isRunning) {
         isRunning = true;
         btn.innerText = "إيقاف مؤقت";
-        btn.style.borderColor = "#ff4444";
+        
+        // حساب "وقت النهاية" الحقيقي (الوقت الحالي + الثواني المتبقية)
+        endTime = Date.now() + (timeLeft * 1000);
         
         timer = setInterval(() => {
+            // تحديث الثواني المتبقية بناءً على ساعة النظام الحقيقية
+            const now = Date.now();
+            timeLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+            
             if (timeLeft <= 0) {
                 clearInterval(timer);
                 isRunning = false;
                 btn.innerText = "ابدأ المهمة";
-                btn.style.borderColor = "var(--primary)";
-                
                 playAlarm(); 
                 addPoints(); 
                 changeQuote();
-            } else {
-                timeLeft--;
-                updateTimerDisplay();
             }
-        }, 1000);
+            updateTimerDisplay();
+        }, 100); // تحديث سريع جداً لضمان الدقة
     } else {
         clearInterval(timer);
         isRunning = false;
         btn.innerText = "استئناف";
-        btn.style.borderColor = "var(--primary)";
     }
 }
 
