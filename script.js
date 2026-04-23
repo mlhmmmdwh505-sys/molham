@@ -129,7 +129,7 @@ function buyBreak(min) {
         isRunning = false;
         timeLeft = min * 60;
         updateTimerDisplay();
-        alert(`تم شراء استراحة لمدة ${min} دقائق! ☕`);
+        alert(`تم شراء استراحة لمدة ${min} دقائق! ☕`); 
     } else {
         alert("عذراً دكتور، النقاط غير كافية! 💪");
     }
