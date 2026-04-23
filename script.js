@@ -1,11 +1,10 @@
-// --- 1. المتغيرات الأساسية واستعادة البيانات ---
+// --- 1. المتغيرات والبيانات ---
 let timer;
 let timeLeft;
 let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 
-// --- 2. قائمة العبارات التشجيعية ---
 const quotes = [
     "الطب رسالة، وأنت قدها يا دكتور ملهم! 🩺",
     "كل دقيقة مذاكرة هي خطوة نحو لقب 'جراح'. ✨",
@@ -14,14 +13,13 @@ const quotes = [
     "أدرس اليوم لتعالج غداً.. استمر يا بطل! 💉"
 ];
 
-// --- 3. تهيئة الصفحة عند التحميل ---
+// --- 2. تشغيل عند التحميل ---
 window.onload = () => {
     updatePointsDisplay();
     displayDate();
     startGraduationCountdown();
     changeQuote();
     
-    // استعادة الإعدادات المحفوظة
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
     document.getElementById('colorPicker').value = savedColor;
@@ -30,56 +28,62 @@ window.onload = () => {
     resetTimer(); 
 };
 
-// --- 4. نظام المنبه (صوت قوي) ---
+// --- 3. المنبه القوي (حل مشكلة عدم التشغيل) ---
 function playAlarm() {
     try {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const context = new AudioContext();
         const oscillator = context.createOscillator();
         const gainNode = context.createGain();
 
         oscillator.type = 'sawtooth'; 
-        oscillator.frequency.setValueAtTime(500, context.currentTime); 
-        gainNode.gain.setValueAtTime(5, context.currentTime); 
+        oscillator.frequency.setValueAtTime(880, context.currentTime); 
+        gainNode.gain.setValueAtTime(1, context.currentTime); 
 
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
 
         oscillator.start();
-        setTimeout(() => oscillator.stop(), 200); 
+        setTimeout(() => { oscillator.stop(); context.close(); }, 4000); 
     } catch (e) {
-        console.error("المتصفح منع تشغيل الصوت تلقائياً.");
+        alert("انتهى الوقت يا دكتور ملهم! 🔔");
     }
 }
 
-// --- 5. نظام التحكم في المؤقت (تشغيل / إيقاف مؤقت) ---
+// --- 4. المؤقت الذكي (مقاوم للتأخير 100%) ---
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     
     if (!isRunning) {
         isRunning = true;
         btn.innerText = "إيقاف مؤقت";
-        btn.style.borderColor = "#ff4444";
         
+        // السر هنا: بنسجل اللحظة الحالية بالمللي ثانية
+        let startTime = Date.now();
+        let initialTimeLeft = timeLeft;
+
         timer = setInterval(() => {
+            // بنحسب الفرق بين "دلوقتي" و "وقت البداية"
+            let currentTime = Date.now();
+            let elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
+            
+            timeLeft = initialTimeLeft - elapsedSeconds;
+
             if (timeLeft <= 0) {
+                timeLeft = 0;
                 clearInterval(timer);
                 isRunning = false;
                 btn.innerText = "ابدأ المهمة";
-                btn.style.borderColor = "var(--primary)";
-                
-                playAlarm(); 
-                addPoints(); 
+                playAlarm();
+                addPoints();
                 changeQuote();
-            } else {
-                timeLeft--;
-                updateTimerDisplay();
             }
-        }, 1000);
+            updateTimerDisplay();
+        }, 100); // التحديث سريع جداً عشان لو رجعت للتطبيق تلاقي الوقت اتعدل فوراً
     } else {
         clearInterval(timer);
         isRunning = false;
         btn.innerText = "استئناف";
-        btn.style.borderColor = "var(--primary)";
     }
 }
 
@@ -87,45 +91,32 @@ function resetTimer() {
     clearInterval(timer);
     isRunning = false;
     const btn = document.getElementById('startBtn');
-    if (btn) btn.innerText = "ابدأ المهمة";
-
-    const minsInput = document.getElementById('minsInput');
-    const mins = (minsInput && minsInput.value) ? minsInput.value : 25;
+    if(btn) btn.innerText = "ابدأ المهمة";
+    
+    const mins = document.getElementById('minsInput').value || 25;
     timeLeft = mins * 60;
     updateTimerDisplay();
 }
 
-// --- 6. نظام النقاط والمحل (الحسبة التي طلبتها) ---
-
+// --- 5. نظام النقاط والمتجر ---
 function addPoints() {
-    const minsInput = document.getElementById('minsInput');
-    const minsWorked = (minsInput && minsInput.value) ? parseInt(minsInput.value) : 25;
-    
-    // الدقيقة مذاكرة = 3 نقاط (الـ 25 دقيقة تعطي 75 نقطة)
-    points += (minsWorked * 3); 
+    const minsWorked = parseInt(document.getElementById('minsInput').value) || 25;
+    points += (minsWorked * 3); // دقيقة مذاكرة = 3 نقاط
     savePoints();
 }
 
 function buyBreak(min) {
-    // استراحة 5 دقائق = 75 نقطة (يعني الدقيقة بـ 15 نقطة)
-    const cost = min * 15; 
-    
+    const cost = min * 15; // 5 دقائق استراحة = 75 نقطة
     if (points >= cost) {
         points -= cost;
         savePoints();
-        
-        // تحويل المؤقت لوقت الاستراحة
         clearInterval(timer);
         isRunning = false;
         timeLeft = min * 60;
         updateTimerDisplay();
-        
-        const btn = document.getElementById('startBtn');
-        if(btn) btn.innerText = "ابدأ الاستراحة ☕";
-        
-        alert(`تم شراء استراحة لمدة ${min} دقائق.. استمتع يا دكتور!`);
+        alert(`تم شراء استراحة ${min} دقائق! استمتع ☕`);
     } else {
-        alert("عذراً دكتور، نقاطك لا تكفي! تحتاج للمذاكرة أكثر لجمع ${point} نقطة. 💪");
+        alert("نقاطك لا تكفي! ذاكر أكتر يا دكتور 💪");
     }
 }
 
@@ -135,40 +126,31 @@ function savePoints() {
 }
 
 function updatePointsDisplay() {
-    const pointsDisplay = document.getElementById('userPoints');
-    if (pointsDisplay) pointsDisplay.innerText = points;
+    document.getElementById('userPoints').innerText = points;
 }
 
 function resetPoints() {
-    if (confirm("هل تريد تصفير جميع نقاطك يا دكتور؟ 🩺")) {
+    if(confirm("تصفير النقاط؟")) {
         points = 0;
         savePoints();
     }
 }
 
-// --- 7. الدوال المساعدة ---
+// --- 6. دوال مساعدة ---
 function updateTimerDisplay() {
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
-    const display = document.getElementById('pomoDisplay');
-    if (display) {
-        display.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-    }
+    document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
 function changeQuote() {
-    const qElem = document.getElementById('motivationQuote');
-    if (qElem) {
-        qElem.innerText = quotes[Math.floor(Math.random() * quotes.length)];
-    }
+    const q = document.getElementById('motivationQuote');
+    if(q) q.innerText = quotes[Math.floor(Math.random() * quotes.length)];
 }
 
 function displayDate() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const dateDisp = document.getElementById('dateDisplay');
-    if (dateDisp) {
-        dateDisp.innerText = new Date().toLocaleDateString('ar-EG', options);
-    }
+    document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('ar-EG', options);
 }
 
 function startGraduationCountdown() {
@@ -184,7 +166,6 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
-// --- 8. حفظ الإعدادات وقائمة المهام ---
 document.getElementById('mainSaveBtn').addEventListener('click', () => {
     const newColor = document.getElementById('colorPicker').value;
     document.documentElement.style.setProperty('--primary', newColor);
@@ -196,9 +177,9 @@ document.getElementById('mainSaveBtn').addEventListener('click', () => {
 
 function addTask() {
     const input = document.getElementById('taskInput');
-    if (!input || input.value.trim() === '') return;
+    if (input.value.trim() === '') return;
     const li = document.createElement('li');
-    li.innerHTML = `<span>${input.value}</span><button onclick="this.parentElement.remove()" style="background:none!important; border:none!important; cursor:pointer;">❌</button>`;
+    li.innerHTML = `<span>${input.value}</span><button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer;">❌</button>`;
     document.getElementById('taskList').appendChild(li);
     input.value = '';
 }
