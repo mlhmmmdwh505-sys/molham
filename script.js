@@ -1,4 +1,4 @@
-// --- 1. المتغيرات والبيانات ---
+// --- 1. المتغيرات الأساسية ---
 let timer;
 let timeLeft;
 let isRunning = false;
@@ -13,7 +13,7 @@ const quotes = [
     "أدرس اليوم لتعالج غداً.. استمر يا بطل! 💉"
 ];
 
-// --- 2. تشغيل عند التحميل ---
+// --- 2. تهيئة الصفحة عند التحميل ---
 window.onload = () => {
     updatePointsDisplay();
     displayDate();
@@ -28,7 +28,7 @@ window.onload = () => {
     resetTimer(); 
 };
 
-// --- 3. المنبه القوي (حل مشكلة عدم التشغيل) ---
+// --- 3. نظام المنبه القوي ---
 function playAlarm() {
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -37,15 +37,16 @@ function playAlarm() {
         const gainNode = context.createGain();
 
         oscillator.type = 'sawtooth'; 
-        oscillator.frequency.setValueAtTime(200, context.currentTime); 
-        gainNode.gain.setValueAtTime(5, context.currentTime); 
+        oscillator.frequency.setValueAtTime(880, context.currentTime); 
+        gainNode.gain.setValueAtTime(1, context.currentTime); 
 
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
 
         oscillator.start();
-        setTimeout(() => { oscillator.stop(); context.close(); }, 200); 
+        setTimeout(() => { oscillator.stop(); context.close(); }, 4000); 
     } catch (e) {
+        console.log("Audio blocked, fallback to alert");
         alert("انتهى الوقت يا دكتور ملهم! 🔔");
     }
 }
@@ -57,16 +58,13 @@ function toggleTimer() {
     if (!isRunning) {
         isRunning = true;
         btn.innerText = "إيقاف مؤقت";
+        btn.style.borderColor = "#ff4444";
         
-        // السر هنا: بنسجل اللحظة الحالية بالمللي ثانية
         let startTime = Date.now();
         let initialTimeLeft = timeLeft;
 
         timer = setInterval(() => {
-            // بنحسب الفرق بين "دلوقتي" و "وقت البداية"
-            let currentTime = Date.now();
-            let elapsedSeconds = Math.floor((currentTime - startTime) / 1000);
-            
+            let elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
             timeLeft = initialTimeLeft - elapsedSeconds;
 
             if (timeLeft <= 0) {
@@ -74,16 +72,18 @@ function toggleTimer() {
                 clearInterval(timer);
                 isRunning = false;
                 btn.innerText = "ابدأ المهمة";
+                btn.style.borderColor = "var(--primary)";
                 playAlarm();
-                addPoints();
+                addPoints(); // هنا إضافة النقاط عند الصفر فقط
                 changeQuote();
             }
             updateTimerDisplay();
-        }, 100); // التحديث سريع جداً عشان لو رجعت للتطبيق تلاقي الوقت اتعدل فوراً
+        }, 1000);
     } else {
         clearInterval(timer);
         isRunning = false;
         btn.innerText = "استئناف";
+        btn.style.borderColor = "var(--primary)";
     }
 }
 
@@ -93,20 +93,27 @@ function resetTimer() {
     const btn = document.getElementById('startBtn');
     if(btn) btn.innerText = "ابدأ المهمة";
     
-    const mins = document.getElementById('minsInput').value || 25;
-    timeLeft = mins * 60;
+    const mins = parseFloat(document.getElementById('minsInput').value) || 25;
+    timeLeft = Math.floor(mins * 60);
     updateTimerDisplay();
 }
 
-// --- 5. نظام النقاط والمتجر ---
+// --- 5. نظام النقاط والمحل (التعديل المطلوب) ---
 function addPoints() {
-    const minsWorked = parseInt(document.getElementById('minsInput').value) || 25;
-    points += (minsWorked * 3); // دقيقة مذاكرة = 3 نقاط
+    const minsInput = document.getElementById('minsInput').value;
+    const minsWorked = parseFloat(minsInput) || 25;
+    
+    // الحسبة الصحيحة: الدقيقة = 3 نقاط
+    // لو كتبت 0.1 دقيقة (6 ثواني) هتاخد 0.3 نقطة (بتقريب الكود هتبقى نقاط بسيطة)
+    // لو كتبت 25 دقيقة هتاخد 75 نقطة
+    const newPoints = Math.floor(minsWorked * 3); 
+    points += newPoints;
+    
     savePoints();
 }
 
 function buyBreak(min) {
-    const cost = min * 15; // 5 دقائق استراحة = 75 نقطة
+    const cost = min * 15; // استراحة 5 دقائق بـ 75 نقطة (15 نقطة للدقيقة)
     if (points >= cost) {
         points -= cost;
         savePoints();
@@ -114,9 +121,9 @@ function buyBreak(min) {
         isRunning = false;
         timeLeft = min * 60;
         updateTimerDisplay();
-        alert(`تم شراء استراحة ${min} دقائق! استمتع ☕`);
+        alert(`استمتع باستراحة ${min} دقائق! ☕`);
     } else {
-        alert("نقاطك لا تكفي! ذاكر أكتر يا دكتور 💪");
+        alert("نقاطك لا تكفي يا دكتور! تحتاج مذاكرة أكتر. 💪");
     }
 }
 
