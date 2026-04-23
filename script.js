@@ -15,21 +15,43 @@ const quotes = [
 ];
 
 // --- 3. تهيئة الصفحة عند التحميل ---
+// عند تحميل الصفحة، استرجاع الاسم المحفوظ
 window.onload = () => {
-    updatePointsDisplay();
-    displayDate();
-    startGraduationCountdown();
-    changeQuote();
+    const savedName = localStorage.getItem('userName') || "ملهم ممدوح";
     
-    // استعادة الإعدادات المحفوظة
-    document.getElementById('gradDateInput').value = graduationDate;
-    const savedColor = localStorage.getItem('themeColor') || "#6366f1";
-    document.getElementById('colorPicker').value = savedColor;
+    // وضع الاسم في خانة الإدخال وفي العناوين
+    document.getElementById('userNameInput').value = savedName;
+    document.getElementById('userNameSpan').innerText = savedName;
+    document.getElementById('displayUserName').innerText = savedName.split(' ')[0]; // يأخذ الاسم الأول فقط للترحيب الصغير
+    
+    // باقي إعدادات اللون والتاريخ
+    const savedColor = localStorage.getItem('themeColor') || "#00ff00";
     document.documentElement.style.setProperty('--primary', savedColor);
+    document.getElementById('colorPicker').value = savedColor;
     
-    resetTimer(); 
+    // ... تشغيل التايمر والعد التنازلي ...
 };
 
+// عند الضغط على زر "تأكيد الإعدادات"
+document.getElementById('mainSaveBtn').addEventListener('click', () => {
+    const newName = document.getElementById('userNameInput').value;
+    
+    if (newName.trim() !== "") {
+        // حفظ الاسم في الذاكرة
+        localStorage.setItem('userName', newName);
+        
+        // تحديث النصوص في الصفحة فوراً
+        document.getElementById('userNameSpan').innerText = newName;
+        document.getElementById('displayUserName').innerText = newName.split(' ')[0];
+    }
+    
+    // حفظ اللون والتاريخ الآخرين
+    localStorage.setItem('themeColor', document.getElementById('colorPicker').value);
+    localStorage.setItem('gradDate', document.getElementById('gradDateInput').value);
+    
+    // إعادة تحميل خفيفة أو تحديث الإعدادات
+    location.reload(); 
+});
 // --- 4. نظام المنبه (صوت قوي) ---
 function playAlarm() {
     try {
