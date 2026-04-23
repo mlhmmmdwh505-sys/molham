@@ -213,3 +213,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     font-weight: bold;
     color: #ccc;
 }
+/* تصغير خانة إدخال الاسم */
+#userNameInput {
+    width: 60%; /* صغرنا العرض بدل ما كان واخد السطر كله */
+    padding: 5px 10px; /* تقليل المساحة الداخلية */
+    font-size: 0.9rem; /* تصغير الخط جوه الخانة */
+    margin-top: 5px;
+}
+
+/* تصغير سطر الترحيب */
+#welcomeText {
+    font-size: 1.1rem !important; /* تصغير حجم "مرحباً بك" */
+    color: #eee;
+    font-weight: normal;
+}
+
+/* لو عايز تصغر المسافة بين السطور */
+.setting-item {
+    margin-bottom: 10px;
+    gap: 4px;
+}
