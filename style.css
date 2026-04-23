@@ -1,29 +1,174 @@
+/* الألوان والأساسيات */
 :root { --primary: #6366f1; }
-body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; margin: 0; padding: 20px; }
-.container { max-width: 600px; margin: auto; }
 
-/* تنسيق العنوان والترحيب */
-#welcomeTitle { font-size: 1.8rem; margin-bottom: 5px; color: var(--primary); }
-#welcomeText { font-size: 1rem; color: #cbd5e1; margin-bottom: 20px; }
-#displayUserName { font-weight: bold; color: var(--primary); }
-
-.main-card { background: #1e293b; padding: 20px; border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
-.timer-display { font-size: 4rem; font-weight: bold; margin: 20px 0; color: var(--primary); }
-
-/* تنسيق خانة الاسم لتكون أصغر */
-#userNameInput {
-    width: 80%;
-    padding: 8px;
-    background: #0f172a;
-    border: 1px solid #334155;
-    border-radius: 5px;
-    color: white;
-    font-size: 0.9rem;
+body {
+    background: #020617;
+    background-image: radial-gradient(circle at center, color-mix(in srgb, var(--primary) 10%, #0f172a), #020617);
+    font-family: 'Cairo', sans-serif; color: white;
+    height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center;
+    overflow: hidden;
 }
 
-.settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; text-align: right; }
-.setting-item { display: flex; flex-direction: column; font-size: 0.85rem; }
-.save-btn { grid-column: span 2; padding: 10px; background: var(--primary); border: none; border-radius: 5px; color: white; cursor: pointer; font-weight: bold; }
-button { padding: 10px 15px; border-radius: 5px; border: 2px solid var(--primary); background: transparent; color: white; cursor: pointer; transition: 0.3s; }
-button:hover { background: var(--primary); }
-.quote { margin-top: 30px; font-style: italic; color: #94a3b8; }
+.glass-card {
+    background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px);
+    border-radius: 40px; width: 1050px; padding: 40px;
+    border: 1px solid rgba(255, 255, 255, 0.1); position: relative;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+}
+
+/* النقاط الصغيرة (يمين) */
+.mini-score {
+    position: absolute; top: 25px; right: 35px;
+    background: rgba(255, 215, 0, 0.1); padding: 6px 18px;
+    border-radius: 50px; border: 1px solid rgba(255, 215, 0, 0.3);
+    color: #ffd700; display: flex; align-items: center; gap: 12px;
+    font-weight: bold; font-size: 18px; z-index: 10;
+}
+
+.reset-mini {
+    background: none !important; border: none !important; color: #ff4444 !important;
+    cursor: pointer; font-size: 14px; opacity: 0.6; padding: 0 !important; min-width: auto !important;
+}
+.reset-mini:hover { opacity: 1; transform: scale(1.2); }
+
+.date-tag { position: absolute; top: 30px; left: 35px; font-size: 14px; color: #64748b; }
+
+/* التنسيق العام للأزرار والكبسولات */
+header { text-align: center; margin-bottom: 35px; }
+.settings-bar { display: flex; justify-content: center; gap: 20px; align-items: flex-end; }
+.input-group { display: flex; flex-direction: column; gap: 5px; font-size: 12px; color: #94a3b8; }
+
+button {
+    background: rgba(255, 255, 255, 0.05) !important; color: white !important;
+    border: 1px solid var(--primary) !important; padding: 10px 22px;
+    border-radius: 50px !important; cursor: pointer; font-weight: bold;
+    transition: 0.3s; font-family: 'Cairo'; min-width: 90px;
+}
+button:hover { background: var(--primary) !important; box-shadow: 0 0 15px var(--primary); }
+
+/* إخفاء الأسهم في الدقائق */
+input[type="number"]::-webkit-inner-spin-button, 
+input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+input[type="number"] {
+    background: rgba(255, 255, 255, 0.05); /* */
+    border: 1px solid var(--primary); /* */
+    border-radius: 50px; /* */
+    color: white; /* */
+    padding: 10px; /* */
+    text-align: center; /* */
+    width: 60px; /* */
+    
+    /* الإضافة الجديدة هنا لضبط الخط والأرقام */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+    font-weight: bold;
+    font-size: 18px;
+      unicode-bidi: plaintext;
+    direction: ltr; /* يجبر الأرقام على الظهور بالشكل الإنجليزي */
+}
+
+/* الـ Grid والمسافات */
+.dashboard-grid { display: flex; gap: 40px; }
+.side-col, .main-col { flex: 1; display: flex; flex-direction: column; gap: 35px; }
+.info-card { 
+    background: rgba(255,255,255,0.02); padding: 30px; border-radius: 35px; 
+    border: 1px solid rgba(255,255,255,0.05); text-align: center;
+}
+
+#pomoDisplay { font-size: 80px; font-weight: 800; color: var(--primary); margin-bottom: 25px; text-shadow: 0 0 20px rgba(99, 102, 241, 0.3); }
+.pomo-actions { display: flex; justify-content: center; gap: 15px; }
+
+/* خانة المهام الطويلة جداً */
+.input-section { display: flex; gap: 15px; margin-bottom: 20px; width: 100%; }
+.input-section input {
+    flex: 4; background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    padding: 12px 25px; border-radius: 50px !important; color: white; outline: none;
+}
+.input-section input:focus { border-color: var(--primary) !important; }
+.btn-add { flex: 1; font-size: 22px; padding: 0 !important; height: 48px; }
+
+/* قائمة المهام */
+ul { list-style: none; padding: 0; max-height: 150px; overflow-y: auto; text-align: right; }
+li { background: rgba(255,255,255,0.03); padding: 12px 20px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+
+.modern-timer { display: flex; justify-content: space-around; margin-top: 15px; }
+.unit span { font-size: 32px; font-weight: 800; color: var(--primary); display: block; }
+.unit label { font-size: 12px; color: #64748b; }
+
+.store-grid { display: flex; gap: 10px; margin-top: 15px; }
+.item { flex: 1; background: rgba(34, 197, 94, 0.05); padding: 12px; border-radius: 20px; cursor: pointer; border: 1px solid transparent; transition: 0.3s; }
+.item:hover { border-color: #22c55e; background: rgba(34, 197, 94, 0.1); transform: scale(1.05); }
+/* أضف هذا التنسيق لخانة التاريخ */
+input[type="date"] {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--primary);
+    border-radius: 50px;
+    color: white;
+    padding: 8px 15px;
+    font-family: 'Cairo', sans-serif;
+    outline: none;
+    cursor: pointer;
+}
+/* --- كود منع الرعشة وتثبيت الأرقام --- */
+#years, #days, #hours, #pomoDisplay, .unit span, .minutes-display, .item span {
+    font-family: 'Orbitron', sans-serif !important;
+    direction: ltr !important; 
+    unicode-bidi: bidi-override !important;
+    display: inline-block;
+    
+    /* السطرين دول بيخلوا الأرقام ثابتة ومستقيمة */
+    font-variant-numeric: tabular-nums; 
+    min-width: 1.5ch; 
+    text-align: center;
+}
+
+/* تثبيت مساحة عداد المذاكرة الكبير */
+#pomoDisplay {
+    min-width: 180px; 
+    text-align: center;
+}
+/* لتحسين مظهر أيقونة التقويم داخل الخانة */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1); /* يجعل الأيقونة بيضاء لتناسب الستايل الغامق */
+    cursor: pointer;
+}
+/* --- تنسيق خانة اختيار اللون (إزالة المربع الأبيض) --- */
+#colorPicker {
+    -webkit-appearance: none; /* إزالة الشكل الافتراضي للمتصفح */
+    -moz-appearance: none;
+    appearance: none;
+    width: 60px;
+    height: 35px;
+    background-color: transparent; /* إزالة الخلفية البيضاء الأساسية */
+    border: 1px solid var(--primary); /* جعل الإطار بنفس لون السيم */
+    border-radius: 50px; /* جعل الحواف مستديرة لتناسب التصميم */
+    cursor: pointer;
+    padding: 0;
+    overflow: hidden;
+    vertical-align: middle;
+}
+
+/* أهم جزء: إزالة الفراغ الأبيض الداخلي في متصفحات Chrome و Edge */
+#colorPicker::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+#colorPicker::-webkit-color-swatch {
+    border: none;
+    border-radius: 0; /* لجعل اللون يملأ الخانة بالكامل */
+}
+
+/* إزالة الفراغ لمستخدمي Firefox */
+#colorPicker::-moz-color-swatch {
+    border: none;
+}
+
+/* --- تعديل إضافي لضمان محاذاة العناصر في settings-bar --- */
+.setting-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #94a3b8;
+    font-size: 14px;
+}
