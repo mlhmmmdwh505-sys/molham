@@ -6,7 +6,7 @@ let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem(
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 
 const quotes = [
-    "الطب رسالة، وأنت قدها يا دكتور ملهم! 🩺",
+    "الطب رسالة، وأنت قدها يا دكتور! 🩺",
     "كل دقيقة مذاكرة هي خطوة نحو لقب 'جراح'. ✨",
     "تذكر دائماً لماذا بدأت.. العالم ينتظر مهاراتك. 🌍",
     "المعاناة مؤقتة، لكن اللقب أبدي. 💪",
@@ -15,13 +15,16 @@ const quotes = [
 
 // --- 2. تهيئة الصفحة عند التحميل ---
 window.onload = () => {
+    // استعادة الاسم
+    const savedName = localStorage.getItem('userName') || "ملهم ممدوح";
+    document.getElementById('userNameInput').value = savedName;
+    document.getElementById('welcomeTitle').innerText = `لوحة تحكم د. ${savedName} 🩺`;
+
     updatePointsDisplay();
     displayDate();
-    startGraduationCountdown();
     changeQuote();
-    const savedName = localStorage.getItem('userName') || "ملهم ممدوح";
-document.getElementById('userNameInput').value = savedName;
-document.getElementById('welcomeTitle').innerText = `لوحة تحكم د. ${savedName} 🩺`;
+    
+    // استعادة اللون والتاريخ
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
     document.getElementById('colorPicker').value = savedColor;
@@ -39,17 +42,16 @@ function playAlarm() {
         const gainNode = context.createGain();
 
         oscillator.type = 'sawtooth'; 
-        oscillator.frequency.setValueAtTime(500, context.currentTime); 
+        oscillator.frequency.setValueAtTime(880, context.currentTime); 
         gainNode.gain.setValueAtTime(1, context.currentTime); 
 
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
 
         oscillator.start();
-        setTimeout(() => { oscillator.stop(); context.close(); }, 500); 
+        setTimeout(() => { oscillator.stop(); context.close(); }, 4000); 
     } catch (e) {
-        console.log("Audio blocked, fallback to alert");
-        alert("انتهى الوقت يا دكتور ملهم! 🔔");
+        alert("انتهى الوقت يا دكتور! 🔔");
     }
 }
 
@@ -60,7 +62,6 @@ function toggleTimer() {
     if (!isRunning) {
         isRunning = true;
         btn.innerText = "إيقاف مؤقت";
-        btn.style.borderColor = "#ff4444";
         
         let startTime = Date.now();
         let initialTimeLeft = timeLeft;
@@ -74,9 +75,8 @@ function toggleTimer() {
                 clearInterval(timer);
                 isRunning = false;
                 btn.innerText = "ابدأ المهمة";
-                btn.style.borderColor = "var(--primary)";
                 playAlarm();
-                addPoints(); // هنا إضافة النقاط عند الصفر فقط
+                addPoints(); 
                 changeQuote();
             }
             updateTimerDisplay();
@@ -85,7 +85,6 @@ function toggleTimer() {
         clearInterval(timer);
         isRunning = false;
         btn.innerText = "استئناف";
-        btn.style.borderColor = "var(--primary)";
     }
 }
 
@@ -100,22 +99,17 @@ function resetTimer() {
     updateTimerDisplay();
 }
 
-// --- 5. نظام النقاط والمحل (التعديل المطلوب) ---
+// --- 5. نظام النقاط والمتجر (دقيقة=3ن | 5د راحة=75ن) ---
 function addPoints() {
-    const minsInput = document.getElementById('minsInput').value;
-    const minsWorked = parseFloat(minsInput) || 25;
-    
-    // الحسبة الصحيحة: الدقيقة = 3 نقاط
-    // لو كتبت 0.1 دقيقة (6 ثواني) هتاخد 0.3 نقطة (بتقريب الكود هتبقى نقاط بسيطة)
-    // لو كتبت 25 دقيقة هتاخد 75 نقطة
-    const newPoints = Math.floor(minsWorked * 3); 
-    points += newPoints;
-    
+    const minsWorked = parseFloat(document.getElementById('minsInput').value) || 25;
+    // الحسبة: الدقيقة بـ 3 نقاط (الـ 25 دقيقة تعطيك 75 نقطة)
+    const earned = Math.floor(minsWorked * 3);
+    points += earned;
     savePoints();
 }
 
 function buyBreak(min) {
-    const cost = min * 15; // استراحة 5 دقائق بـ 75 نقطة (15 نقطة للدقيقة)
+    const cost = min * 15; // الـ 5 دقائق بـ 75 نقطة
     if (points >= cost) {
         points -= cost;
         savePoints();
@@ -123,9 +117,9 @@ function buyBreak(min) {
         isRunning = false;
         timeLeft = min * 60;
         updateTimerDisplay();
-        alert(`استمتع باستراحة ${min} دقائق! ☕`);
+        alert(`تم شراء استراحة ${min} دقائق.. استمتع يا دكتور! ☕`);
     } else {
-        alert("نقاطك لا تكفي يا دكتور! تحتاج مذاكرة أكتر. 💪");
+        alert("عذراً، نقاطك لا تكفي! تحتاج لـ 75 نقطة لشراء 5 دقائق. 💪");
     }
 }
 
@@ -139,13 +133,34 @@ function updatePointsDisplay() {
 }
 
 function resetPoints() {
-    if(confirm("تصفير النقاط؟")) {
+    if(confirm("هل تريد تصفير النقاط؟")) {
         points = 0;
         savePoints();
     }
 }
 
-// --- 6. دوال مساعدة ---
+// --- 6. الإعدادات العامة وحفظ الاسم ---
+document.getElementById('mainSaveBtn').addEventListener('click', () => {
+    // حفظ اللون والتاريخ
+    const newColor = document.getElementById('colorPicker').value;
+    document.documentElement.style.setProperty('--primary', newColor);
+    localStorage.setItem('themeColor', newColor);
+    
+    graduationDate = document.getElementById('gradDateInput').value;
+    localStorage.setItem('gradDate', graduationDate);
+
+    // حفظ وتحديث الاسم
+    const newName = document.getElementById('userNameInput').value;
+    if (newName.trim() !== "") {
+        localStorage.setItem('userName', newName);
+        document.getElementById('welcomeTitle').innerText = `لوحة تحكم د. ${newName} 🩺`;
+    }
+
+    if (!isRunning) resetTimer();
+    alert("تم حفظ جميع التعديلات! ✨");
+});
+
+// --- 7. دوال مساعدة ---
 function updateTimerDisplay() {
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
@@ -160,35 +175,4 @@ function changeQuote() {
 function displayDate() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString('ar-EG', options);
-}
-
-function startGraduationCountdown() {
-    setInterval(() => {
-        const now = new Date().getTime();
-        const gap = new Date(graduationDate).getTime() - now;
-        if (gap > 0) {
-            const second = 1000, minute = second * 60, hour = minute * 60, day = hour * 24, year = day * 365;
-            document.getElementById('years').innerText = Math.floor(gap / year);
-            document.getElementById('days').innerText = Math.floor((gap % year) / day);
-            document.getElementById('hours').innerText = Math.floor((gap % day) / hour);
-        }
-    }, 1000);
-}
-
-document.getElementById('mainSaveBtn').addEventListener('click', () => {
-    const newColor = document.getElementById('colorPicker').value;
-    document.documentElement.style.setProperty('--primary', newColor);
-    localStorage.setItem('themeColor', newColor);
-    graduationDate = document.getElementById('gradDateInput').value;
-    localStorage.setItem('gradDate', graduationDate);
-    if (!isRunning) resetTimer();
-});
-
-function addTask() {
-    const input = document.getElementById('taskInput');
-    if (input.value.trim() === '') return;
-    const li = document.createElement('li');
-    li.innerHTML = `<span>${input.value}</span><button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer;">❌</button>`;
-    document.getElementById('taskList').appendChild(li);
-    input.value = '';
 }
