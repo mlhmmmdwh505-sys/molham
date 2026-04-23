@@ -19,7 +19,9 @@ window.onload = () => {
     displayDate();
     startGraduationCountdown();
     changeQuote();
-    
+    const savedName = localStorage.getItem('userName') || "ملهم ممدوح";
+document.getElementById('userNameInput').value = savedName;
+document.getElementById('welcomeTitle').innerText = `لوحة تحكم د. ${savedName} 🩺`;
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
     document.getElementById('colorPicker').value = savedColor;
