@@ -37,14 +37,14 @@ function playAlarm() {
         const gainNode = context.createGain();
 
         oscillator.type = 'sawtooth'; 
-        oscillator.frequency.setValueAtTime(880, context.currentTime); 
-        gainNode.gain.setValueAtTime(1, context.currentTime); 
+        oscillator.frequency.setValueAtTime(200, context.currentTime); 
+        gainNode.gain.setValueAtTime(5, context.currentTime); 
 
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
 
         oscillator.start();
-        setTimeout(() => { oscillator.stop(); context.close(); }, 4000); 
+        setTimeout(() => { oscillator.stop(); context.close(); }, 200); 
     } catch (e) {
         alert("انتهى الوقت يا دكتور ملهم! 🔔");
     }
