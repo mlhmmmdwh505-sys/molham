@@ -172,3 +172,44 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: #94a3b8;
     font-size: 14px;
 }
+
+/* تنسيق العنوان الرئيسي (الاسم فوق) */
+#welcomeTitle {
+    font-size: 2.2rem;
+    color: var(--primary); /* هيستخدم اللون اللي أنت بتختاره من الإعدادات */
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3); /* ظل خفيف عشان يبرز النص */
+    font-weight: bold;
+    transition: all 0.3s ease; /* أنيميشن ناعم لما اللون يتغير */
+}
+
+/* تنسيق خانة إدخال الاسم في الإعدادات */
+#userNameInput {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #333;
+    border-radius: 8px;
+    background-color: #1a1a1a;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#userNameInput:focus {
+    border-color: var(--primary); /* اللون يتغير لما تيجي تكتب */
+}
+
+/* تنسيق قسم الإعدادات عشان يكون الاسم واضح */
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.setting-item label {
+    font-weight: bold;
+    color: #ccc;
+}
