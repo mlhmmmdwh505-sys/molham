@@ -172,17 +172,3 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: #94a3b8;
     font-size: 14px;
 }
-/* تنسيق خانة الاسم لتكون واضحة وجذابة */
-#userNameInput {
-    background: #0b141a;
-    border: 1px solid #333;
-    color: white;
-    border-radius: 15px;
-    padding: 5px 12px;
-    width: 120px; /* عرض مناسب للمربع */
-    outline: none;
-}
-
-#userNameInput:focus {
-    border-color: var(--primary);
-}
