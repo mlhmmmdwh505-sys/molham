@@ -99,7 +99,7 @@ function resetTimer() {
 }
 
 // --- 5. نظام النقاط والمتجر ---
-function addPoints() {
+function addPoints(minsWorked) {
     const minsWorked = parseInt(document.getElementById('minsInput').value) || 25;
     points += (minsWorked * 3); // دقيقة مذاكرة = 3 نقاط
     savePoints();
