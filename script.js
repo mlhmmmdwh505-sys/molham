@@ -31,22 +31,40 @@ window.onload = () => {
 // --- 3. نظام المنبه القوي ---
 function playAlarm() {
     try {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
+        // إنشاء سياق صوتي
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const context = new AudioContext();
+        
+        // استئناف السياق في حال كان المتصفح وضعه في حالة "تعليق"
+        if (context.state === 'suspended') {
+            context.resume();
+        }
+
         const oscillator = context.createOscillator();
         const gainNode = context.createGain();
 
-        oscillator.type = 'sawtooth'; 
-        oscillator.frequency.setValueAtTime(880, context.currentTime); 
-        gainNode.gain.setValueAtTime(1, context.currentTime); 
-
+        oscillator.type = 'sawtooth'; // نغمة حادة جداً ومنبهة
+        oscillator.frequency.setValueAtTime(100, context.currentTime); // تردد مرتفع مسموع
+        
+        gainNode.gain.setValueAtTime(3, context.currentTime); // أقصى مستوى صوت
+        
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
 
         oscillator.start();
-        setTimeout(() => oscillator.stop(), 3000); 
-    } catch (e) { console.log("Audio Blocked"); }
-}
+        
+        // المنبه سيستمر لمدة 4 ثوانٍ
+        setTimeout(() => {
+            oscillator.stop();
+            context.close();
+        }, 200); 
 
+    } catch (e) {
+        console.error("فشل تشغيل الصوت: ", e);
+        // حل بديل في حال فشل الصوت البرمجي:
+        alert("انتهى الوقت يا دكتور ملهم! 🔔");
+    }
+}
 // --- 4. التحكم في المؤقت (مقاوم للتأخير) ---
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
