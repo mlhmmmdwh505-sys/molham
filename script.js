@@ -44,7 +44,7 @@ function playAlarm() {
         gainNode.connect(context.destination);
 
         oscillator.start();
-        setTimeout(() => { oscillator.stop(); context.close(); }, 200); 
+        setTimeout(() => { oscillator.stop(); context.close(); }, 500); 
     } catch (e) {
         console.log("Audio blocked, fallback to alert");
         alert("انتهى الوقت يا دكتور ملهم! 🔔");
