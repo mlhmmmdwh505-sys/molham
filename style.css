@@ -172,22 +172,3 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: #94a3b8;
     font-size: 14px;
 }
-/* تنسيق زر اللغة */
-.lang-btn {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    font-size: 12px;
-    min-width: 70px !important;
-    margin-left: 10px;
-}
-
-/* لضمان تغير الاتجاه بسلاسة */
-[dir="ltr"] .mini-score {
-    right: auto;
-    left: 20px;
-}
-
-[dir="ltr"] .date-tag {
-    left: auto;
-    right: 20px;
-}
