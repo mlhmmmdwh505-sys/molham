@@ -103,7 +103,7 @@ function addPoints() {
 }
 
 function buyBreak(min) {
-    const cost = min * 0; // الاستراحة الـ 5 دقائق بـ 75 نقطة
+    const cost = min * 15; // الاستراحة الـ 5 دقائق بـ 75 نقطة
     
     if (points >= cost) {
         points -= cost;
