@@ -182,3 +182,60 @@ function addTask() {
     document.getElementById('taskList').appendChild(li);
     input.value = '';
 }
+// 1. تعريف النصوص
+const translations = {
+    ar: {
+        title: "لوحة تحكم د. ملهم ممدوح 🩺",
+        welcome: "مرحباً بك، دكتور ملهم ✨",
+        saveBtn: "تأكيد الإعدادات",
+        gradTitle: "⏳ حلم التخرج",
+        years: "سنة", days: "يوم", hours: "ساعة",
+        storeTitle: "☕ متجر الطاقة",
+        startBtn: "ابدأ المهمة",
+        resetBtn: "إعادة ضبط",
+        taskPlaceholder: "أضف مهمة طبية جديدة..."
+    },
+    en: {
+        title: "Dr. Molham's Dashboard 🩺",
+        welcome: "Welcome, Dr. Molham ✨",
+        saveBtn: "Save Settings",
+        gradTitle: "⏳ Graduation Dream",
+        years: "Years", days: "Days", hours: "Hours",
+        storeTitle: "☕ Energy Store",
+        startBtn: "Start Mission",
+        resetBtn: "Reset",
+        taskPlaceholder: "Add new medical task..."
+    }
+};
+
+let currentLang = localStorage.getItem('lang') || 'ar';
+
+// 2. دالة التبديل
+function toggleLanguage() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    localStorage.setItem('lang', currentLang);
+    applyLanguage();
+}
+
+// 3. دالة التطبيق
+function applyLanguage() {
+    const t = translations[currentLang];
+    const isAr = currentLang === 'ar';
+    
+    // تغيير اتجاه الصفحة
+    document.documentElement.dir = isAr ? 'rtl' : 'ltr';
+    document.documentElement.lang = currentLang;
+    
+    // تحديث النصوص
+    document.getElementById('welcomeTitle').innerText = isAr ? `لوحة تحكم د. ${userName} 🩺` : `Dr. ${userName}'s Dashboard 🩺`;
+    document.querySelector('.welcome-msg').innerText = isAr ? `مرحباً بك، دكتور ${userName} ✨` : `Welcome, Dr. ${userName} ✨`;
+    document.getElementById('mainSaveBtn').innerText = t.saveBtn;
+    document.querySelector('.info-card h3').innerText = t.gradTitle;
+    document.getElementById('startBtn').innerText = t.startBtn;
+    document.getElementById('taskInput').placeholder = t.taskPlaceholder;
+    
+    // تحديث لغة زر التبديل نفسه
+    document.getElementById('langToggle').innerText = isAr ? "English" : "العربية";
+}
+
+// أضف applyLanguage() داخل window.onload لتعمل عند فتح الصفحة
