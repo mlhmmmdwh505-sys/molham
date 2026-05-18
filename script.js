@@ -191,9 +191,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
     
     if (!isRunning) resetTimer();
     
-    // التعديل الصحيح للقوس هنا:
-    alert("تم حفظ وتأكيد الإعدادات والاسم بنجاح! 🩺");
-});
+    // التعديل الصحيح للقوس هنا:});
 });
 
 // --- 7. نظام إدارة المهام (To-Do List) ---
