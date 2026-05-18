@@ -58,23 +58,36 @@ const i18n = {
 // --- 2. تهيئة وتطبيق اللغة والمظهر ---
 window.onload = () => {
     updatePointsDisplay();
-    displayDate();
     startGraduationCountdown();
     renderTasks();
     
-    // جلب الإعدادات المحفوظة
-    const savedName = localStorage.getItem('userName') || "ملهم";
+    // جلب وتطبيق اللغة المحفوظة أولاً
+    currentLang = localStorage.getItem('userLang') || "ar";
+    document.getElementById('langSelect').value = currentLang;
+    applyLanguage(currentLang);
+    displayDate();
+    
+    // جلب وعرض الاسم المحفوظ
+    const savedName = localStorage.getItem('userName') || (currentLang === 'ar' ? "ملهم" : "Molham");
     document.getElementById('userNameInput').value = savedName;
     
+    const trans = i18n[currentLang];
+    document.getElementById('userNameDisplay').innerText = currentLang === 'ar' ? `دكتور ${savedName}` : `Dr. ${savedName}`;
+    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${currentLang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}</span> 🩺`;
+    
+    // جلب وعرض الدقائق المحفوظة
+    const savedMins = localStorage.getItem('userMins') || "25";
+    document.getElementById('minsInput').value = savedMins;
+    
+    // جلب التاريخ واللون
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
     document.getElementById('colorPicker').value = savedColor;
     document.documentElement.style.setProperty('--primary', savedColor);
     
-    document.getElementById('langSelect').value = currentLang;
-    applyLanguage(currentLang); // تطبيق اللغة المحفوظة فوراً
-    
-    resetTimer(); 
+    // ضبط الوقت بناءً على الدقائق المحفوظة
+    timeLeft = parseInt(savedMins) * 60;
+    updateTimerDisplay();
     
     document.getElementById('taskInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') addTask();
