@@ -214,3 +214,21 @@ input[type="text"]:focus, select:focus {
     width: 110px !important;
     padding-right: 10px !important;
 }
+/* استبدل .tasks-container باسم الكلاس الخاص بصندوق المهام عندك */
+.tasks-container {
+    /* السماح بالتمرير الداخلي للمهام */
+    overflow-y: auto; 
+    overflow-x: hidden;
+
+    /* 1. إخفاء شريط التمرير في متصفحات كروم، إيدج، وسفاري (جوجل وأبل) */
+    &::-webkit-scrollbar {
+        width: 0px;
+        background: transparent;
+    }
+
+    /* 2. إخفاء شريط التمرير في متصفح فايرفوكس */
+    scrollbar-width: none;
+
+    /* 3. إخفاء شريط التمرير في متصفحات إنترنت إكسبلورر القديمة */
+    -ms-overflow-style: none; 
+}
