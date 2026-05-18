@@ -6,8 +6,8 @@ let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem(
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 
 const quotes = [
-    "الطب رسالة، وأنت قدها يا دكتور ملهم! 🩺",
-    "كل دقيقة مذاكرة هي خطوة نحو لقب 'جراح'. ✨",
+    "الطب رسالة، وأنت قدها! 🩺",
+    "كل دقيقة مذاكرة هي خطوة نحو لقب كبيير. ✨",
     "تذكر دائماً لماذا بدأت.. العالم ينتظر مهاراتك. 🌍",
     "المعاناة مؤقتة، لكن اللقب أبدي. 💪",
     "أدرس اليوم لتعالج غداً.. استمر يا بطل! 💉",
@@ -15,12 +15,18 @@ const quotes = [
     "لا مستحيل مع العمل .💪🏼"
 ];
 
-// --- 2. تهيئة الصفحة ---
+// --- 2. تهيئة الصفحة عند الفتح ---
 window.onload = () => {
     updatePointsDisplay();
     displayDate();
     startGraduationCountdown();
     changeQuote();
+    renderTasks();
+    
+    // جلب وعرض اسم المستخدم المحفوظ
+    const savedName = localStorage.getItem('userName') || "دكتور ملهم";
+    document.getElementById('userNameDisplay').innerText = savedName;
+    document.getElementById('userNameInput').value = savedName;
     
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
@@ -28,6 +34,10 @@ window.onload = () => {
     document.documentElement.style.setProperty('--primary', savedColor);
     
     resetTimer(); 
+    
+    document.getElementById('taskInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') addTask();
+    });
 };
 
 // --- 3. نظام المنبه القوي ---
@@ -49,7 +59,7 @@ function playAlarm() {
     } catch (e) { console.log("Audio Blocked"); }
 }
 
-// --- 4. التحكم في المؤقت (مقاوم للتأخير) ---
+// --- 4. التحكم في المؤقت ---
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     
@@ -57,12 +67,10 @@ function toggleTimer() {
         isRunning = true;
         btn.innerText = "إيقاف مؤقت";
         
-        // تسجيل وقت البداية الحقيقي من ساعة النظام
         let startTime = Date.now();
         let initialTimeLeft = timeLeft;
 
         timer = setInterval(() => {
-            // حساب الفرق الزمني الفعلي
             let elapsed = Math.floor((Date.now() - startTime) / 1000);
             timeLeft = initialTimeLeft - elapsed;
 
@@ -95,27 +103,25 @@ function resetTimer() {
     updateTimerDisplay();
 }
 
-// --- 5. نظام النقاط والمتجر (دقيقة=3ن | 5د استراحة=75ن) ---
+// --- 5. نظام النقاط والمتجر ---
 function addPoints() {
     const minsWorked = parseInt(document.getElementById('minsInput').value) || 25;
-    points += (minsWorked * 3);  // الدقيقة بـ 3 نقاط
+    points += (minsWorked * 3);  
     savePoints();
 }
 
 function buyBreak(min) {
-    const cost = min * 15; // الاستراحة الـ 5 دقائق بـ 75 نقطة
-    
+    const cost = min * 15; 
     if (points >= cost) {
         points -= cost;
         savePoints();
-        
         clearInterval(timer);
         isRunning = false;
         timeLeft = min * 60;
         updateTimerDisplay();
         alert(`تم شراء استراحة لمدة ${min} دقائق! ☕`);
     } else {
-        alert("عذراً دكتور، النقاط غير كافية! 💪");
+        alert("عذراً، النقاط غير كافية! 💪");
     }
 }
 
@@ -135,7 +141,7 @@ function resetPoints() {
     }
 }
 
-// --- 6. الدوال المساعدة ---
+// --- 6. الدوال المساعدة والعد التنازلي ---
 function updateTimerDisplay() {
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
@@ -165,20 +171,65 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
+// حفظ الإعدادات بالكامل بما فيها الاسم
 document.getElementById('mainSaveBtn').addEventListener('click', () => {
+    // حفظ الاسم وتحديث الشاشة فوراً
+    const newName = document.getElementById('userNameInput').value.trim() || "دكتور ملهم";
+    localStorage.setItem('userName', newName);
+    document.getElementById('userNameDisplay').innerText = newName;
+
+    // حفظ باقي الإعدادات القديمة
     const newColor = document.getElementById('colorPicker').value;
     document.documentElement.style.setProperty('--primary', newColor);
     localStorage.setItem('themeColor', newColor);
     graduationDate = document.getElementById('gradDateInput').value;
     localStorage.setItem('gradDate', graduationDate);
     if (!isRunning) resetTimer();
+    
+    alert("تم حفظ وتأكيد الإعدادات والاسم بنجاح! 🩺");
 });
 
+// --- 7. نظام إدارة المهام (To-Do List) ---
 function addTask() {
     const input = document.getElementById('taskInput');
-    if (input.value.trim() === '') return;
-    const li = document.createElement('li');
-    li.innerHTML = `<span>${input.value}</span><button onclick="this.parentElement.remove()" style="background:none; border:none; cursor:pointer;">❌</button>`;
-    document.getElementById('taskList').appendChild(li);
+    const text = input.value.trim();
+    if (text === '') return;
+    
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    tasks.push({ text: text, done: false });
+    
+    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
     input.value = '';
+    renderTasks();
+}
+
+function toggleTask(index) {
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    tasks[index].done = !tasks[index].done;
+    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
+    renderTasks();
+}
+
+function deleteTask(index) {
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    tasks.splice(index, 1);
+    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
+    renderTasks();
+}
+
+function renderTasks() {
+    const taskList = document.getElementById('taskList');
+    taskList.innerHTML = '';
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    
+    tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+            <span style="cursor:pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
+                ${task.done ? '✅' : '⭕'} ${task.text}
+            </span>
+            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width:auto !important; background:none !important; border:none !important;">❌</button>
+        `;
+        taskList.appendChild(li);
+    });
 }
