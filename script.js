@@ -175,8 +175,6 @@ document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
         timeLeft = newMins * 60;
         updateTimerDisplay();
     }
-    
-    alert(trans.alertSave);
 });
 
 // --- 5. نظام المنبه والمؤقت الذكي ---
