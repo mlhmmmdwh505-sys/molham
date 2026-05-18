@@ -24,9 +24,11 @@ window.onload = () => {
     renderTasks();
     
     // جلب وعرض اسم المستخدم المحفوظ
-    const savedName = localStorage.getItem('userName') || "دكتور ملهم";
-    document.getElementById('userNameDisplay').innerText = savedName;
-    document.getElementById('userNameInput').value = savedName;
+    // جلب وعرض الاسم المحفوظ عند فتح الصفحة
+const savedName = localStorage.getItem('userName') || "ملهم";
+document.getElementById('userNameDisplay').innerText = `دكتور ${savedName}`;
+document.getElementById('mainTitleName').innerText = `دكتور ${savedName}`; // عرض الاسم في العنوان الكبير
+document.getElementById('userNameInput').value = savedName;
     
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
