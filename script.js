@@ -266,28 +266,47 @@ function startGraduationCountdown() {
 }
 
 // زر الحفظ الرئيسي
+// --- تحديث دالة حفظ الإعدادات الرئيسية ---
 document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
-    e.preventDefault();
+    e.preventDefault(); // منع الريفريش التلقائي اللي بيطير البيانات
     
-    // 1. حفظ الاسم وتحديثه
-    const newName = document.getElementById('userNameInput').value.trim() || "ملهم";
-    localStorage.setItem('userName', newName);
+    // 1. حفظ وتحديث اللغة
+    const selectedLang = document.getElementById('langSelect').value;
+    currentLang = selectedLang;
+    localStorage.setItem('userLang', selectedLang);
+    applyLanguage(selectedLang);
+    displayDate(); // تحديث لغة التاريخ فوق على الشمال
 
-    // 2. حفظ المظهر والتاريخ
+    // 2. حفظ وتحديث الاسم (في العنوان ورسالة الترحيب)
+    const userNameInput = document.getElementById('userNameInput');
+    const newName = userNameInput.value.trim() || (selectedLang === 'ar' ? "ملهم" : "Molham");
+    localStorage.setItem('userName', newName);
+    
+    const trans = i18n[selectedLang];
+    document.getElementById('welcomeWord').innerText = trans.welcome;
+    document.getElementById('userNameDisplay').innerText = selectedLang === 'ar' ? `دكتور ${newName}` : `Dr. ${newName}`;
+    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${selectedLang === 'ar' ? 'دكتور' : 'Dr.'} ${newName}</span> 🩺`;
+
+    // 3. حفظ وتحديث الدقائق للتايمر
+    const minsInput = document.getElementById('minsInput');
+    const newMins = parseInt(minsInput.value) || 25;
+    localStorage.setItem('userMins', newMins); // حفظ الدقائق في الكاش
+
+    // 4. حفظ المظهر والتاريخ
     const newColor = document.getElementById('colorPicker').value;
     document.documentElement.style.setProperty('--primary', newColor);
     localStorage.setItem('themeColor', newColor);
+    
     graduationDate = document.getElementById('gradDateInput').value;
     localStorage.setItem('gradDate', graduationDate);
     
-    // 3. حفظ وتطبيق اللغة المحددة من الـ Select
-    const selectedLang = document.getElementById('langSelect').value;
-    applyLanguage(selectedLang);
-    displayDate(); // إعادة تهيئة التاريخ حسب اللغة الجديدة
+    // تطبيق الدقائق الجديدة فوراً على التايمر لو مش شغال
+    if (!isRunning) {
+        timeLeft = newMins * 60;
+        updateTimerDisplay();
+    }
     
-    if (!isRunning) resetTimer();
-    
-    alert(i18n[currentLang].alertSave);
+    alert(trans.alertSave);
 });
 
 // --- 6. نظام إدارة المهام (To-Do List) ---
@@ -321,7 +340,7 @@ function renderTasks() {
         const li = document.createElement('li');
         li.innerHTML = `
             <span style="cursor:pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
-                ${task.done ? '✅' : '⭕'} ${task.text}
+                ${task.done ? '✅' : '✅'} ${task.text}
             </span>
             <button onclick="deleteTask(${index})" class="reset-mini" style="min-width:auto !important; background:none !important; border:none !important;">❌</button>
         `;
