@@ -4,7 +4,7 @@ let timeLeft;
 let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
-let currentLang = localStorage.getItem('userLang') || "ar"; // اللغة الافتراضية
+let currentLang = localStorage.getItem('userLang') || "ar"; 
 
 const quotes = {
     ar: [
@@ -25,7 +25,7 @@ const quotes = {
     ]
 };
 
-// قاموس الترجمة لجميع عناصر اللوحة
+// قاموس الترجمة الكامل المتوافق مع الـ HTML
 const i18n = {
     ar: {
         welcome: "مرحباً بك،",
@@ -44,7 +44,7 @@ const i18n = {
         welcome: "Welcome,",
         mainTitle: "Dashboard of ",
         langLabel: "Lang", nameLabel: "Name", colorLabel: "Color", dateLabel: "Date", minsLabel: "Mins",
-        saveBtn: "Confirm", countdownTitle: "⏳ Graduation Dream",
+        saveBtn: "Confirm Settings", countdownTitle: "⏳ Graduation Dream",
         years: "Years", days: "Days", hours: "Hours",
         storeTitle: "☕ Energy Store 1m = 15p",
         break5: "5 Min = <small>75p</small>", break10: "10 Min = <small>150p</small>", break15: "15 Min = <small>225p</small>",
@@ -55,7 +55,7 @@ const i18n = {
     }
 };
 
-// --- 2. تهيئة وتطبيق اللغة والمظهر ---
+// --- 2. دالة تهيئة الصفحة وتشغيلها عند الفتح ---
 window.onload = () => {
     updatePointsDisplay();
     startGraduationCountdown();
@@ -79,7 +79,7 @@ window.onload = () => {
     const savedMins = localStorage.getItem('userMins') || "25";
     document.getElementById('minsInput').value = savedMins;
     
-    // جلب التاريخ واللون
+    // جلب التاريخ واللون المحفوظين
     document.getElementById('gradDateInput').value = graduationDate;
     const savedColor = localStorage.getItem('themeColor') || "#6366f1";
     document.getElementById('colorPicker').value = savedColor;
@@ -94,21 +94,20 @@ window.onload = () => {
     });
 };
 
+// --- 3. دالة تطبيق وترجمة اللغة ---
 function applyLanguage(lang) {
     currentLang = lang;
     localStorage.setItem('userLang', lang);
     
-    // تغيير اتجاه ونوع لغة الـ HTML
-    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">Dr. ${savedName}</span> 🩺`;
-document.getElementById('userNameDisplay').innerText = `Dr. ${savedName}`;
+    document.documentElement.setAttribute('lang', lang);
+    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
     
-    // ترجمة النصوص الثابتة في الصفحة
     const trans = i18n[lang];
-    const savedName = localStorage.getItem('userName') || "ملهم";
+    const savedName = localStorage.getItem('userName') || (lang === 'ar' ? "ملهم" : "Molham");
     
     document.getElementById('welcomeWord').innerText = trans.welcome;
-    document.getElementById('mainTitleName').innerText = `دكتور ${savedName}`;
-    document.getElementById('userNameDisplay').innerText = `دكتور ${savedName}`;
+    document.getElementById('mainTitleName').innerText = `${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}`;
+    document.getElementById('userNameDisplay').innerText = `${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}`;
     
     document.getElementById('langLabel').innerText = trans.langLabel;
     document.getElementById('nameLabel').innerText = trans.nameLabel;
@@ -137,7 +136,50 @@ document.getElementById('userNameDisplay').innerText = `Dr. ${savedName}`;
     changeQuote();
 }
 
-// --- 3. نظام المنبه والمؤقت ---
+// --- 4. زر الحفظ الرئيسي والتأكيد (اللغة، الاسم، الدقائق، إلخ) ---
+document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
+    e.preventDefault(); 
+    
+    // حفظ وتطبيق اللغة
+    const selectedLang = document.getElementById('langSelect').value;
+    currentLang = selectedLang;
+    localStorage.setItem('userLang', selectedLang);
+    applyLanguage(selectedLang);
+    displayDate(); 
+
+    // حفظ وتحديث الاسم
+    const userNameInput = document.getElementById('userNameInput');
+    const newName = userNameInput.value.trim() || (selectedLang === 'ar' ? "ملهم" : "Molham");
+    localStorage.setItem('userName', newName);
+    
+    const trans = i18n[selectedLang];
+    document.getElementById('welcomeWord').innerText = trans.welcome;
+    document.getElementById('userNameDisplay').innerText = selectedLang === 'ar' ? `دكتور ${newName}` : `Dr. ${newName}`;
+    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${selectedLang === 'ar' ? 'دكتور' : 'Dr.'} ${newName}</span> 🩺`;
+
+    // حفظ وتحديث الدقائق
+    const minsInput = document.getElementById('minsInput');
+    const newMins = parseInt(minsInput.value) || 25;
+    localStorage.setItem('userMins', newMins); 
+
+    // حفظ المظهر والتاريخ
+    const newColor = document.getElementById('colorPicker').value;
+    document.documentElement.style.setProperty('--primary', newColor);
+    localStorage.setItem('themeColor', newColor);
+    
+    graduationDate = document.getElementById('gradDateInput').value;
+    localStorage.setItem('gradDate', graduationDate);
+    
+    // تطبيق الدقائق فوراً على التايمر إذا كان واقفاً
+    if (!isRunning) {
+        timeLeft = newMins * 60;
+        updateTimerDisplay();
+    }
+    
+    alert(trans.alertSave);
+});
+
+// --- 5. نظام المنبه والمؤقت الذكي ---
 function playAlarm() {
     try {
         const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -189,15 +231,20 @@ function toggleTimer() {
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
-    const btn = document.getElementById('startBtn');
-    if(btn) btn.innerText = i18n[currentLang].startBtnJob;
+    document.getElementById('startBtn').innerText = i18n[currentLang].startBtnJob;
     
     const mins = document.getElementById('minsInput').value || 25;
     timeLeft = mins * 60;
     updateTimerDisplay();
 }
 
-// --- 4. نظام النقاط والمتجر ---
+function updateTimerDisplay() {
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+}
+
+// --- 6. نظام النقاط ومتجر الطاقة ---
 function addPoints() {
     const minsWorked = parseInt(document.getElementById('minsInput').value) || 25;
     points += (minsWorked * 3);  
@@ -233,13 +280,7 @@ function resetPoints() {
     }
 }
 
-// --- 5. الدوال المساعدة والعد التنازلي ---
-function updateTimerDisplay() {
-    const m = Math.floor(timeLeft / 60);
-    const s = timeLeft % 60;
-    document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-}
-
+// --- 7. الدوال المساعدة والعد التنازلي ---
 function changeQuote() {
     const qElem = document.getElementById('motivationQuote');
     const currentQuotes = quotes[currentLang];
@@ -265,51 +306,7 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
-// زر الحفظ الرئيسي
-// --- تحديث دالة حفظ الإعدادات الرئيسية ---
-document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
-    e.preventDefault(); // منع الريفريش التلقائي اللي بيطير البيانات
-    
-    // 1. حفظ وتحديث اللغة
-    const selectedLang = document.getElementById('langSelect').value;
-    currentLang = selectedLang;
-    localStorage.setItem('userLang', selectedLang);
-    applyLanguage(selectedLang);
-    displayDate(); // تحديث لغة التاريخ فوق على الشمال
-
-    // 2. حفظ وتحديث الاسم (في العنوان ورسالة الترحيب)
-    const userNameInput = document.getElementById('userNameInput');
-    const newName = userNameInput.value.trim() || (selectedLang === 'ar' ? "ملهم" : "Molham");
-    localStorage.setItem('userName', newName);
-    
-    const trans = i18n[selectedLang];
-    document.getElementById('welcomeWord').innerText = trans.welcome;
-    document.getElementById('userNameDisplay').innerText = selectedLang === 'ar' ? `دكتور ${newName}` : `Dr. ${newName}`;
-    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${selectedLang === 'ar' ? 'دكتور' : 'Dr.'} ${newName}</span> 🩺`;
-
-    // 3. حفظ وتحديث الدقائق للتايمر
-    const minsInput = document.getElementById('minsInput');
-    const newMins = parseInt(minsInput.value) || 25;
-    localStorage.setItem('userMins', newMins); // حفظ الدقائق في الكاش
-
-    // 4. حفظ المظهر والتاريخ
-    const newColor = document.getElementById('colorPicker').value;
-    document.documentElement.style.setProperty('--primary', newColor);
-    localStorage.setItem('themeColor', newColor);
-    
-    graduationDate = document.getElementById('gradDateInput').value;
-    localStorage.setItem('gradDate', graduationDate);
-    
-    // تطبيق الدقائق الجديدة فوراً على التايمر لو مش شغال
-    if (!isRunning) {
-        timeLeft = newMins * 60;
-        updateTimerDisplay();
-    }
-    
-    alert(trans.alertSave);
-});
-
-// --- 6. نظام إدارة المهام (To-Do List) ---
+// --- 8. نظام إدارة المهام (To-Do List) ---
 function addTask() {
     const input = document.getElementById('taskInput');
     const text = input.value.trim();
@@ -340,7 +337,7 @@ function renderTasks() {
         const li = document.createElement('li');
         li.innerHTML = `
             <span style="cursor:pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
-                ${task.done ? '✅' : '✅'} ${task.text}
+                ${task.done ? '✅' : '⭕'} ${task.text}
             </span>
             <button onclick="deleteTask(${index})" class="reset-mini" style="min-width:auto !important; background:none !important; border:none !important;">❌</button>
         `;
