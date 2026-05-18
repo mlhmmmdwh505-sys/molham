@@ -172,7 +172,10 @@ function startGraduationCountdown() {
 }
 
 // حفظ الإعدادات بالكامل بما فيها الاسم
-document.getElementById('mainSaveBtn').addEventListener('click', () => {
+// حفظ الإعدادات بالكامل بما فيها الاسم
+document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
+    e.preventDefault(); // ميزة لمنع الريفريش التلقائي
+
     // حفظ الاسم وتحديث الشاشة فوراً
     const newName = document.getElementById('userNameInput').value.trim() || "دكتور ملهم";
     localStorage.setItem('userName', newName);
@@ -182,11 +185,15 @@ document.getElementById('mainSaveBtn').addEventListener('click', () => {
     const newColor = document.getElementById('colorPicker').value;
     document.documentElement.style.setProperty('--primary', newColor);
     localStorage.setItem('themeColor', newColor);
+    
     graduationDate = document.getElementById('gradDateInput').value;
     localStorage.setItem('gradDate', graduationDate);
+    
     if (!isRunning) resetTimer();
     
+    // التعديل الصحيح للقوس هنا:
     alert("تم حفظ وتأكيد الإعدادات والاسم بنجاح! 🩺");
+});
 });
 
 // --- 7. نظام إدارة المهام (To-Do List) ---
