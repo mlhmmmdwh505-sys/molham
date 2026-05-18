@@ -177,10 +177,13 @@ document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
     e.preventDefault(); // ميزة لمنع الريفريش التلقائي
 
     // حفظ الاسم وتحديث الشاشة فوراً
-    const newName = document.getElementById('userNameInput').value.trim() || "دكتور ملهم";
-    localStorage.setItem('userName', newName);
-    document.getElementById('userNameDisplay').innerText = newName;
+   // جلب الاسم وتحديثه في العنوان ورسالة الترحيب فوراً
+const userNameInput = document.getElementById('userNameInput');
+const newName = userNameInput.value.trim() || "ملهم";
 
+localStorage.setItem('userName', newName);
+document.getElementById('userNameDisplay').innerText = `دكتور ${newName}`;
+document.getElementById('mainTitleName').innerText = `دكتور ${newName}`; // التحديث في العنوان الكبير
     // حفظ باقي الإعدادات القديمة
     const newColor = document.getElementById('colorPicker').value;
     document.documentElement.style.setProperty('--primary', newColor);
