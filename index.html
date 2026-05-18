@@ -23,57 +23,56 @@
 
         <div class="date-tag" id="dateDisplay"></div>
 
-
-   <header>
-    <h1>لوحة تحكم <span id="mainTitleName">الطبيب</span> 🩺</h1>
-    <p class="welcome-msg">مرحباً بك، <span id="userNameDisplay">دكتور ملهم</span> ✨</p>
-    <p id="motivationQuote" style="color: var(--primary); font-style: italic; margin-top: 10px; min-height: 24px;"></p>
-    
-    <div class="settings-bar card">
-        <div class="setting-item">
-            <label id="langLabel">اللغة</label>
-            <select id="langSelect" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--primary); border-radius: 50px; color: white; padding: 8px 15px; font-family: 'Cairo', sans-serif; outline: none; cursor: pointer;">
-                <option value="ar" style="color: black;">العربية</option>
-                <option value="en" style="color: black;">English</option>
-            </select>
-        </div>
-        <div class="setting-item">
-            <label>الاسم</label>
-            <input type="text" id="userNameInput" placeholder="اكتب اسمك هنا..." style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--primary); border-radius: 50px; color: white; padding: 8px 15px; font-family: 'Cairo', sans-serif; outline: none; width: 140px;">
-        </div>
-        <div class="setting-item">
-            <label>اللون</label>
-            <input type="color" id="colorPicker" value="#6366f1">
-        </div>
-        <div class="setting-item">
-            <label>التاريخ</label>
-            <input type="date" id="gradDateInput">
-        </div>
-        <div class="setting-item">
-            <label>الدقائق</label>
-            <input type="number" id="minsInput" value="25" class="num-input">
-        </div>
-        <button class="btn-save" id="mainSaveBtn">تأكيد الإعدادات</button>
-    </div>
-</header>
+        <header>
+            <h1 id="mainTitle">لوحة تحكم <span id="mainTitleName">الطبيب</span> 🩺</h1>
+            <p class="welcome-msg"><span id="welcomeWord">مرحباً بك،</span> <span id="userNameDisplay">دكتور ملهم</span> ✨</p>
+            <p id="motivationQuote" style="color: var(--primary); font-style: italic; margin-top: 10px; min-height: 24px;"></p>
+            
+            <div class="settings-bar card">
+                <div class="setting-item">
+                    <label id="langLabel">اللغة</label>
+                    <select id="langSelect">
+                        <option value="ar">العربية</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label id="nameLabel">الاسم</label>
+                    <input type="text" id="userNameInput" placeholder="اكتب اسمك هنا...">
+                </div>
+                <div class="setting-item">
+                    <label id="colorLabel">اللون</label>
+                    <input type="color" id="colorPicker" value="#6366f1">
+                </div>
+                <div class="setting-item">
+                    <label id="dateLabel">التاريخ</label>
+                    <input type="date" id="gradDateInput">
+                </div>
+                <div class="setting-item">
+                    <label id="minsLabel">الدقائق</label>
+                    <input type="number" id="minsInput" value="25" class="num-input">
+                </div>
+                <button class="btn-save" id="mainSaveBtn">تأكيد الإعدادات</button>
+            </div>
+        </header>
 
         <div class="dashboard-grid">
             <aside class="side-col">
                 <section class="info-card">
-                    <h3>⏳ حلم التخرج</h3>
+                    <h3 id="countdownTitle">⏳ حلم التخرج</h3>
                     <div id="countdown" class="modern-timer">
-                        <div class="unit"><span id="years">00</span><label>سنة</label></div>
-                        <div class="unit"><span id="days">00</span><label>يوم</label></div>
-                        <div class="unit"><span id="hours">00</span><label>ساعة</label></div>
+                        <div class="unit"><span id="years">00</span><label id="labelYears">سنة</label></div>
+                        <div class="unit"><span id="days">00</span><label id="labelDays">يوم</label></div>
+                        <div class="unit"><span id="hours">00</span><label id="labelHours">ساعة</label></div>
                     </div>
                 </section>
 
                 <section class="info-card store-card">
-                    <h3>☕ متجر الطاقة 1د = 15ن</h3>
+                    <h3 id="storeTitle">☕ متجر الطاقة 1د = 15ن</h3>
                     <div class="store-grid">
-                        <div class="item" onclick="buyBreak(5)">5 د =<small>75ن</small></div>
-                        <div class="item" onclick="buyBreak(10)">10 د =<small>150ن</small></div>
-                        <div class="item" onclick="buyBreak(15)">15 د =<small>225ن</small></div>
+                        <div class="item" onclick="buyBreak(5)" id="itemBreak5">5 د = <small>75ن</small></div>
+                        <div class="item" onclick="buyBreak(10)" id="itemBreak10">10 د = <small>150ن</small></div>
+                        <div class="item" onclick="buyBreak(15)" id="itemBreak15">15 د = <small>225ن</small></div>
                     </div>
                 </section>
             </aside>
@@ -83,13 +82,13 @@
                     <div id="pomoDisplay">25:00</div>
                     <div class="pomo-actions">
                        <button onclick="toggleTimer()" id="startBtn" class="btn-main">ابدأ المهمة</button>
-                        <button onclick="resetTimer()">اعادة ضبط</button>
+                        <button onclick="resetTimer()" id="resetBtn">اعادة ضبط</button>
                     </div>
                 </section>
 
                 <section class="info-card tasks-card">
                     <div class="input-section">
-                        <input type="text" id="taskInput" placeholder="أضف مهمة طبية جديدة (عملية، مراجعة)...">
+                        <input type="text" id="taskInput" placeholder="أضف مهمة جديدة...">
                         <button onclick="addTask()" class="btn-add">+</button>
                     </div>
                     <ul id="taskList" class="custom-scroll"></ul>
