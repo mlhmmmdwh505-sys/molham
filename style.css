@@ -172,3 +172,45 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     color: #94a3b8;
     font-size: 14px;
 }
+/* تنسيق موحد لجميع خانات الإدخال والقوائم لجعلها زجاجية متناسقة */
+input[type="text"], 
+input[type="number"], 
+input[type="date"], 
+select {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 50px !important;
+    color: white !important;
+    padding: 10px 15px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    outline: none !important;
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: 0.3s ease;
+}
+
+/* تحسين شكل الخيارات داخل قائمة اللغة عشان متظهرش بيضاء */
+select option {
+    background-color: #0f172a !important; /* لون غامق متناسق مع الخلفية */
+    color: white !important;
+    font-family: 'Cairo', sans-serif;
+}
+
+/* تأثير خفيف عند التركيز أو الوقوف على الخانات */
+input[type="text"]:focus, select:focus {
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 10px var(--primary);
+}
+
+/* ضبط عرض خانة الاسم واللغة بشكل متناسق في شريط الإعدادات */
+#userNameInput {
+    width: 150px !important;
+    text-align: center;
+}
+
+#langSelect {
+    width: 110px !important;
+    padding-right: 10px !important;
+}
