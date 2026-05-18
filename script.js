@@ -86,8 +86,8 @@ function applyLanguage(lang) {
     localStorage.setItem('userLang', lang);
     
     // تغيير اتجاه ونوع لغة الـ HTML
-    document.documentElement.setAttribute('lang', lang);
-    document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">Dr. ${savedName}</span> 🩺`;
+document.getElementById('userNameDisplay').innerText = `Dr. ${savedName}`;
     
     // ترجمة النصوص الثابتة في الصفحة
     const trans = i18n[lang];
