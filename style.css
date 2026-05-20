@@ -351,7 +351,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 /* ======================================================= */
 /* ======================================================= */
-/* 🖥️ المنظومة الحديدية: حدود للمهام وسكرول مغناطيسي ذكي يقف عند كل مهمة */
+/* 🖥️ التثبيت الذهبي: تقفيل الأبعاد ومحاذاة شريط الإعدادات بالكامل */
 /* ======================================================= */
 @media (min-width: 1025px) {
     html, body {
@@ -376,6 +376,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     header { margin-bottom: 5px !important; }
     header h1 { font-size: 24px !important; }
 
+    /* 🎯 ضبط وتوسط نصوص شريط الإعدادات بالملّي */
     .settings-bar { 
         display: grid !important;
         grid-template-columns: repeat(5, 1fr) !important; 
@@ -385,6 +386,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         margin: 0 auto 10px auto !important;
     }
 
+    /* إجبار توسيط الكلمات والأرقام داخل خانات الإعدادات */
     input[type="text"], input[type="number"], input[type="date"], select, #userNameInput, #langSelect, #colorPicker { 
         width: 100% !important; height: 38px !important;
         text-align: center !important; font-size: 14px !important; box-sizing: border-box !important;
@@ -421,7 +423,10 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     }
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
 
-    /* صندوق المهام الخارجي */
+    /* ========================================== */
+    /* 📦 المنظومة المحكمة لـ صندوق المهام */
+    /* ========================================== */
+    
     .todo-box {
         flex: 0 0 auto !important;
         display: flex !important;
@@ -434,9 +439,10 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         overflow: hidden !important; 
     }
 
-    /* توحيد السطر العلوي */
+    /* 🎯 تعديل توزيع السطر ليكون مرناً ومحاذياً من اليمين لليسار */
     .todo-box form, .input-group, .todo-input-row {
         display: flex !important;
+        flex-direction: row-reverse !important; /* لضمان الترتيب الصحيح (الخانة أولاً ثم الزر) */
         width: 100% !important;
         gap: 15px !important; 
         align-items: center !important;
@@ -445,6 +451,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         margin-bottom: 5px !important;
     }
 
+    /* خانة الكتابة تأخذ المساحة الأكبر بالكامل */
     #taskInput {
         flex: 1 !important; 
         height: 44px !important; 
@@ -452,10 +459,12 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         box-sizing: border-box !important;
         padding: 0 20px !important;
         font-size: 14px !important;
+        text-align: right !important; /* الكتابة من اليمين لتناسب اللغة العربية */
     }
 
+    /* زر الإضافة (+) يصبح ملموماً وعبارة عن كبسولة أنيقة بجانب الخانة */
     .todo-box button, .todo-box .add-btn, .todo-box input[type="submit"] {
-        width: 70px !important; 
+        width: 60px !important; /* عرض ثابت ملموم وذكي للزر */
         height: 44px !important; 
         max-height: 44px !important;
         box-sizing: border-box !important;
@@ -464,9 +473,10 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         justify-content: center !important;
         padding: 0 !important;
         margin: 0 !important;
+        flex-shrink: 0 !important; /* يمنع المتصفح من مط الزر */
     }
 
-    /* 🎯 1. تفعيل خاصية السكرول المغناطيسي على الحاوية 🎯 */
+    /* الحاوية الذكية للمهام */
     .tasks-container, #todoList, #taskList {
         display: flex !important;
         flex-direction: column !important;
@@ -480,12 +490,14 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         padding: 0 5px 0 0 !important;
         margin: 12px 0 0 0 !important; 
 
-        /* 👈 حيلة التمرير المغناطيسي الإجباري الرأسي */
         scroll-snap-type: y mandatory !important; 
         scroll-behavior: smooth !important;
+        
+        scroll-padding-bottom: 10px !important; 
+        scroll-padding-top: 10px !important;
     }
 
-    /* 🎯 2. إضافة حدود (Border) مخصصة وتفعيل قفل الوقوف عند كل عنصر */
+    /* عناصر المهام بحدود مخصصة وسكرول متمركز */
     .fixed-task-item {
         display: flex !important;
         justify-content: space-between !important;
@@ -498,14 +510,12 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         flex-shrink: 0 !important; 
         box-sizing: border-box !important;
 
-        /* 👈 إضافة حدود أنيقة شفافة متماشية مع مظهر الزجاج الديجيتال */
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 8px !important;
-        padding: 0 15px !important; /* مسافة داخلية عشان الكلام ميزنّقش في الحدود */
+        padding: 0 15px !important; 
         background: rgba(255, 255, 255, 0.03) !important;
 
-        /* 👈 نقطة المغناطيس: إجبار السكرول يقف بالملّي عند بداية كل مهمة */
-        scroll-snap-align: start !important; 
+        scroll-snap-align: center !important; 
     }
 
     /* تجميل شريط التمرير */
