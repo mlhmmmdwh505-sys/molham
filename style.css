@@ -353,52 +353,65 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 /* ======================================================= */
 /* 🖥️ الإصلاح النهائي لملء كافة الفراغات الداخلية والخارجية للماك بوك */
 /* ======================================================= */
+/* ======================================================= */
+/* 🖥️ التثبيت الكامل للوحة في شاشة واحدة ثابتة بدون Scroll (ماك بوك / كمبيوتر) */
+/* ======================================================= */
+/* ======================================================= */
+/* 🖥️ التثبيت الكامل للوحة في شاشة واحدة ثابتة بدون Scroll (ماك بوك / كمبيوتر) */
+/* ======================================================= */
 @media (min-width: 1025px) {
-    /* 1. جعل الكارت الزجاجي الكبير مرن ليتمدد يمين وشمال */
+    /* 1. إجبار جسم الصفحة على الثبات داخل حدود الشاشة المتاحة */
+    html, body {
+        height: 100vh !important;
+        overflow: hidden !important; /* منع ظهور شريط التمرير النهائي نهائياً 🚫 */
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* 2. ضبط الصندوق الزجاجي الكبير ليناسب الشاشة عمودياً وأفقياً */
     .glass-card { 
-        width: 94vw !important; /* استغلال 94% من عرض الشاشة */
-        max-width: 1440px !important; /* حد أقصى مثالي للشاشات الكبيرة */
-        padding: 40px !important;
+        width: 95vw !important;
+        height: 92vh !important; /* أخذ 92% من ارتفاع الشاشة لتترك متسعاً مريحاً */
+        max-width: 1440px !important; 
+        padding: 20px 30px !important; /* تقليل البادينج الرأسي لضغط المحتوى */
         box-sizing: border-box !important;
-        margin: 0 auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important; /* توزيع العناصر بانتظام عمودياً */
+        overflow: hidden !important;
     }
 
-    /* 2. إجبار الحاوية الشبكية على التمدد بكامل العرض الجديد */
-    .dashboard-grid { 
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important; /* تقسيم اللوحة لعمودين متساويين تماماً بالملّي */
-        gap: 30px !important; /* مسافة متناسقة بين العمودين */
-        width: 100% !important;
+    /* 3. ضغط الهيدر والترحيب لتقليل استهلاك المساحة الرأسية */
+    header {
+        margin-bottom: 10px !important;
     }
+    header h1 { font-size: 24px !important; margin-bottom: 2px !important; }
+    header p { font-size: 14px !important; margin-bottom: 2px !important; }
+    .subtitle { font-size: 12px !important; margin-bottom: 5px !important; }
 
-    /* 3. جعل الأعمدة الداخلية والصناديق تفتح بكامل العرض المتاح لها */
-    .main-col, .side-col, .pomo-box, .todo-box, .store-card, .countdown-card {
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
-
-    /* 4. موازنة شريط الإعدادات ليمتد بمرونة مع الحجم الجديد للكارت */
+    /* 4. شريط الإعدادات الأفقي المدمج */
     .settings-bar { 
         display: grid !important;
         grid-template-columns: repeat(5, 1fr) !important; 
-        gap: 20px !important; 
+        gap: 15px !important; 
         align-items: flex-end !important;
         width: 100% !important; 
-        max-width: 100% !important; /* يفتح بكامل عرض الكارت */
-        margin: 0 auto 30px auto !important;
+        max-width: 100% !important;
+        margin: 0 auto 15px auto !important;
     }
 
     .input-group, .setting-item { 
         display: flex !important;
         flex-direction: column !important; 
-        gap: 8px !important;
+        gap: 5px !important;
         width: 100% !important;
-        margin: 0 !important;
         align-items: center !important;
     }
 
-    /* توحيد مقاسات كل خانات الإعدادات */
+    /* تقليص بسيط في ارتفاع الخانات لتوفير مساحة */
     input[type="text"], 
     input[type="number"], 
     input[type="date"], 
@@ -407,35 +420,72 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     #langSelect,
     #colorPicker { 
         width: 100% !important;
-        height: 45px !important;
+        height: 38px !important; /* ارتفاع مدمج ومثالي */
         text-align: center !important; 
-        font-size: 15px !important; 
+        font-size: 14px !important; 
         padding: 0 10px !important; 
         box-sizing: border-box !important;
     }
 
-    /* زر التأكيد في المنتصف */
+    /* زر التأكيد مدمج في سطر مستقل بمسافة صغيرة */
     .settings-bar button {
         grid-column: 1 / -1 !important;
         justify-self: center !important;
-        width: 180px !important;
-        height: 45px !important;
-        margin-top: 15px !important;
+        width: 160px !important;
+        height: 38px !important;
+        margin-top: 5px !important;
+    }
+
+    /* 5. موازنة الـ Grid السفلي وضبط ارتفاعه تلقائياً */
+    .dashboard-grid { 
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important; 
+        gap: 20px !important; 
+        width: 100% !important;
+        flex: 1 !important; /* يخليه ياخد كل المساحة المتبقية تحت الإعدادات */
+        min-height: 0 !important; /* يمنع الـ Grid من التمدد خارج الأب */
+    }
+
+    /* 6. جعل الأعمدة تملأ المساحة الرأسية بدقة وبدون زيادة */
+    .main-col, .side-col { 
+        display: flex !important;
+        flex-direction: column !important; 
+        gap: 20px !important; 
+        height: 100% !important;
+        justify-content: flex-start !important;
+    }
+
+    /* 7. ضبط كتل العرض (المؤقت، المهام، المتجر، حلم التخرج) */
+    .pomo-box, .todo-box, .store-card, .countdown-card {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 15px 20px !important; /* تقليص البادينج الداخلي لتجنب المط */
+    }
+
+    /* تظبيط حجم خط العداد الكبير ليتوافق مع الضغط الجديد */
+    #pomoDisplay {
+        font-size: 65px !important;
+        margin: 10px 0 !important;
+    }
+
+    /* السماح لصندوق المهام فقط بالـ Scroll الداخلي النظيف لو المهام كترت */
+    .todo-box {
+        display: flex;
+        flex-direction: column;
+        flex: 1 !important; /* خليه ياخد المساحة المتاحة تحت العداد بالكامل */
+        min-height: 0;
+    }
+    .tasks-container {
+        flex: 1;
+        overflow-y: auto !important; /* سكرول داخلي للمهام فقط عند الحاجة */
     }
 }
 
-/* 🎨 التعديل الجذري الثابت لمنع ظهور الهلال الأسود في بوكس اللون */
+/* 🎨 قفل الهلال الأسود لبوكس اللون */
 #colorPicker {
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-    background: transparent !important;
-    border: 1px solid var(--primary) !important;
-    border-radius: 50px !important;
-    cursor: pointer !important;
-    overflow: hidden !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
+    -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important;
+    background: transparent !important; border: 1px solid var(--primary) !important;
+    border-radius: 50px !important; cursor: pointer !important; overflow: hidden !important; padding: 0 !important;
 }
 #colorPicker::-webkit-color-swatch-wrapper { padding: 0 !important; margin: 0 !important; border-radius: 50px !important; }
 #colorPicker::-webkit-color-swatch { border: none !important; border-radius: 0 !important; width: 100% !important; height: 100% !important; }
