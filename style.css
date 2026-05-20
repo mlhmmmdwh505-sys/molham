@@ -351,7 +351,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 /* ======================================================= */
 /* ======================================================= */
-/* 🖥️ التثبيت النهائي: توحيد أحجام ومحاذاة خانات وأزرار المهام */
+/* 🖥️ التثبيت النهائي: مسافات صغيرة وملمومة لعرض مهمتين فقط بالسكرول */
 /* ======================================================= */
 @media (min-width: 1025px) {
     html, body {
@@ -422,7 +422,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
 
     /* ========================================== */
-    /* 📦 منظومة صندوق المهام الموحدة الأبعاد */
+    /* 📦 منظومة صندوق المهام الملمومة والموحدة */
     /* ========================================== */
     
     /* صندوق المهام الخارجي */
@@ -433,36 +433,36 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         width: 100% !important;
         padding: 15px 25px !important;
         box-sizing: border-box !important;
-        height: 220px !important; 
-        max-height: 220px !important;
+        height: 195px !important; /* 👈 تقليص الارتفاع الإجمالي ليناسب المسافة الصغيرة الجديدة */
+        max-height: 195px !important;
         overflow: hidden !important; 
     }
 
-    /* 🎯 1. توحيد السطر العلوي (الخانة + الزر) بربطهم بارتفاع واحد */
+    /* توحيد السطر العلوي (الخانة + الزر) بربطهم بارتفاع واحد */
     .todo-box form, .input-group, .todo-input-row {
         display: flex !important;
         width: 100% !important;
-        gap: 15px !important; /* مسافة متناسقة بين الخانة والزر */
+        gap: 15px !important; 
         align-items: center !important;
-        height: 44px !important; /* الارتفاع القياسي الموحد */
+        height: 44px !important; 
         max-height: 44px !important;
         margin-bottom: 5px !important;
     }
 
     /* خانة الكتابة الأساسية */
     #taskInput {
-        flex: 1 !important; /* تأخذ المساحة المتبقية بالكامل */
-        height: 44px !important; /* نفس الارتفاع القياسي */
+        flex: 1 !important; 
+        height: 44px !important; 
         max-height: 44px !important;
         box-sizing: border-box !important;
         padding: 0 20px !important;
         font-size: 14px !important;
     }
 
-    /* زر الإضافة (+) ليطابق الخانة تماماً */
+    /* زر الإضافة (+) */
     .todo-box button, .todo-box .add-btn, .todo-box input[type="submit"] {
-        width: 70px !important; /* عرض ثابت وأنيق للزر */
-        height: 44px !important; /* طابق الارتفاع بالملّي مع خانة الكتابة */
+        width: 70px !important; 
+        height: 44px !important; 
         max-height: 44px !important;
         box-sizing: border-box !important;
         display: flex !important;
@@ -472,32 +472,35 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         margin: 0 !important;
     }
 
-    /* 🎯 2. حاوية اللستة لعرض مهمتين فقط */
+    /* 🎯 وزنة الحاوية المحكومة لعرض مهمتين بمسافة صغيرة 🎯 */
     .tasks-container, #todoList, #taskList {
         display: flex !important;
         flex-direction: column !important;
         gap: 0px !important;
         
-        height: 115px !important; 
-        max-height: 115px !important; 
+        /* 👈 الارتفاع الهندسي الجديد لعرض مهمتين متلاصقتين بشكل أنيق */
+        height: 98px !important; 
+        max-height: 98px !important; 
         
         overflow-y: auto !important; 
         overflow-x: hidden !important;
         padding: 0 5px 0 0 !important;
-        margin: 15px 0 0 0 !important; /* مسافة مريحة تفصلها عن سطر الإدخال العلوي */
+        margin: 12px 0 0 0 !important; 
     }
 
-    /* 🎯 3. تثبيت حجم عناصر المهام لتطابق تماماً حجم خانة الإدخال */
+    /* 🔒 تقليص المسافات بين المهام لتصبح ملمومة */
     .fixed-task-item {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
         width: 100% !important;
         
-        height: 44px !important; /* نفس الارتفاع الموحد 44 بكسل */
+        height: 44px !important; 
         max-height: 44px !important;
         
-        margin-bottom: 18px !important; /* المسافة الواسعة المريحة بين المهمتين */
+        /* 👈 تصغير المسافة بين كل مهمة والثانية لتبدو متناسقة وقريبة */
+        margin-bottom: 8px !important; 
+        
         flex-shrink: 0 !important; 
         box-sizing: border-box !important;
     }
