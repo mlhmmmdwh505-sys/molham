@@ -181,8 +181,11 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 /* ======================================================= */
 /* 📱 إضافة أكواد التجاوب والملاءمة الهواتف الذكية (Responsiveness) */
 /* ======================================================= */
+/* ======================================================= */
+/* 📱 التنسيق الاحترافي للموبايل لجعل الإعدادات بنفس الحجم وعلى مستوى واحد */
+/* ======================================================= */
 @media (max-width: 1024px) {
-    body { height: auto; padding: 40px 15px; }
+    body { height: auto; padding: 40px 15px; overflow-y: auto; }
     .glass-card { width: 100%; padding: 30px 20px; border-radius: 25px; }
     .dashboard-grid { flex-direction: column; gap: 25px; }
     .date-tag, .mini-score { position: static; text-align: center; justify-content: center; margin: 10px auto; }
@@ -191,10 +194,49 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 
 @media (max-width: 480px) {
     .glass-card { padding: 25px 15px; }
-    #pomoDisplay { font-size: 55px; }
-    .settings-bar { flex-direction: column; align-items: center; width: 100%; gap: 15px; }
-    .input-group, input[type="text"], select, #userNameInput, #langSelect { width: 100% !important; text-align: center; }
+    #pomoDisplay { font-size: 55px; min-width: 100%; }
+    
+    /* جعل شريط الإعدادات مرن وبجانب بعض على نفس المستوى */
+    .settings-bar { 
+        display: flex !important;
+        flex-direction: row !important; /* 👈 يخليهم جنب بعض مش تحت بعض */
+        flex-wrap: wrap !important; /* للسماح بنزول العناصر لو الشاشة صغيرة جداً */
+        justify-content: center !important; 
+        gap: 12px !important; 
+        width: 100% !important; 
+    }
+    
+    /* توحيد حجم وعرض كل عناصر الإدخال والـ select بالملّي */
+    .input-group, 
+    input[type="text"], 
+    input[type="number"], 
+    input[type="date"], 
+    select, 
+    #userNameInput, 
+    #langSelect { 
+        width: 130px !important; /* 👈 حجم موحد ومناسب جداً لعرض شاشة الموبايل */
+        max-width: 100% !important;
+        text-align: center !important; 
+        font-size: 14px !important; /* حجم خط متناسق */
+        padding: 8px 10px !important; /* بادينج موحد */
+        height: 42px !important; /* ارتفاع ثابت وموحد لكل الخانات */
+    }
+
+    /* ضبط اختيار اللون والـ label عشان يمشوا على نفس المحاذاة */
+    .setting-item {
+        height: 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    #colorPicker {
+        height: 42px !important; /* نفس ارتفاع باقي الخانات */
+        width: 60px !important;
+    }
+
     .store-grid { flex-direction: column; }
     .modern-timer { flex-wrap: wrap; gap: 15px; }
     .unit { flex: 1 1 40%; }
+    .input-section { flex-direction: column; gap: 10px; }
+    .btn-add { width: 100%; }
 }
