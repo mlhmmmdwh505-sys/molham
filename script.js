@@ -334,18 +334,20 @@ window.deleteTask = function(index) {
 function renderTasks() {
     const taskList = document.getElementById('taskList');
     if (!taskList) return;
+    
     taskList.innerHTML = '';
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
         li.className = 'fixed-task-item'; 
+        
         li.innerHTML = `
             <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; cursor: pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
                 <span style="flex-shrink: 0; font-size: 18px;">${task.done ? '✅' : '⭕'}</span>
                 <span style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; font-weight: 600;">${task.text}</span>
             </div>
-            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width: auto !important; background: none !important; border: none !important; cursor: pointer; padding: 0 5px !important; flex-shrink: 0; font-size: 14px;">❌</button>
+            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width: auto !important; background: none !important; border: none !important; cursor: pointer; padding: 0 5px !important; flex-shrink: 0; font-size: 14px; color: #ff4444;">❌</button>
         `;
         taskList.appendChild(li);
     });
