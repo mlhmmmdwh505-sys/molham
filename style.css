@@ -455,7 +455,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     }
 
     .todo-box button, .todo-box .add-btn, .todo-box input[type="submit"] {
-        width: 70px !important; 
+        width: 55px !important; 
         height: 44px !important; 
         max-height: 44px !important;
         box-sizing: border-box !important;
