@@ -754,4 +754,72 @@ ul::-webkit-scrollbar-thumb {
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important; 
 }
+
+/* ==========================================================================
+   👑 الحل الفجر: فرد وتكبير جميع كروت اللوحة بالعرض الكامل (د. ملهم)
+   ========================================================================== */
+
+/* 1. تحرير الحاوية الزجاجية الكبرى للموقع لتأخذ كامل عرض الشاشة */
+.glass-card, .container, .wrapper {
+    width: 96vw !important;       /* فرش الموقع بالكامل بعرض الشاشة */
+    max-width: 1800px !important;  /* السماح بالتمدد الأقصى على الشاشات الكبيرة */
+    margin: 0 auto !important;
+    padding: 25px 30px !important;
+    height: auto !important;       /* إعطاء مرونة عمودية عشان الكروت متنكتمش */
+}
+
+/* 2. توزيع شبكة الكروت (Dashboard Grid) نصفين متساويين مفرودين */
+.dashboard-grid, .main-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    gap: 30px !important;          /* مسافة أنيقة بين الجانبين */
+}
+
+/* 3. إجبار العمود الأيمن والعمود الأيسر على أخذ 50% بالملي من العرض الجديد الواسع */
+.main-col, .side-col, .left-column, .right-column {
+    flex: 1 !important;
+    width: 50% !important;        /* تقسيم عادل وفرد كامل للكروت */
+    max-width: 50% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 25px !important;          /* تباعد عمودي فخم بين الكروت */
+}
+
+/* 4. تفجير كارت المهام وكارت العداد والمتجر ليتمددوا لأقصى عرض متاح */
+.todo-box, .timer-box, .info-card, .store-card, .chart-box {
+    width: 100% !important;       /* تملأ الفراغ بالكامل */
+    min-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* 5. ضبط حاوية قائمة المهام الداخلية لعرض مهمتين فقط مع المغناطيس */
+#taskList, .tasks-container, ul {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+    padding: 0 !important;
+    margin: 20px 0 0 0 !important;
+    height: 124px !important;     /* ارتفاع مهمتين بالظبط */
+    max-height: 124px !important;
+    overflow-y: scroll !important;
+    scroll-snap-type: y mandatory !important;
+    scroll-behavior: smooth !important;
+}
+
+/* 6. عنصر المهمة الفردي مفرود ومنصاع للمغناطيس */
+.fixed-task-item, li {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    flex-shrink: 0 !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
 }
