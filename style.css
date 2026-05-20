@@ -496,24 +496,15 @@ button:active {
 /* 🧲 حاوية السكرول المغناطيسي - الحسبة الإمبراطورية الدقيقة جداً للمهمتين */
 .tasks-container, 
 #todoList, 
-#taskList, 
-ul {
-    list-style: none !important;
-    display: block !important; /* تغييرها لـ block لمنع المتصفح من كبس العناصر بالداخل */
+#taskList, ul {
+    display: flex !important;
+    flex-direction: column !important;
     width: 100% !important;
-    margin: 20px 0 0 0 !important; 
+    gap: 10px !important;
     padding: 0 !important;
-    text-align: right !important;
-    
-    /* 🎯 الحسبة الحديدية: كل مهمة بارتفاع 54px + هامش 12px = إجمالي 132px للمهمتين كاملتين.
-       جعلنا الارتفاع 150px بالملي لكي تظهر المهمتان كاملتين ويظهر رأس الثالثة بوضوح بالأسفل */
-    height: 150px !important;
-    max-height: 150px !important;
-    
-    overflow-y: auto !important;               
-    scroll-snap-type: y mandatory !important;    
-    scroll-behavior: smooth !important;         
-    -webkit-overflow-scrolling: touch !important; 
+    margin: 15px 0 0 0 !important;
+    overflow-y: auto !important;
+    height: 145px !important; /* مساحة ممتازة لعرض مهمتين كاملتين وطرف الثالثة */
 }
 
 /* تصميم شريط سكرول ناعم مخصص */
@@ -527,28 +518,19 @@ ul::-webkit-scrollbar-thumb {
 }
 
 /* 🧲 عنصر المهمة الفردية مفرود ومحمي بالكامل */
-li, .fixed-task-item {
+.fixed-task-item, li {
     display: flex !important;
-    justify-content: space-between !important;
     align-items: center !important;
+    justify-content: space-between !important;
     width: 100% !important;
-    
-    /* حماية أبعاد المهمة من أي تشويه */
-    height: 54px !important;       
-    min-height: 54px !important; 
-    max-height: 54px !important;
-    margin-bottom: 12px !important; 
-    flex-shrink: 0 !important;     
-    
     box-sizing: border-box !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 18px !important; 
-    padding: 0 20px !important;    
+    min-height: 50px !important; /* ارتفاع مريح وثابت يحمي المهمة */
+    height: auto !important; 
     background: rgba(255, 255, 255, 0.03) !important;
-    font-size: 16px !important;   
-    
-    scroll-snap-align: start !important;
-    scroll-snap-stop: always !important; 
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 15px !important;
+    padding: 10px 15px !important;
+    flex-shrink: 0 !important; /* يمنع المتصفح من كبس العنصر عمودياً */
 }
 /* ==========================================================================
    🖥️ 11. هندسة الحواسب والأجهزة المكتبية الكبيرة والماك بوك (1025px وأعلى)
