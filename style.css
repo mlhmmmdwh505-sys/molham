@@ -293,25 +293,29 @@ button:active {
 }
 
 /* ==========================================================================
-   📊 6. لوحة التحكم والـ Grid الأساسي 
+   📊 6. لوحة التحكم والـ Grid الأساسي (🚀 تعديل لمنع خنق صندوق المهام)
    ========================================================================== */
 .dashboard-grid {
     width: 100%;
     flex: 1 1 auto;
     min-height: 0;
+    display: flex !important; /* استخدام flex بدلاً من grid العادي لضمان توازن الأعمدة */
+    gap: 30px !important;
 }
 
 .main-col, .side-col {
     display: flex;
     flex-direction: column;
     height: 100%;
-    width: 100%;
+    width: 50% !important; /* توزيع متساوي تماماً بنسبة 50% لكل جانب */
     min-height: 0;
+    gap: 25px !important; /* مسافة مريحة بين الكروت */
 }
 
+/* تعديل أحجام الكروت لتعطي مساحة لبعضها البعض */
 .info-card {
     background: rgba(255, 255, 255, 0.01);
-    padding: 26px;
+    padding: 22px;
     border-radius: 35px;
     border: 1px solid var(--glass-border-light);
     text-align: center;
@@ -320,8 +324,8 @@ button:active {
     justify-content: center;
     align-items: center;
     width: 100%;
+    box-sizing: border-box !important;
 }
-
 /* ==========================================================================
    ⏱️ 7. منظومة بومودورو والعداد (Timer & Pomodoro Engine)
    ========================================================================== */
@@ -432,18 +436,17 @@ button:active {
     background: var(--success-hover);
     transform: scale(1.03);
 }
-
 /* ==========================================================================
-   📝 10. منظومة المهام الفخمة والأبعاد الصارمة (🎯 الحل النهائي والقطعي)
+   📝 10. منظومة المهام الفخمة (🎯 توسيع الكارد وفرد المهام بالكامل)
    ========================================================================== */
 .todo-box {
-    flex: 1 1 auto !important; 
+    flex: 2 1 auto !important; /* 🚀 رفع القوة المرنة إلى 2 ليتوسع الكارد لأسفل على حساب العداد إذا لزم الأمر */
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
     padding: 25px !important;  
     box-sizing: border-box !important;
-    min-height: 280px !important; 
+    min-height: 290px !important; /* 🎯 رفع الحد الأدنى لارتفاع الكارد نفسه ليحتوي على العناصر مستريحة */
     overflow: hidden !important;
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
@@ -460,6 +463,7 @@ button:active {
     height: 52px !important;   
     max-height: 52px !important;
     margin-bottom: 0px !important;
+    flex-shrink: 0 !important; /* منع حقل الإدخال من الانكماش */
 }
 
 #taskInput, .input-section input {
@@ -486,33 +490,33 @@ button:active {
     margin: 0 !important;
     font-size: 24px !important;
     border-radius: 50px !important;
+    flex-shrink: 0 !important;
 }
 
-/* 🧲 حاوية السكرول المغناطيسي - الحسبة الإمبراطورية الدقيقة */
+/* 🧲 حاوية السكرول المغناطيسي - ضبط نهائي بعد توسيع الكارد */
 .tasks-container, 
 #todoList, 
 #taskList, 
 ul {
     list-style: none !important;
-    display: block !important; /* 🎯 تحويلها إلى block بدلاً من flex لمنع المتصفح من كبس الارتفاع */
+    display: block !important; 
     width: 100% !important;
     margin: 20px 0 0 0 !important; 
     padding: 0 !important;
     text-align: right !important;
     
-    /* 🎯 الارتفاع المثالي: 145px يضمن ظهور مهمتين (كل واحدة 54px + هامش 12px = إجمالي 132px) 
-       والـ 13px المتبقية تظهر بدقة شديدة تلميحة أو طرف المهمة الثالثة بالأسفل */
-    height: 145px !important;
-    max-height: 145px !important;
+    /* 🎯 الارتفاع الآن أصبح مدعوماً بحجم الكارد الموسع */
+    height: 150px !important;
+    max-height: 150px !important;
+    flex-grow: 1 !important; /* السماح للحاوية بأن تأخذ راحتها في المساحة الجديدة */
     
-    /* تفعيل السكرول والمغناطيس الانسيابي */
     overflow-y: auto !important;               
     scroll-snap-type: y mandatory !important;    
     scroll-behavior: smooth !important;         
     -webkit-overflow-scrolling: touch !important; 
 }
 
-/* تصميم شريط سكرول ميكروسكوبي مخصص لحركة الماوس */
+/* تصميم شريط سكرول ميكروسكوبي مخصص */
 .tasks-container::-webkit-scrollbar, 
 #todoList::-webkit-scrollbar, 
 #taskList::-webkit-scrollbar, 
@@ -528,19 +532,17 @@ ul::-webkit-scrollbar-thumb {
     border-radius: 10px !important;
 }
 
-/* 🧲 عنصر المهمة الفردية الثابت بأبعاده الحديدية */
+/* 🧲 عنصر المهمة الفردية مفرود وبحجم ثابت */
 li, .fixed-task-item {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
     width: 100% !important;
     
-    /* 🎯 تثبيت مطلق وقاتل للارتفاع يمنع المتصفح تماماً من التقليص */
     height: 54px !important;       
-    min-height: 54px !important; /* إجبار المتصفح على عدم النزول عن 54 بكسل */
+    min-height: 54px !important; 
     max-height: 54px !important;
     
-    /* مسافة التباعد بين المهمتين */
     margin-bottom: 12px !important; 
     flex-shrink: 0 !important;     
     
@@ -551,7 +553,6 @@ li, .fixed-task-item {
     background: rgba(255, 255, 255, 0.02) !important;
     font-size: 16px !important;   
     
-    /* إقفال نقطة الجذب المغناطيسية السلسة */
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important; 
 }
