@@ -72,17 +72,19 @@ body {
     -webkit-backdrop-filter: blur(25px);
     border-radius: 40px;
     width: 95vw;
-    height: 94vh;
+    /* 🚀 التعديل: جعل الارتفاع مرناً حسب المحتوى مع حد أدنى مريح لحماية الأبعاد */
+    height: auto !important;
+    min-height: 85vh !important;
     max-width: 1440px;
-    max-height: 900px;
     padding: 30px 40px;
     border: 1px solid var(--glass-border);
     position: relative;
     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    overflow: hidden !important;
+    justify-content: flex-start;
+    gap: 20px;
+    overflow: visible !important; /* السماح للعناصر بالتنفس */
 }
 
 /* Tags العلوية المطلقة */
@@ -293,29 +295,26 @@ button:active {
 }
 
 /* ==========================================================================
-   📊 6. لوحة التحكم والـ Grid الأساسي (🚀 تعديل لمنع خنق صندوق المهام)
+   📊 6. لوحة التحكم والـ Grid الأساسي 
    ========================================================================== */
 .dashboard-grid {
     width: 100%;
-    flex: 1 1 auto;
-    min-height: 0;
-    display: flex !important; /* استخدام flex بدلاً من grid العادي لضمان توازن الأعمدة */
+    display: flex !important; /* تحويلها إلى flex لضمان مرونة الأعمدة */
+    flex-direction: row !important;
     gap: 30px !important;
+    align-items: flex-start !important;
 }
 
 .main-col, .side-col {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 50% !important; /* توزيع متساوي تماماً بنسبة 50% لكل جانب */
-    min-height: 0;
-    gap: 25px !important; /* مسافة مريحة بين الكروت */
+    display: flex !important;
+    flex-direction: column !important;
+    width: 50% !important; /* تقسيم الشاشة نصفين متساويين تماماً 50% لكل جانب */
+    gap: 25px !important; /* تباعد عمودي أنيق بين الكروت */
 }
 
-/* تعديل أحجام الكروت لتعطي مساحة لبعضها البعض */
 .info-card {
     background: rgba(255, 255, 255, 0.01);
-    padding: 22px;
+    padding: 25px;
     border-radius: 35px;
     border: 1px solid var(--glass-border-light);
     text-align: center;
@@ -437,19 +436,20 @@ button:active {
     transform: scale(1.03);
 }
 /* ==========================================================================
-   📝 10. منظومة المهام الفخمة (🎯 توسيع الكارد وفرد المهام بالكامل)
+   📝 10. منظومة المهام الفخمة (🎯 فرض الأبعاد لمنع الدهس والانكماش)
    ========================================================================== */
 .todo-box {
-    flex: 2 1 auto !important; /* 🚀 رفع القوة المرنة إلى 2 ليتوسع الكارد لأسفل على حساب العداد إذا لزم الأمر */
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
     padding: 25px !important;  
     box-sizing: border-box !important;
-    min-height: 290px !important; /* 🎯 رفع الحد الأدنى لارتفاع الكارد نفسه ليحتوي على العناصر مستريحة */
+    /* 🚀 تثبيت الارتفاع الكلي لكارد المهام ليصبح مستريحاً جداً */
+    height: 320px !important; 
+    min-height: 320px !important;
     overflow: hidden !important;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 35px;
 }
 
 /* صف حقل الإدخال وزر الإضافة (+) */
@@ -463,7 +463,7 @@ button:active {
     height: 52px !important;   
     max-height: 52px !important;
     margin-bottom: 0px !important;
-    flex-shrink: 0 !important; /* منع حقل الإدخال من الانكماش */
+    flex-shrink: 0 !important; /* منع حقل الإدخال من الانكماش نهائياً */
 }
 
 #taskInput, .input-section input {
@@ -480,7 +480,7 @@ button:active {
 .todo-box .add-btn, 
 .todo-box input[type="submit"], 
 .btn-add {
-    width: 85px !important;   
+    width: 60px !important;   
     height: 52px !important;
     box-sizing: border-box !important;
     display: inline-flex !important;
@@ -493,22 +493,22 @@ button:active {
     flex-shrink: 0 !important;
 }
 
-/* 🧲 حاوية السكرول المغناطيسي - ضبط نهائي بعد توسيع الكارد */
+/* 🧲 حاوية السكرول المغناطيسي - الحسبة الإمبراطورية الدقيقة جداً للمهمتين */
 .tasks-container, 
 #todoList, 
 #taskList, 
 ul {
     list-style: none !important;
-    display: block !important; 
+    display: block !important; /* تغييرها لـ block لمنع المتصفح من كبس العناصر بالداخل */
     width: 100% !important;
     margin: 20px 0 0 0 !important; 
     padding: 0 !important;
     text-align: right !important;
     
-    /* 🎯 الارتفاع الآن أصبح مدعوماً بحجم الكارد الموسع */
+    /* 🎯 الحسبة الحديدية: كل مهمة بارتفاع 54px + هامش 12px = إجمالي 132px للمهمتين كاملتين.
+       جعلنا الارتفاع 150px بالملي لكي تظهر المهمتان كاملتين ويظهر رأس الثالثة بوضوح بالأسفل */
     height: 150px !important;
     max-height: 150px !important;
-    flex-grow: 1 !important; /* السماح للحاوية بأن تأخذ راحتها في المساحة الجديدة */
     
     overflow-y: auto !important;               
     scroll-snap-type: y mandatory !important;    
@@ -516,41 +516,35 @@ ul {
     -webkit-overflow-scrolling: touch !important; 
 }
 
-/* تصميم شريط سكرول ميكروسكوبي مخصص */
-.tasks-container::-webkit-scrollbar, 
-#todoList::-webkit-scrollbar, 
-#taskList::-webkit-scrollbar, 
+/* تصميم شريط سكرول ناعم مخصص */
 ul::-webkit-scrollbar {
-    width: 5px !important;                      
+    width: 6px !important;                      
     background: transparent !important;
 }
-.tasks-container::-webkit-scrollbar-thumb, 
-#todoList::-webkit-scrollbar-thumb, 
-#taskList::-webkit-scrollbar-thumb, 
 ul::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2) !important; 
+    background: rgba(255, 255, 255, 0.15) !important; 
     border-radius: 10px !important;
 }
 
-/* 🧲 عنصر المهمة الفردية مفرود وبحجم ثابت */
+/* 🧲 عنصر المهمة الفردية مفرود ومحمي بالكامل */
 li, .fixed-task-item {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
     width: 100% !important;
     
+    /* حماية أبعاد المهمة من أي تشويه */
     height: 54px !important;       
     min-height: 54px !important; 
     max-height: 54px !important;
-    
     margin-bottom: 12px !important; 
     flex-shrink: 0 !important;     
     
     box-sizing: border-box !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-radius: 16px !important; 
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 18px !important; 
     padding: 0 20px !important;    
-    background: rgba(255, 255, 255, 0.02) !important;
+    background: rgba(255, 255, 255, 0.03) !important;
     font-size: 16px !important;   
     
     scroll-snap-align: start !important;
