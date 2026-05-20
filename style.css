@@ -700,36 +700,10 @@ ul::-webkit-scrollbar-thumb {
 }
 
 /* ==========================================================================
-   👑 تفجير وفرد كارد المهام بالعرض الكامل (🎯 الحل القطعي للدكتور ملهم)
+   🧲 إعادة تفعيل الحركة المغناطيسية لـ مهمتين بالظبط (د. ملهم)
    ========================================================================== */
 
-/* 1. إجبار الكارد الخارجي على الفرد الأفقي الكامل بعرض الشاشة */
-.todo-box {
-    display: flex !important;
-    flex-direction: column !important;
-    
-    /* 🚀 الفرد بالعرض اللي بتدور عليه */
-    width: 100% !important;
-    min-width: 100% !important; 
-    max-width: 100% !important;
-    
-    /* الارتفاع المريح */
-    height: 300px !important;
-    min-height: 300px !important;
-    
-    padding: 25px !important;
-    box-sizing: border-box !important;
-    overflow: hidden !important;
-}
-
-/* 2. إجبار الحاوية الأساسية (العمود اللي شايل الكارد) على التمدد */
-.side-col, .main-col {
-    width: 100% !important;
-    min-width: 100% !important;
-    flex: 1 1 auto !important;
-}
-
-/* 🎯 ضبط الارتفاع الميكروسكوبي: عرض مهمتين فقط بالملي وبدون أي أطراف إضافية */
+/* 1. الحاوية الأساسية - تفعيل المغناطيس الرأسي */
 #taskList, .tasks-container, ul {
     list-style: none !important;
     display: block !important;
@@ -738,15 +712,25 @@ ul::-webkit-scrollbar-thumb {
     padding: 0 !important;
     text-align: right !important;
     
-    /* 🚀 الحسبة الدقيقة: (مهمة 52px + هامش 10px) * 2 = 124px بالتمام والكمال */
+    /* الارتفاع المحكم لمهمتين */
     height: 124px !important;
     max-height: 124px !important;
-    
-    overflow-y: auto !important; /* السكرول شغال تمام لو ضفت رابعة وخامسة */
     box-sizing: border-box !important;
+    
+    /* 🚀 تشغيل التثبيت المغناطيسي */
+    overflow-y: scroll !important; /* إجبار السكرول على العمل دائماً لدعم المغناطيس */
+    scroll-snap-type: y mandatory !important;    
+    scroll-behavior: smooth !important;         
+    -webkit-overflow-scrolling: touch !important; 
 }
 
-/* تأكيد أبعاد المهمة الفردية لتتطابق مع الحسبة */
+/* أخفاء شريط السكرول الافتراضي لجعل الشكل فخم ونظيف */
+#taskList::-webkit-scrollbar, ul::-webkit-scrollbar {
+    width: 0px !important;
+    background: transparent !important;
+}
+
+/* 2. عنصر المهمة الفردية - إجباره على الالتصاق المغناطيسي */
 .fixed-task-item, li {
     display: flex !important;
     flex-direction: row !important;
@@ -758,11 +742,16 @@ ul::-webkit-scrollbar-thumb {
     height: 52px !important;
     min-height: 52px !important;
     max-height: 52px !important;
-    margin-bottom: 10px !important; /* الهامش بين المهمتين */
+    margin-bottom: 10px !important;
     
     background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     border-radius: 15px !important;
     padding: 0 20px !important;
     flex-shrink: 0 !important;
+    
+    /* 🚀 نقطة الالتصاق المغناطيسي عند السكرول */
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important; 
+}
 }
