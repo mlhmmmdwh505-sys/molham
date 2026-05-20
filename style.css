@@ -351,7 +351,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 /* ======================================================= */
 /* ======================================================= */
-/* 🖥️ المنظومة الحديدية: تثبيت حجم الصندوق وعرض مهمة واحدة فقط لا غير */
+/* 🖥️ المنظومة الحديدية النهائية: قفل أبعاد الصندوق الخارجي بالملّي */
 /* ======================================================= */
 @media (min-width: 1025px) {
     /* 1. تثبيت الشاشة ومنع التمرير الخارجي نهائياً */
@@ -426,40 +426,41 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     }
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
 
-    /* 6. صندوق المهام الإجمالي الرئيسي */
+    /* 6. 🎯 القفل الأكبر: تحديد الارتفاع الإجمالي لصندوق المهام بالكامل 🎯 */
     .todo-box {
-        flex: 0 0 auto !important; /* منع الصندوق بالكامل من التمدد لأسفل الشاشة */
+        flex: 0 0 auto !important;
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
         padding: 15px 25px !important;
         box-sizing: border-box !important;
+        
+        /* 👈 قفل ارتفاع الصندوق الإجمالي (الخانة + المهمة الأولى فقط) */
+        height: 145px !important;
+        max-height: 145px !important;
+        overflow: hidden !important; /* بلع أي حاجة تزيد عن المساحة دي */
     }
 
-    /* 🎯 7. الحاوي السحري: قفل كامل للمساحة وإخفاء تام لأي مهمة إضافية 🎯 */
+    /* 7. الحاوية الداخلية للمهام */
     .tasks-container, #todoList {
-        display: block !important; /* كسر الـ Flexbox العنيد */
-        
-        /* قفل الارتفاع بالملّي على مقاس أول مهمة فقط وتعمية الباقي 🛑 */
-        height: 46px !important; 
-        max-height: 46px !important; 
-        overflow: hidden !important; /* 👈 ممنوع السكرول وممنوع ظهور أي مهمة تانية نهائياً */
-        
+        display: block !important;
+        height: 50px !important; 
+        max-height: 50px !important; 
+        overflow: hidden !important; /* منع ظهور المهمة التانية نهائياً */
         padding: 0 !important;
         margin: 10px 0 0 0 !important;
     }
 
-    /* تثبيت أبعاد المهمة الأولى بدقة عشان تفرش البوكس */
+    /* تثبيت أبعاد المهمة الأولى بدقة */
     .tasks-container li, #todoList li, .task-item {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
         width: 100% !important;
-        height: 44px !important; /* الارتفاع الدقيق للمهمة */
+        height: 44px !important;
         max-height: 44px !important;
-        margin: 0 0 50px 0 !important; /* زق أي مهمة تانية بعيد جداً في الخفاء */
+        margin: 0 0 50px 0 !important; /* رمي الباقي في المجهول */
         box-sizing: border-box !important;
-        overflow: hidden !important;
     }
 }
 
