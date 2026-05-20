@@ -351,7 +351,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 /* ======================================================= */
 /* ======================================================= */
-/* 🖥️ التثبيت النهائي: شاشة واحدة ثابتة وصندوق مهام بسكرول لمهمة واحدة */
+/* 🖥️ التثبيت النهائي: مسافات واسعة ومريحة مع عرض مهمة واحدة بالسكرول */
 /* ======================================================= */
 @media (min-width: 1025px) {
     html, body {
@@ -421,7 +421,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     }
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
 
-    /* 📦 صندوق المهام الإجمالي - يظل ثابت الحجم تماماً */
+    /* صندوق المهام الإجمالي الخارجي */
     .todo-box {
         flex: 0 0 auto !important;
         display: flex !important;
@@ -429,40 +429,45 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         width: 100% !important;
         padding: 15px 25px !important;
         box-sizing: border-box !important;
+        height: 145px !important;
+        max-height: 145px !important;
+        overflow: hidden !important; 
     }
 
-    /* 🎯 السحر هنا: قفل أبعاد اللستة بدقة لعرض مهمة واحدة مع تفعيل السكرول 📜 */
+    /* 🎯 تعديل أبعاد الحاوية لتتناسب مع المسافات الموسعة الجديدة 🎯 */
     .tasks-container, #todoList, #taskList {
         display: flex !important;
         flex-direction: column !important;
         gap: 0px !important;
         
-        /* الارتفاع الصارم الكافي لعنصر واحد فقط لمنع مط الصندوق */
-        height: 46px !important; 
-        max-height: 46px !important; 
+        /* ضبط الارتفاع بدقة ليحكم الإغلاق على مهمة واحدة بمسافتها الجديدة */
+        height: 48px !important; 
+        max-height: 48px !important; 
         
-        overflow-y: auto !important; /* تفعيل السكرول بشكل إجباري وصريح */
+        overflow-y: auto !important; 
         overflow-x: hidden !important;
         padding: 0 5px 0 0 !important;
-        margin: 10px 0 0 0 !important;
+        margin: 12px 0 0 0 !important;
     }
 
-    /* 🔒 تثبيت حجم المهمة الواحدة برمجياً لمنع العصر */
+    /* 🔒 توسيع المسافات بين المهام ومنع الالتصاق أثناء السكرول 🔒 */
     .fixed-task-item {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
         width: 100% !important;
         
-        height: 44px !important; /* نفس ارتفاع الحاوية تقريباً */
+        height: 44px !important; /* ارتفاع المهمة الزجاجية */
         max-height: 44px !important;
         
-        flex-shrink: 0 !important; /* يمنع المتصفح من ضغط العناصر */
+        /* 👈 إعطاء مسافة عزل سفلية كبيرة وواسعة بين المهمة الحالية والتي تليها */
+        margin-bottom: 25px !important; 
+        
+        flex-shrink: 0 !important; 
         box-sizing: border-box !important;
-        margin-bottom: 2px !important;
     }
 
-    /* تخصيص مظهر شريط التمرير (السكرول الداخلي) ليكون أنيقاً وواضحاً للمهمات */
+    /* تجميل شريط التمرير (السكرول الداخلي) */
     .tasks-container::-webkit-scrollbar, #todoList::-webkit-scrollbar, #taskList::-webkit-scrollbar { 
         width: 5px !important; 
     }
