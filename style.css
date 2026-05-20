@@ -359,11 +359,14 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 /* ======================================================= */
 /* 🖥️ التثبيت الكامل للوحة في شاشة واحدة ثابتة بدون Scroll (ماك بوك / كمبيوتر) */
 /* ======================================================= */
+/* ======================================================= */
+/* 🖥️ المنظومة الكاملة والمحكمة للوحة التحكم (ماك بوك / كمبيوتر) */
+/* ======================================================= */
 @media (min-width: 1025px) {
-    /* 1. إجبار جسم الصفحة على الثبات داخل حدود الشاشة المتاحة */
+    /* 1. تثبيت نافذة المتصفح لمنع التمرير الخارجي نهائياً */
     html, body {
         height: 100vh !important;
-        overflow: hidden !important; /* منع ظهور شريط التمرير النهائي نهائياً 🚫 */
+        overflow: hidden !important; 
         margin: 0;
         padding: 0;
         display: flex;
@@ -371,47 +374,47 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         justify-content: center;
     }
 
-    /* 2. ضبط الصندوق الزجاجي الكبير ليناسب الشاشة عمودياً وأفقياً */
+    /* 2. جعل اللوحة الزجاجية تتنفس وتملأ المساحة بحد أقصى آمن */
     .glass-card { 
         width: 95vw !important;
-        height: 92vh !important; /* أخذ 92% من ارتفاع الشاشة لتترك متسعاً مريحاً */
+        height: 92vh !important; /* احتواء عمودي مثالي داخل الشاشة */
         max-width: 1440px !important; 
-        padding: 20px 30px !important; /* تقليل البادينج الرأسي لضغط المحتوى */
+        padding: 20px 35px !important; /* بادينج مدمج يمنع المط الرأسي */
         box-sizing: border-box !important;
         display: flex !important;
         flex-direction: column !important;
-        justify-content: space-between !important; /* توزيع العناصر بانتظام عمودياً */
+        justify-content: space-between !important;
         overflow: hidden !important;
     }
 
-    /* 3. ضغط الهيدر والترحيب لتقليل استهلاك المساحة الرأسية */
+    /* 3. تقليص مساحات الهيدر الرأسية لتوفر مساحة للصناديق */
     header {
-        margin-bottom: 10px !important;
+        margin-bottom: 8px !important;
     }
-    header h1 { font-size: 24px !important; margin-bottom: 2px !important; }
+    header h1 { font-size: 26px !important; margin-bottom: 2px !important; }
     header p { font-size: 14px !important; margin-bottom: 2px !important; }
-    .subtitle { font-size: 12px !important; margin-bottom: 5px !important; }
+    .subtitle { font-size: 13px !important; margin-bottom: 4px !important; }
 
-    /* 4. شريط الإعدادات الأفقي المدمج */
+    /* 4. شريط إعدادات أفقي ممتد بكامل عرض اللوحة */
     .settings-bar { 
         display: grid !important;
-        grid-template-columns: repeat(5, 1fr) !important; 
-        gap: 15px !important; 
+        grid-template-columns: repeat(5, 1fr) !important; /* 5 أعمدة متساوية بالملّي */
+        gap: 20px !important; 
         align-items: flex-end !important;
         width: 100% !important; 
         max-width: 100% !important;
-        margin: 0 auto 15px auto !important;
+        margin: 0 auto 12px auto !important;
     }
 
     .input-group, .setting-item { 
         display: flex !important;
         flex-direction: column !important; 
-        gap: 5px !important;
+        gap: 6px !important;
         width: 100% !important;
         align-items: center !important;
     }
 
-    /* تقليص بسيط في ارتفاع الخانات لتوفير مساحة */
+    /* توحيد أبعاد ومقاسات خانات الإدخال والقوائم */
     input[type="text"], 
     input[type="number"], 
     input[type="date"], 
@@ -420,73 +423,108 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     #langSelect,
     #colorPicker { 
         width: 100% !important;
-        height: 38px !important; /* ارتفاع مدمج ومثالي */
+        height: 40px !important; /* ارتفاع مدمج وأنيق */
         text-align: center !important; 
         font-size: 14px !important; 
         padding: 0 10px !important; 
         box-sizing: border-box !important;
+        margin: 0 !important;
     }
 
-    /* زر التأكيد مدمج في سطر مستقل بمسافة صغيرة */
+    /* 5. تمركز زر تأكيد الإعدادات في المنتصف أسفل الخانات */
     .settings-bar button {
-        grid-column: 1 / -1 !important;
-        justify-self: center !important;
-        width: 160px !important;
-        height: 38px !important;
-        margin-top: 5px !important;
+        grid-column: 1 / -1 !important; /* الامتداد تحت الشبكة */
+        justify-self: center !important; /* التوسيط الأفقي الصريح */
+        width: 170px !important;
+        height: 40px !important;
+        margin-top: 8px !important;
+        padding: 0 !important;
     }
 
-    /* 5. موازنة الـ Grid السفلي وضبط ارتفاعه تلقائياً */
+    /* 6. إعادة هيكلة توزيع الصناديق السفلية لملء المساحة أفقياً ورأسياً */
     .dashboard-grid { 
         display: grid !important;
-        grid-template-columns: 1fr 1fr !important; 
-        gap: 20px !important; 
+        grid-template-columns: 1fr 1fr !important; /* تقسيم متساوي تماماً لعمودين يمين ويسار */
+        gap: 25px !important; 
         width: 100% !important;
-        flex: 1 !important; /* يخليه ياخد كل المساحة المتبقية تحت الإعدادات */
-        min-height: 0 !important; /* يمنع الـ Grid من التمدد خارج الأب */
+        flex: 1 !important; /* استهلاك كامل المساحة المتبقية */
+        min-height: 0 !important; /* حماية تمنع تخطي حدود الحاوية الزجاجية */
     }
 
-    /* 6. جعل الأعمدة تملأ المساحة الرأسية بدقة وبدون زيادة */
+    /* ضبط الأعمدة لتعبئة الارتفاع بمرونة */
     .main-col, .side-col { 
         display: flex !important;
         flex-direction: column !important; 
         gap: 20px !important; 
         height: 100% !important;
+        width: 100% !important;
         justify-content: flex-start !important;
     }
 
-    /* 7. ضبط كتل العرض (المؤقت، المهام، المتجر، حلم التخرج) */
+    /* إجبار كافة كتل العرض الداخلية على فرد مساحتها أفقياً */
     .pomo-box, .todo-box, .store-card, .countdown-card {
         width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
-        padding: 15px 20px !important; /* تقليص البادينج الداخلي لتجنب المط */
+        padding: 15px 25px !important; /* ضغط المسافات الداخلية لتجنب المط */
     }
 
-    /* تظبيط حجم خط العداد الكبير ليتوافق مع الضغط الجديد */
+    /* موازنة خط العداد الكبير مع المساحة الجديدة */
     #pomoDisplay {
-        font-size: 65px !important;
+        font-size: 70px !important;
         margin: 10px 0 !important;
     }
 
-    /* السماح لصندوق المهام فقط بالـ Scroll الداخلي النظيف لو المهام كترت */
+    /* 7. تفعيل التمرير الداخلي المنفصل لصندوق المهام عند زيادة العناصر */
     .todo-box {
-        display: flex;
-        flex-direction: column;
-        flex: 1 !important; /* خليه ياخد المساحة المتاحة تحت العداد بالكامل */
-        min-height: 0;
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1 !important; /* تعبئة المساحة المتاحة تحت العداد */
+        min-height: 0 !important;
     }
+    
     .tasks-container {
-        flex: 1;
-        overflow-y: auto !important; /* سكرول داخلي للمهام فقط عند الحاجة */
+        flex: 1 !important;
+        overflow-y: auto !important; /* سكرول راسي ذكي خاص بالمهام فقط */
+        padding-right: 5px;
     }
 }
 
-/* 🎨 قفل الهلال الأسود لبوكس اللون */
+/* ======================================================= */
+/* 🎨 التثبيت الجذري لمدخل اختيار اللون (منع الهلال الأسود والفراغات) */
+/* ======================================================= */
 #colorPicker {
-    -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important;
-    background: transparent !important; border: 1px solid var(--primary) !important;
-    border-radius: 50px !important; cursor: pointer !important; overflow: hidden !important; padding: 0 !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background: transparent !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 50px !important;
+    cursor: pointer !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
 }
-#colorPicker::-webkit-color-swatch-wrapper { padding: 0 !important; margin: 0 !important; border-radius: 50px !important; }
-#colorPicker::-webkit-color-swatch { border: none !important; border-radius: 0 !important; width: 100% !important; height: 100% !important; }
-#colorPicker::-moz-color-swatch { border: none !important; border-radius: 0 !important; width: 100% !important; height: 100% !important; }
+
+/* ملء المساحة الداخلية بالكامل بكافة المتصفحات */
+#colorPicker::-webkit-color-swatch-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50px !important;
+    background: none !important;
+}
+#colorPicker::-webkit-color-swatch {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important; /* إلغاء التدوير الداخلي لإلغاء الفراغات الجانبية */
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+}
+#colorPicker::-moz-color-swatch {
+    border: none !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
