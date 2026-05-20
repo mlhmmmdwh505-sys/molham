@@ -1,12 +1,14 @@
 /* الألوان والأساسيات */
-:root { --primary: #6366f1 !important; } /* تأمين الـ primary ضد الـ JS */
+:root { 
+    --primary: #6366f1 !important; /* تأمين اللون لمنع الـ JS من قلبه للأسود */
+}
 
 body {
-    background: #020617 !important; /* تأمين الخلفية الداكنة */
+    background: #020617 !important; /* تأمين الخلفية لمنع الانهيار للأبيض */
     background-image: radial-gradient(circle at center, color-mix(in srgb, var(--primary) 10%, #0f172a), #020617) !important;
     font-family: 'Cairo', sans-serif; color: white;
     min-height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center;
-    overflow-x: hidden; /* منع التمرير الأفقي تماماً */
+    overflow-x: hidden;
     padding: 20px 10px;
 }
 
@@ -67,11 +69,11 @@ input[type="number"] {
     direction: ltr;
 }
 
-/* الـ Grid والمسافات */
+/* الـ Grid والمسافات الأصلي للكمبيوتر (Flexbox) */
 .dashboard-grid { display: flex; gap: 40px; }
 .side-col, .main-col { flex: 1; display: flex; flex-direction: column; gap: 35px; min-width: 0; }
 .info-card { 
-    background: rgba(255,255,255,0.02); padding: 30px; border-radius: 35px; 
+    background: rgba(255,255,255,0.02) !important; padding: 30px; border-radius: 35px; 
     border: 1px solid rgba(255,255,255,0.05); text-align: center;
 }
 
@@ -79,15 +81,15 @@ input[type="number"] {
 .pomo-actions { display: flex; justify-content: center; gap: 15px; }
 
 /* خانة المهام الطويلة جداً */
-.input-section { display: flex; gap: 15px; margin-bottom: 20px; width: 100%; }
+.input-section { display: flex; gap: 15px; margin-bottom: 20px; width: 100%; direction: ltr !important; }
 .input-section input {
     flex: 4; background: rgba(255,255,255,0.05) !important;
-    border: 1px solid rgba(255,255,255,0.1) !important;
-    padding: 12px 25px; border-radius: 50px !important; color: white; outline: none;
-    min-width: 0;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    padding: 12px 25px; border-radius: 50px !important; color: white !important; outline: none;
+    min-width: 0; text-align: right;
 }
 .input-section input:focus { border-color: var(--primary) !important; }
-.btn-add { flex: 1; font-size: 22px; padding: 0 !important; height: 48px; }
+.btn-add { flex: 1; font-size: 22px; padding: 0 !important; height: 48px; min-width: 60px; }
 
 /* قائمة المهام */
 ul { 
@@ -106,7 +108,10 @@ ul::-webkit-scrollbar {
     background: transparent !important;
 }
 
-li { background: rgba(255,255,255,0.03); padding: 12px 20px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+li { 
+    background: rgba(255,255,255,0.03) !important; padding: 12px 20px; border-radius: 15px; margin-bottom: 10px; 
+    display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.15) !important; 
+}
 
 .modern-timer { display: flex; justify-content: space-around; margin-top: 15px; }
 .unit span { font-size: 32px; font-weight: 800; color: var(--primary); display: block; }
@@ -179,7 +184,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
 
 /* ======================================================= */
-/* 📱 إضافة أكواد التجاوب وملاءمة الهواتف الذكية (Responsiveness) */
+/* 📱 التجاوب مع الهواتف الذكية */
 /* ======================================================= */
 @media (max-width: 1024px) {
     body { height: auto; padding: 40px 15px; overflow-y: auto; }
@@ -193,7 +198,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     .glass-card { padding: 25px 15px; }
     #pomoDisplay { font-size: 55px; min-width: 100%; }
 
-    /* 1. إعادة ترتيب حاوية الإعدادات لتكون عمودية ومنظمة */
     .settings-bar { 
         display: flex !important;
         flex-direction: column !important; 
@@ -202,10 +206,9 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         gap: 15px !important; 
     }
 
-    /* 2. تنظيم كل خانة مع الـ Label الخاص بها */
     .input-group, .setting-item { 
         display: flex !important;
-        flex-direction: row !important; /* منع الانعكاس للحفاظ على الترتيب الأصلي */
+        flex-direction: row !important;
         justify-content: space-between !important;
         align-items: center !important;
         width: 100% !important; 
@@ -213,13 +216,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         gap: 15px !important;
     }
 
-    /* 3. توحيد حجم وعرض كل عناصر الإدخال بشكل كامل */
-    input[type="text"], 
-    input[type="number"], 
-    input[type="date"], 
-    select, 
-    #userNameInput, 
-    #langSelect { 
+    input[type="text"], input[type="number"], input[type="date"], select, #userNameInput, #langSelect { 
         width: 160px !important; 
         height: 42px !important; 
         text-align: center !important; 
@@ -228,189 +225,42 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         box-sizing: border-box !important;
     }
 
-    /* 4. ضبط خانة اختيار اللون */
-    #colorPicker {
-        width: 160px !important; 
-        height: 42px !important; 
-    }
-
-    /* 5. ضبط زر تأكيد الإعدادات ليأخذ العرض بالكامل أسفلهم */
-    .settings-bar button {
-        width: 160px !important;
-        height: 42px !important;
-        margin-top: 5px !important;
-    }
-
-    /* تنسيقات الأقسام الأخرى للموبايل */
+    #colorPicker { width: 160px !important; height: 42px !important; }
+    .settings-bar button { width: 160px !important; height: 42px !important; margin-top: 5px !important; }
     .store-grid { flex-direction: column; }
     .modern-timer { flex-wrap: wrap; gap: 15px; }
     .unit { flex: 1 1 40%; }
 }
 
-/* 🎨 التعديل الجذري الثابت لمنع ظهور الهلال الأسود في بوكس اللون */
+/* تخصيص بوكس الألوان لمنع الهلال الأسود */
 #colorPicker {
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-    background: transparent !important;
-    border: 1px solid var(--primary) !important;
-    border-radius: 50px !important;
-    cursor: pointer !important;
-    overflow: hidden !important;
-    padding: 0 !important;
+    -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important;
+    background: transparent !important; border: 1px solid var(--primary) !important;
+    border-radius: 50px !important; cursor: pointer !important; overflow: hidden !important; padding: 0 !important;
     box-sizing: border-box !important;
 }
+#colorPicker::-webkit-color-swatch-wrapper { padding: 0 !important; margin: 0 !important; background: none !important; border-radius: 50px !important; }
+#colorPicker::-webkit-color-swatch { border: none !important; padding: 0 !important; margin: 0 !important; border-radius: 0 !important; width: 100% !important; height: 100% !important; box-sizing: border-box !important; }
+#colorPicker::-moz-color-swatch { border: none !important; border-radius: 0 !important; width: 100% !important; height: 100% !important; }
 
-#colorPicker::-webkit-color-swatch-wrapper {
-    padding: 0 !important;
-    margin: 0 !important;
-    background: none !important;
-    border-radius: 50px !important;
-}
-
-#colorPicker::-webkit-color-swatch {
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    box-sizing: border-box !important;
-}
-
-#colorPicker::-moz-color-swatch {
-    border: none !important;
-    border-radius: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-/* ======================================================= */
-/* 🖥️ المنظومة الحديدية: حدود للمهام وسكرول مغناطيسي ذكي */
-/* ======================================================= */
+/* السكرول المغناطيسي للمهام وعرض مهمتين بحدود واضحة في الـ 529 سطر الأصليين */
 @media (min-width: 1025px) {
-    html, body {
-        height: 100vh !important;
-        overflow: hidden !important; 
-        margin: 0; padding: 0;
-        display: flex; align-items: center; justify-content: center;
-    }
-
-    .glass-card { 
-        width: 95vw !important;
-        height: 94vh !important; 
-        max-width: 1440px !important; 
-        padding: 20px 35px !important; 
-        box-sizing: border-box !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
-        overflow: hidden !important;
-    }
-
+    html, body { height: 100vh !important; overflow: hidden !important; margin: 0; padding: 0; display: flex; align-items: center; justify-content: center; }
+    .glass-card { width: 95vw !important; height: 94vh !important; max-width: 1440px !important; padding: 20px 35px !important; box-sizing: border-box !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; overflow: hidden !important; }
     header { margin-bottom: 5px !important; }
     header h1 { font-size: 24px !important; }
-
-    .settings-bar { 
-        display: flex !important; /* استرجاع الـ Flex الأصلي بتاعك */
-        justify-content: center !important;
-        gap: 20px !important;
-        align-items: flex-end !important;
-        flex-wrap: wrap !important;
-        width: 100% !important; 
-        margin: 0 auto 10px auto !important;
-    }
-
-    input[type="text"], input[type="number"], input[type="date"], select, #userNameInput, #langSelect, #colorPicker { 
-        height: 38px !important;
-    }
-
-    .settings-bar button {
-        height: 38px !important; margin-top: 5px !important;
-    }
-
-    .dashboard-grid { 
-        display: flex !important; /* استرجاع الـ Flex الأصلي */
-        gap: 40px !important;
-        width: 100% !important;
-        flex: 1 !important; 
-        min-height: 0 !important; 
-    }
-
-    .main-col, .side-col { 
-        display: flex !important;
-        flex-direction: column !important; 
-        gap: 15px !important; 
-        height: 100% !important;
-        width: 100% !important;
-        min-height: 0 !important; 
-    }
-
+    .settings-bar { display: flex !important; justify-content: center !important; gap: 20px !important; align-items: flex-end !important; flex-wrap: wrap !important; width: 100% !important; margin: 0 auto 10px auto !important; }
+    input[type="text"], input[type="number"], input[type="date"], select, #userNameInput, #langSelect, #colorPicker { height: 38px !important; }
+    .settings-bar button { height: 38px !important; margin-top: 5px !important; }
+    .dashboard-grid { display: flex !important; gap: 40px !important; width: 100% !important; flex: 1 !important; min-height: 0 !important; }
+    .main-col, .side-col { display: flex !important; flex-direction: column !important; gap: 15px !important; height: 100% !important; width: 100% !important; min-height: 0 !important; }
     .side-col .store-card, .side-col .countdown-card { flex: 1 !important; }
-
-    .pomo-box {
-        flex: 0 0 auto !important;
-        padding: 12px 25px !important;
-    }
+    .pomo-box { flex: 0 0 auto !important; padding: 12px 25px !important; }
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
-
-    /* صندوق المهام الخارجي */
-    .todo-box {
-        flex: 0 0 auto !important;
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        padding: 15px 25px !important;
-        box-sizing: border-box !important;
-        height: 195px !important; 
-        max-height: 195px !important;
-        overflow: hidden !important; 
-    }
-
-    /* 🎯 تفعيل خاصية السكرول المغناطيسي */
-    .tasks-container, #todoList, #taskList, ul {
-        display: flex !important;
-        flex-direction: column !important;
-        
-        height: 98px !important; 
-        max-height: 98px !important; 
-        
-        overflow-y: auto !important; 
-        overflow-x: hidden !important;
-        padding: 0 5px 0 0 !important;
-        margin: 12px 0 0 0 !important; 
-
-        scroll-snap-type: y mandatory !important; 
-        scroll-behavior: smooth !important;
-    }
-
-    /* 🎯 إضافة حدود مخصصة وقفل الوقوف عند كل عنصر */
-    .fixed-task-item, li {
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        width: 100% !important;
-        
-        height: 44px !important; 
-        max-height: 44px !important;
-        margin-bottom: 8px !important; 
-        flex-shrink: 0 !important; 
-        box-sizing: border-box !important;
-
-        border: 1px solid rgba(255, 255, 255, 0.15) !important;
-        border-radius: 8px !important;
-        padding: 0 15px !important; 
-        background: rgba(255, 255, 255, 0.03) !important;
-
-        scroll-snap-align: start !important; 
-    }
-
-    /* تجميل شريط التمرير */
-    .tasks-container::-webkit-scrollbar, #todoList::-webkit-scrollbar, #taskList::-webkit-scrollbar, ul::-webkit-scrollbar { 
-        width: 5px !important; 
-    }
-    .tasks-container::-webkit-scrollbar-thumb, #todoList::-webkit-scrollbar-thumb, #taskList::-webkit-scrollbar-thumb, ul::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.3) !important; 
-        border-radius: 10px !important;
-    }
+    
+    .todo-box { flex: 0 0 auto !important; display: flex !important; flex-direction: column !important; width: 100% !important; padding: 15px 25px !important; box-sizing: border-box !important; height: 195px !important; max-height: 195px !important; overflow: hidden !important; }
+    .tasks-container, #todoList, #taskList, ul { display: flex !important; flex-direction: column !important; height: 98px !important; max-height: 98px !important; overflow-y: auto !important; overflow-x: hidden !important; padding: 0 5px 0 0 !important; margin: 12px 0 0 0 !important; scroll-snap-type: y mandatory !important; scroll-behavior: smooth !important; }
+    .fixed-task-item, li { display: flex !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; height: 44px !important; max-height: 44px !important; margin-bottom: 8px !important; flex-shrink: 0 !important; box-sizing: border-box !important; border: 1px solid rgba(255, 255, 255, 0.15) !important; border-radius: 8px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.03) !important; scroll-snap-align: start !important; }
+    .tasks-container::-webkit-scrollbar, #todoList::-webkit-scrollbar, #taskList::-webkit-scrollbar, ul::-webkit-scrollbar { width: 5px !important; }
+    .tasks-container::-webkit-scrollbar-thumb, #todoList::-webkit-scrollbar-thumb, #taskList::-webkit-scrollbar-thumb, ul::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3) !important; border-radius: 10px !important; }
 }
