@@ -526,4 +526,4 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 #colorPicker::-webkit-color-swatch-wrapper { padding: 0 !important; margin: 0 !important; border-radius: 50px !important; }
 #colorPicker::-webkit-color-swatch { border: none !important; border-radius: 0 !important; width: 100% !important; height: 100% !important; }
-#colorPicker::-moz-color-swatch { border: none !important; border-radius: 0 !important; width: 100% !important; height: 100% !important; }                               ما اخطاء هذا الكود
+#colorPicker::-moz-color-swatch { border: none !important; border-radius: 0 !important; width: 100% !important; height: 100% !important; }                           
