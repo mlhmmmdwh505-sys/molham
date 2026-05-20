@@ -351,7 +351,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 /* ======================================================= */
 /* ======================================================= */
-/* 🖥️ التقفيل النهائي: معالجة مغناطيس آخر المهام وتوسيط الوقوف */
+/* 🖥️ المنظومة الحديدية: حدود للمهام وسكرول مغناطيسي ذكي يقف عند كل مهمة */
 /* ======================================================= */
 @media (min-width: 1025px) {
     html, body {
@@ -466,7 +466,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         margin: 0 !important;
     }
 
-    /* الحاوية الذكية للمهام */
+    /* 🎯 1. تفعيل خاصية السكرول المغناطيسي على الحاوية 🎯 */
     .tasks-container, #todoList, #taskList {
         display: flex !important;
         flex-direction: column !important;
@@ -480,15 +480,12 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         padding: 0 5px 0 0 !important;
         margin: 12px 0 0 0 !important; 
 
+        /* 👈 حيلة التمرير المغناطيسي الإجباري الرأسي */
         scroll-snap-type: y mandatory !important; 
         scroll-behavior: smooth !important;
-        
-        /* 👈 إعطاء مساحة مبطنة بالأسفل عشان آخر عناصر تاخد راحتها في القفش المغناطيسي */
-        scroll-padding-bottom: 10px !important; 
-        scroll-padding-top: 10px !important;
     }
 
-    /* عناصر المهام بحدود مخصصة وسكرول متمركز */
+    /* 🎯 2. إضافة حدود (Border) مخصصة وتفعيل قفل الوقوف عند كل عنصر */
     .fixed-task-item {
         display: flex !important;
         justify-content: space-between !important;
@@ -501,13 +498,14 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         flex-shrink: 0 !important; 
         box-sizing: border-box !important;
 
+        /* 👈 إضافة حدود أنيقة شفافة متماشية مع مظهر الزجاج الديجيتال */
         border: 1px solid rgba(255, 255, 255, 0.15) !important;
         border-radius: 8px !important;
-        padding: 0 15px !important; 
+        padding: 0 15px !important; /* مسافة داخلية عشان الكلام ميزنّقش في الحدود */
         background: rgba(255, 255, 255, 0.03) !important;
 
-        /* 🎯 التعديل الجوهري: جعل المغناطيس يقفل في سنتر (منتصف) المهمة تماماً */
-        scroll-snap-align: center !important; 
+        /* 👈 نقطة المغناطيس: إجبار السكرول يقف بالملّي عند بداية كل مهمة */
+        scroll-snap-align: start !important; 
     }
 
     /* تجميل شريط التمرير */
