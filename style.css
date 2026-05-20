@@ -351,10 +351,9 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 /* ======================================================= */
 /* ======================================================= */
-/* 🖥️ المنظومة الحديدية النهائية: قفل أبعاد الصندوق الخارجي بالملّي */
+/* 🖥️ التثبيت النهائي: شاشة واحدة ثابتة وصندوق مهام بسكرول لمهمة واحدة */
 /* ======================================================= */
 @media (min-width: 1025px) {
-    /* 1. تثبيت الشاشة ومنع التمرير الخارجي نهائياً */
     html, body {
         height: 100vh !important;
         overflow: hidden !important; 
@@ -362,7 +361,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         display: flex; align-items: center; justify-content: center;
     }
 
-    /* 2. أبعاد اللوحة الزجاجية الكبيرة واحتوائها */
     .glass-card { 
         width: 95vw !important;
         height: 94vh !important; 
@@ -378,7 +376,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     header { margin-bottom: 5px !important; }
     header h1 { font-size: 24px !important; }
 
-    /* 3. شريط الإعدادات الموحد */
     .settings-bar { 
         display: grid !important;
         grid-template-columns: repeat(5, 1fr) !important; 
@@ -398,7 +395,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         width: 160px !important; height: 38px !important; margin-top: 5px !important;
     }
 
-    /* 4. الـ Grid والتحكم في الأعمدة */
     .dashboard-grid { 
         display: grid !important;
         grid-template-columns: 1fr 1fr !important; 
@@ -419,14 +415,13 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 
     .side-col .store-card, .side-col .countdown-card { flex: 1 !important; }
 
-    /* 5. العداد */
     .pomo-box {
         flex: 0 0 auto !important;
         padding: 12px 25px !important;
     }
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
 
-    /* 6. 🎯 القفل الأكبر: تحديد الارتفاع الإجمالي لصندوق المهام بالكامل 🎯 */
+    /* 📦 صندوق المهام الإجمالي - يظل ثابت الحجم تماماً */
     .todo-box {
         flex: 0 0 auto !important;
         display: flex !important;
@@ -434,33 +429,46 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         width: 100% !important;
         padding: 15px 25px !important;
         box-sizing: border-box !important;
-        
-        /* 👈 قفل ارتفاع الصندوق الإجمالي (الخانة + المهمة الأولى فقط) */
-        height: 145px !important;
-        max-height: 145px !important;
-        overflow: hidden !important; /* بلع أي حاجة تزيد عن المساحة دي */
     }
 
-    /* 7. الحاوية الداخلية للمهام */
-    .tasks-container, #todoList {
-        display: block !important;
-        height: 50px !important; 
-        max-height: 50px !important; 
-        overflow: hidden !important; /* منع ظهور المهمة التانية نهائياً */
-        padding: 0 !important;
+    /* 🎯 السحر هنا: قفل أبعاد اللستة بدقة لعرض مهمة واحدة مع تفعيل السكرول 📜 */
+    .tasks-container, #todoList, #taskList {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0px !important;
+        
+        /* الارتفاع الصارم الكافي لعنصر واحد فقط لمنع مط الصندوق */
+        height: 46px !important; 
+        max-height: 46px !important; 
+        
+        overflow-y: auto !important; /* تفعيل السكرول بشكل إجباري وصريح */
+        overflow-x: hidden !important;
+        padding: 0 5px 0 0 !important;
         margin: 10px 0 0 0 !important;
     }
 
-    /* تثبيت أبعاد المهمة الأولى بدقة */
-    .tasks-container li, #todoList li, .task-item {
+    /* 🔒 تثبيت حجم المهمة الواحدة برمجياً لمنع العصر */
+    .fixed-task-item {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
         width: 100% !important;
-        height: 44px !important;
+        
+        height: 44px !important; /* نفس ارتفاع الحاوية تقريباً */
         max-height: 44px !important;
-        margin: 0 0 50px 0 !important; /* رمي الباقي في المجهول */
+        
+        flex-shrink: 0 !important; /* يمنع المتصفح من ضغط العناصر */
         box-sizing: border-box !important;
+        margin-bottom: 2px !important;
+    }
+
+    /* تخصيص مظهر شريط التمرير (السكرول الداخلي) ليكون أنيقاً وواضحاً للمهمات */
+    .tasks-container::-webkit-scrollbar, #todoList::-webkit-scrollbar, #taskList::-webkit-scrollbar { 
+        width: 5px !important; 
+    }
+    .tasks-container::-webkit-scrollbar-thumb, #todoList::-webkit-scrollbar-thumb, #taskList::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.4) !important; 
+        border-radius: 10px !important;
     }
 }
 
