@@ -351,7 +351,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 /* ======================================================= */
 /* ======================================================= */
-/* 🖥️ التثبيت النهائي: مسافات صغيرة وملمومة لعرض مهمتين فقط بالسكرول */
+/* 🖥️ المنظومة الحديدية: حدود للمهام وسكرول مغناطيسي ذكي يقف عند كل مهمة */
 /* ======================================================= */
 @media (min-width: 1025px) {
     html, body {
@@ -421,10 +421,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     }
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
 
-    /* ========================================== */
-    /* 📦 منظومة صندوق المهام الملمومة والموحدة */
-    /* ========================================== */
-    
     /* صندوق المهام الخارجي */
     .todo-box {
         flex: 0 0 auto !important;
@@ -433,12 +429,12 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         width: 100% !important;
         padding: 15px 25px !important;
         box-sizing: border-box !important;
-        height: 195px !important; /* 👈 تقليص الارتفاع الإجمالي ليناسب المسافة الصغيرة الجديدة */
+        height: 195px !important; 
         max-height: 195px !important;
         overflow: hidden !important; 
     }
 
-    /* توحيد السطر العلوي (الخانة + الزر) بربطهم بارتفاع واحد */
+    /* توحيد السطر العلوي */
     .todo-box form, .input-group, .todo-input-row {
         display: flex !important;
         width: 100% !important;
@@ -449,7 +445,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         margin-bottom: 5px !important;
     }
 
-    /* خانة الكتابة الأساسية */
     #taskInput {
         flex: 1 !important; 
         height: 44px !important; 
@@ -459,7 +454,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         font-size: 14px !important;
     }
 
-    /* زر الإضافة (+) */
     .todo-box button, .todo-box .add-btn, .todo-box input[type="submit"] {
         width: 70px !important; 
         height: 44px !important; 
@@ -472,13 +466,12 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         margin: 0 !important;
     }
 
-    /* 🎯 وزنة الحاوية المحكومة لعرض مهمتين بمسافة صغيرة 🎯 */
+    /* 🎯 1. تفعيل خاصية السكرول المغناطيسي على الحاوية 🎯 */
     .tasks-container, #todoList, #taskList {
         display: flex !important;
         flex-direction: column !important;
         gap: 0px !important;
         
-        /* 👈 الارتفاع الهندسي الجديد لعرض مهمتين متلاصقتين بشكل أنيق */
         height: 98px !important; 
         max-height: 98px !important; 
         
@@ -486,9 +479,13 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         overflow-x: hidden !important;
         padding: 0 5px 0 0 !important;
         margin: 12px 0 0 0 !important; 
+
+        /* 👈 حيلة التمرير المغناطيسي الإجباري الرأسي */
+        scroll-snap-type: y mandatory !important; 
+        scroll-behavior: smooth !important;
     }
 
-    /* 🔒 تقليص المسافات بين المهام لتصبح ملمومة */
+    /* 🎯 2. إضافة حدود (Border) مخصصة وتفعيل قفل الوقوف عند كل عنصر */
     .fixed-task-item {
         display: flex !important;
         justify-content: space-between !important;
@@ -497,12 +494,18 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         
         height: 44px !important; 
         max-height: 44px !important;
-        
-        /* 👈 تصغير المسافة بين كل مهمة والثانية لتبدو متناسقة وقريبة */
         margin-bottom: 8px !important; 
-        
         flex-shrink: 0 !important; 
         box-sizing: border-box !important;
+
+        /* 👈 إضافة حدود أنيقة شفافة متماشية مع مظهر الزجاج الديجيتال */
+        border: 1px solid rgba(255, 255, 255, 0.15) !important;
+        border-radius: 8px !important;
+        padding: 0 15px !important; /* مسافة داخلية عشان الكلام ميزنّقش في الحدود */
+        background: rgba(255, 255, 255, 0.03) !important;
+
+        /* 👈 نقطة المغناطيس: إجبار السكرول يقف بالملّي عند بداية كل مهمة */
+        scroll-snap-align: start !important; 
     }
 
     /* تجميل شريط التمرير */
@@ -510,7 +513,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         width: 5px !important; 
     }
     .tasks-container::-webkit-scrollbar-thumb, #todoList::-webkit-scrollbar-thumb, #taskList::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.4) !important; 
+        background: rgba(255, 255, 255, 0.3) !important; 
         border-radius: 10px !important;
     }
 }
