@@ -336,21 +336,67 @@ function renderTasks() {
     if (!taskList) return;
     
     taskList.innerHTML = '';
+    
+    // 🧲 1. تفعيل الحركة المغناطيسية وتثبيت الارتفاع ليعرض مهمتين فقط بالملي ويمنع الانكماش
+    taskList.style.cssText = `
+        display: block !important; 
+        width: 100% !important; 
+        padding: 0 !important; 
+        margin: 15px 0 0 0 !important; 
+        text-align: right !important; 
+        height: 124px !important; 
+        max-height: 124px !important; 
+        box-sizing: border-box !important;
+        overflow-y: scroll !important; 
+        scroll-snap-type: y mandatory !important;    
+        scroll-behavior: smooth !important;         
+        -webkit-overflow-scrolling: touch !important;
+    `;
+
+    // إخفاء شريط السكرول ليبقى التصميم نظيفاً وفخماً
+    const styleId = 'scroll-hide-style';
+    if (!document.getElementById(styleId)) {
+        const style = document.createElement('style');
+        style.id = styleId;
+        style.innerHTML = `#taskList::-webkit-scrollbar { width: 0px !important; background: transparent !important; }`;
+        document.head.appendChild(style);
+    }
+    
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
-        // توزيع النص والأيقونة في صناديق مستقلة تملأ الفراغ بالعرض
+        // 🚀 2. تثبيت أبعاد المهمة الفردية لتتطابق مع الحسبة وربطها بنقاط الالتصاق المغناطيسي
+        li.style.cssText = `
+            display: flex !important; 
+            flex-direction: row !important; 
+            align-items: center !important; 
+            justify-content: space-between !important; 
+            width: 100% !important; 
+            box-sizing: border-box !important; 
+            height: 52px !important; 
+            min-height: 52px !important; 
+            max-height: 52px !important; 
+            margin-bottom: 10px !important; 
+            background: rgba(255, 255, 255, 0.04) !important; 
+            border: 1px solid rgba(255, 255, 255, 0.1) !important; 
+            border-radius: 15px !important; 
+            padding: 0 20px !important; 
+            flex-shrink: 0 !important;
+            scroll-snap-align: start !important;
+            scroll-snap-stop: always !important;
+        `;
+        
         li.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; cursor: pointer; direction: rtl;" onclick="toggleTask(${index})">
-                <span style="flex-shrink: 0; font-size: 16px;">${task.done ? '✅' : '⭕'}</span>
-                <span style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; font-weight: 600; font-size: 15px; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}">
+            <div style="display: flex !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important; direction: rtl !important;" onclick="toggleTask(${index})">
+                <span style="flex-shrink: 0 !important; font-size: 16px !important;">${task.done ? '✅' : '⭕'}</span>
+                <span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; text-align: right !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ${task.done ? 'text-decoration: line-through !important; opacity: 0.5 !important;' : ''}">
                     ${task.text}
                 </span>
             </div>
-            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer; padding: 0 5px !important; flex-shrink: 0; font-size: 14px; margin-right: 10px; color: #ff4444;">❌</button>
+            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; margin-right: 15px !important; color: #ff4444 !important;">❌</button>
         `;
         taskList.appendChild(li);
     });
