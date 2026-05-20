@@ -350,10 +350,10 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     height: 100% !important;
 }
 /* ======================================================= */
-/* 🖥️ الحل النهائي والقطعي لمشكلة اختفاء المهمة الرابعة (ماك بوك) */
+/* 🖥️ الحل الحاسم: تثبيت حاوية المهام لعرض مهمة واحدة فقط */
 /* ======================================================= */
 @media (min-width: 1025px) {
-    /* 1. تثبيت الشاشة لمنع السكرول الخارجي للمتصفح */
+    /* 1. تثبيت الشاشة ومنع التمرير الخارجي */
     html, body {
         height: 100vh !important;
         overflow: hidden !important; 
@@ -361,7 +361,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         display: flex; align-items: center; justify-content: center;
     }
 
-    /* 2. ضبط الكارت الزجاجي الكبير واحتوائه الذكي */
+    /* 2. أبعاد اللوحة الزجاجية المحكومة */
     .glass-card { 
         width: 95vw !important;
         height: 94vh !important; 
@@ -397,65 +397,70 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         width: 160px !important; height: 38px !important; margin-top: 5px !important;
     }
 
-    /* 4. الـ Grid الأساسي متساوي الأعمدة */
+    /* 4. الـ Grid والتحكم في الأعمدة */
     .dashboard-grid { 
         display: grid !important;
         grid-template-columns: 1fr 1fr !important; 
         gap: 25px !important; 
         width: 100% !important;
         flex: 1 !important; 
-        min-height: 0 !important; /* حماية أساسية لمنع تمدد المحتوى */
+        min-height: 0 !important; 
     }
 
-    /* العمودين يمين ويسار */
     .main-col, .side-col { 
         display: flex !important;
         flex-direction: column !important; 
         gap: 15px !important; 
         height: 100% !important;
         width: 100% !important;
-        min-height: 0 !important; /* إجبار العمود على الانصياع لحجم الشاشة */
+        min-height: 0 !important; 
     }
 
-    /* الصناديق اليمين (المتجر والعد التنازلي) */
     .side-col .store-card, .side-col .countdown-card {
-        flex: 1 !important; /* يتقاسمون الارتفاع بالتساوي */
+        flex: 1 !important;
     }
 
-    /* 5. 🎯 تكتيك توزيع مساحة العمود الأيسر (العداد والمهام) */
+    /* 5. العداد */
     .pomo-box {
-        flex: 0 0 auto !important; /* العداد يأخذ مساحته الطبيعية فقط ولا يتمدد */
+        flex: 0 0 auto !important;
         padding: 12px 25px !important;
     }
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
 
+    /* 6. صندوق المهام الإجمالي */
     .todo-box {
-        flex: 1 1 auto !important; /* صندوق المهام يفتح ويأخذ كل المساحة المتبقية بالكامل 🚀 */
+        flex: 1 1 auto !important;
         display: flex !important;
         flex-direction: column !important;
-        min-height: 0 !important; /* يسمح للصندوق بالانكماش الداخلي وتفعيل السكرول */
+        min-height: 0 !important; 
         padding: 15px 25px !important;
     }
 
-    /* 6. 📜 التثبيت النهائي والقطعي لقائمة المهام والسكرول */
+    /* 🎯 السحر هنا: تثبيت الارتفاع ليعرض مهمة واحدة فقط بدقة بالغة 🎯 */
     .tasks-container, #todoList {
         display: flex !important;
         flex-direction: column !important;
         gap: 8px !important;
-        flex: 1 !important;
-        overflow-y: auto !important; /* تفعيل السكرول الداخلي الإجباري */
-        max-height: 180px !important; /* 👈 تحديد سقف رأسي صارم لمنع الخروج بره الكارت الزجاجي */
+        overflow-y: auto !important; /* تفعيل السكرول عند إضافة مهام أكثر */
+        
+        /* 👈 تحديد الارتفاع الأقصى الصارم ليتسع لعنصر واحد فقط بالملّي */
+        max-height: 58px !important; 
+        height: 58px !important; 
+        
         padding-right: 5px !important;
-        padding-bottom: 15px !important; /* مسافة أمان لآخر مهمة */
+        padding-bottom: 2px !important;
+        min-height: 0 !important;
     }
 
-    /* منع انكماش عناصر المهام نهائياً */
+    /* إجبار عناصر المهام على عدم الانكماش والالتزام بحجمها الطبيعي */
     .tasks-container li, #todoList li, .task-item {
         flex-shrink: 0 !important; 
         width: 100% !important;
+        height: 48px !important; /* توحيد ارتفاع المهمة الزجاجية */
+        box-sizing: border-box !important;
     }
 
-    /* تجميل شريط السكرول الداخلي */
+    /* تصميم شريط التمرير (السكرول) ليكون مخفياً تقريباً وناعماً جداً */
     .tasks-container::-webkit-scrollbar, #todoList::-webkit-scrollbar { width: 4px; }
     .tasks-container::-webkit-scrollbar-thumb, #todoList::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.2); border-radius: 10px;
