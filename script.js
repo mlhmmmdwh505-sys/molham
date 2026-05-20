@@ -334,15 +334,12 @@ window.deleteTask = function(index) {
 function renderTasks() {
     const taskList = document.getElementById('taskList');
     if (!taskList) return;
-    
     taskList.innerHTML = '';
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
         li.className = 'fixed-task-item'; 
-        
-        // 🛠️ التعديل الجوهري: توزيع عناصر المهمة داخل صناديق مرنة (Flex Box) مستقلة لمنع تداخل أو اختفاء الكلمات
         li.innerHTML = `
             <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; cursor: pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
                 <span style="flex-shrink: 0; font-size: 18px;">${task.done ? '✅' : '⭕'}</span>
