@@ -193,33 +193,59 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 
 @media (max-width: 480px) {
-    /* ... أي أكواد موبايل أخرى ثابتة عندك ... */
+    .glass-card { padding: 25px 15px; }
+    #pomoDisplay { font-size: 55px; min-width: 100%; }
 
-    /* الحاوية الأساسية للمدخلات */
-    .input-section { 
-        display: block !important; /* إلغاء الـ flex لمنع تصغير العناصر */
-        width: 100% !important; 
-    }
-
-    /* تكبير وتوحيد حجم خانة الكتابة وزر الزائد بالملّي */
-    .input-section input, 
-    .btn-add { 
+    /* 1. إعادة ترتيب حاوية الإعدادات لتكون عمودية ومنظمة */
+    .settings-bar { 
         display: flex !important;
+        flex-direction: column !important; /* ترتيب المجموعات تحت بعضها */
         align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important; /* العرض كامل ومتساوي */
-        height: 52px !important; /* تكبير الارتفاع ليكون مريح ومناسب للمس باليد 🚀 */
-        box-sizing: border-box !important;
-        border-radius: 50px !important;
-        font-size: 16px !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        margin-bottom: 12px !important; /* مسافة رأسية ثابتة بينهما */
-        padding: 0 20px !important;
+        width: 100% !important; 
+        gap: 15px !important; 
     }
 
-    /* إلغاء أي هوامش جانبية قد تسبب تفاوت في العرض */
-    .btn-add {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
+    /* 2. تنظيم كل خانة مع الـ Label الخاص بها في سطر أفقي متناسق */
+    .input-group, .setting-item { 
+        display: flex !important;
+        flex-direction: row-reverse !important; /* يضمن ظهور النص على اليمين والخانات على اليسار بشكل موحد */
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important; /* تأخذ العرض بالكامل */
+        max-width: 280px !important; /* تحديد عرض مناسب وموحد للمجموعات */
+        gap: 15px !important;
+    }
+
+    /* 3. توحيد حجم وعرض كل عناصر الإدخال بشكل كامل */
+    input[type="text"], 
+    input[type="number"], 
+    input[type="date"], 
+    select, 
+    #userNameInput, 
+    #langSelect { 
+        width: 160px !important; /* عرض ثابت وموحد لكل الخانات */
+        height: 42px !important; /* ارتفاع ثابت وموحد */
+        text-align: center !important; 
+        font-size: 14px !important; 
+        padding: 5px 10px !important; 
+        box-sizing: border-box !important;
+    }
+
+    /* 4. ضبط خانة اختيار اللون الدائرية لترتصف معهم */
+    #colorPicker {
+        width: 160px !important; /* نفس عرض باقي الخانات لتصبح منسقة */
+        height: 42px !important;
+    }
+
+    /* 5. ضبط زر تأكيد الإعدادات ليأخذ العرض بالكامل أسفلهم */
+    .settings-bar button {
+        width: 160px !important;
+        height: 42px !important;
+        margin-top: 5px !important;
+    }
+
+    /* تنسيقات الأقسام الأخرى للموبايل */
+    .store-grid { flex-direction: column; }
+    .modern-timer { flex-wrap: wrap; gap: 15px; }
+    .unit { flex: 1 1 40%; }
 }
