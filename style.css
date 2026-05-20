@@ -215,20 +215,17 @@ input[type="text"]:focus, select:focus {
     padding-right: 10px !important;
 }
 /* استبدل .tasks-container باسم الكلاس الخاص بصندوق المهام عندك */
-.tasks-container {
-    /* السماح بالتمرير الداخلي للمهام */
-    overflow-y: auto; 
-    overflow-x: hidden;
+/* انسخ ده بالظبط وحطه في آخر ملف الـ CSS */
 
-    /* 1. إخفاء شريط التمرير في متصفحات كروم، إيدج، وسفاري (جوجل وأبل) */
-    &::-webkit-scrollbar {
-        width: 0px;
-        background: transparent;
-    }
+.tasks-container { /* 👈 لو لقيت الاسم عندك مختلف، شيل tasks-container واكتب الاسم الجديد */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scrollbar-width: none !important; /* لمتصفح فايرفوكس */
+    -ms-overflow-style: none !important; /* لمتصفح إنترنت إكسبلورر */
+}
 
-    /* 2. إخفاء شريط التمرير في متصفح فايرفوكس */
-    scrollbar-width: none;
-
-    /* 3. إخفاء شريط التمرير في متصفحات إنترنت إكسبلورر القديمة */
-    -ms-overflow-style: none; 
+/* الجزء ده مخصص لمتصفحات جوجل كروم وإيدج وسفاري */
+.tasks-container::-webkit-scrollbar {
+    width: 0px !important;
+    background: transparent !important;
 }
