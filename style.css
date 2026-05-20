@@ -349,3 +349,48 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     width: 100% !important;
     height: 100% !important;
 }
+
+/* ======================================================= */
+/* 🖥️ ضبط اللوحة لتملأ الشاشة وتستغل الفراغات على الماك بوك والكمبيوتر */
+/* ======================================================= */
+@media (min-width: 1025px) {
+    /* 1. جعل الكارت الزجاجي مرن ليمتد ويستغل الفراغات الجانبية */
+    .glass-card { 
+        width: 92vw !important; /* يأخذ 92% من عرض الشاشة بالكامل بدلاً من العرض الثابت القديم */
+        max-width: 1400px !important; /* حد أقصى للحفاظ على فخامة الأبعاد على الشاشات العملاقة */
+        padding: 45px !important;
+        box-sizing: border-box !important;
+        margin: 0 auto !important;
+    }
+
+    /* 2. توزيع الـ Dashboard Grid ليعطي مساحة أكبر ومريحة للعناصر */
+    .dashboard-grid { 
+        display: flex !important;
+        gap: 50px !important; /* توسيع المسافة بين العمود الأيمن والأيسر */
+        width: 100% !important;
+    }
+
+    /* 3. جعل الأعمدة تتمدد بالتساوي لملء الفراغ الجديد */
+    .side-col, .main-col { 
+        flex: 1 !important; 
+        display: flex !important;
+        flex-direction: column !important; 
+        gap: 35px !important; 
+    }
+
+    /* 4. موازنة شريط الإعدادات ليمتد بمرونة مع الحجم الجديد للكارت */
+    .settings-bar { 
+        max-width: 100% !important; /* يمتد بكامل عرض الحاوية الزجاجية الجديدة */
+        gap: 25px !important;
+    }
+
+    /* 5. تكبير وتثبيت حجم العداد والمؤقت ليظهر بفخامة في المساحة الجديدة */
+    #pomoDisplay {
+        font-size: 90px !important; /* تكبير بسيط ومناسب لحجم اللوحة الجديد */
+    }
+
+    /* 6. ضبط المتجر ليوزع كبسولاته بشكل مريح ممتد */
+    .store-grid {
+        gap: 15px !important;
+    }
+}
