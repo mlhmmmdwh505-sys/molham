@@ -355,8 +355,8 @@ function renderTasks() {
         margin: 15px 0 0 0 !important;
         text-align: right !important;
         box-sizing: border-box !important;
-        height: 124px !important;
-        max-height: 124px !important;
+        height: 186px !important;
+        max-height: 186px !important;
         overflow-y: scroll !important;
         scroll-snap-type: y mandatory !important;
         scroll-behavior: smooth !important;
