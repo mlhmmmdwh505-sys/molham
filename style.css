@@ -698,3 +698,50 @@ ul::-webkit-scrollbar-thumb {
         max-width: 240px !important;
     }
 }
+
+/* ==========================================================================
+   🎯 الحل النهائي والقطعي لفرد المهام وملء الفراغات (د. ملهم)
+   ========================================================================== */
+
+/* 1. تجديد كارد المهام ومنحه مساحة مستريحة جداً */
+.todo-box {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    padding: 25px !important;  
+    box-sizing: border-box !important;
+    height: 320px !important; /* ارتفاع ثابت يمنع المتصفح من كبس الكارد */
+    min-height: 320px !important;
+    overflow: hidden !important;
+}
+
+/* 2. حاوية القائمة (الـ سكرول) - إجبارها على الفرد الرأسي */
+#taskList, .tasks-container, ul {
+    list-style: none !important;
+    display: block !important; /* تحويلها لـ block يمنع المتصفح من دهس النصوص بالداخل */
+    width: 100% !important;
+    margin: 20px 0 0 0 !important; 
+    padding: 0 !important;
+    text-align: right !important;
+    height: 160px !important; /* مساحة ممتازة لعرض المهمتين كاملتين */
+    max-height: 160px !important;
+    overflow-y: auto !important; /* تفعيل السكرول */
+}
+
+/* 3. عنصر المهمة الفردي - فرد أفقي كامل وملء الفراغات اللي جنب الأزرار */
+.fixed-task-item, li {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    height: 54px !important; /* ارتفاع ثابت ومحمي لكل مهمة */
+    min-height: 54px !important; 
+    max-height: 54px !important;
+    margin-bottom: 12px !important; 
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 15px !important;
+    padding: 0 20px !important;
+    flex-shrink: 0 !important; /* يمنع الانكماش نهائياً */
+}
