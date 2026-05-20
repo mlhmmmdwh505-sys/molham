@@ -271,4 +271,85 @@ function savePoints() {
     localStorage.setItem('userPoints', points);
     updatePointsDisplay();
 }
-function updatePointsDisplay() { document.getElementById('
+function updatePointsDisplay() { document.getElementById('userPoints').innerText = points; }
+function resetPoints() {
+    if(confirm(i18n[currentLang].alertResetPoints)) {
+        points = 0;
+        savePoints();
+    }
+}
+
+// --- 7. الدوال المساعدة والعد التنازلي ---
+function changeQuote() {
+    const qElem = document.getElementById('motivationQuote');
+    const currentQuotes = quotes[currentLang];
+    if(qElem) qElem.innerText = currentQuotes[Math.floor(Math.random() * currentQuotes.length)];
+}
+
+function displayDate() {
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+    document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString(locale, options);
+}
+
+function startGraduationCountdown() {
+    setInterval(() => {
+        const now = new Date().getTime();
+        const gap = new Date(graduationDate).getTime() - now;
+        if (gap > 0) {
+            const second = 1000, minute = second * 60, hour = minute * 60, day = hour * 24, year = day * 365;
+            document.getElementById('years').innerText = Math.floor(gap / year);
+            document.getElementById('days').innerText = Math.floor((gap % year) / day);
+            document.getElementById('hours').innerText = Math.floor((gap % day) / hour);
+        }
+    }, 1000);
+}
+
+// --- 8. نظام إدارة المهام (To-Do List) - 🎯 النسخة المحدثة لحل مشكلة اللاب توب بالكامل ---
+function addTask() {
+    const input = document.getElementById('taskInput');
+    const text = input.value.trim();
+    if (text === '') return;
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    tasks.push({ text: text, done: false });
+    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
+    input.value = '';
+    renderTasks();
+}
+
+window.toggleTask = function(index) {
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    tasks[index].done = !tasks[index].done;
+    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
+    renderTasks();
+}
+
+window.deleteTask = function(index) {
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    tasks.splice(index, 1);
+    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
+    renderTasks();
+}
+
+function renderTasks() {
+    const taskList = document.getElementById('taskList');
+    if (!taskList) return;
+    
+    taskList.innerHTML = '';
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    
+    tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        li.className = 'fixed-task-item'; 
+        
+        // 🛠️ التعديل الجوهري: توزيع عناصر المهمة داخل صناديق مرنة (Flex Box) مستقلة لمنع تداخل أو اختفاء الكلمات
+        li.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; cursor: pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
+                <span style="flex-shrink: 0; font-size: 18px;">${task.done ? '✅' : '⭕'}</span>
+                <span style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; font-weight: 600;">${task.text}</span>
+            </div>
+            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width: auto !important; background: none !important; border: none !important; cursor: pointer; padding: 0 5px !important; flex-shrink: 0; font-size: 14px;">❌</button>
+        `;
+        taskList.appendChild(li);
+    });
+}
