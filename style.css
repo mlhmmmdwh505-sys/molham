@@ -350,10 +350,11 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     height: 100% !important;
 }
 /* ======================================================= */
-/* 🖥️ الحل النهائي والقطعي: إجبار الصندوق على عرض مهمة واحدة فقط بالملّي */
+/* ======================================================= */
+/* 🖥️ المنظومة الحديدية: تثبيت حجم الصندوق وعرض مهمة واحدة فقط لا غير */
 /* ======================================================= */
 @media (min-width: 1025px) {
-    /* 1. تثبيت الشاشة ومنع التمرير الخارجي للمتصفح */
+    /* 1. تثبيت الشاشة ومنع التمرير الخارجي نهائياً */
     html, body {
         height: 100vh !important;
         overflow: hidden !important; 
@@ -361,7 +362,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         display: flex; align-items: center; justify-content: center;
     }
 
-    /* 2. أبعاد اللوحة الزجاجية الكبيرة */
+    /* 2. أبعاد اللوحة الزجاجية الكبيرة واحتوائها */
     .glass-card { 
         width: 95vw !important;
         height: 94vh !important; 
@@ -416,9 +417,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         min-height: 0 !important; 
     }
 
-    .side-col .store-card, .side-col .countdown-card {
-        flex: 1 !important;
-    }
+    .side-col .store-card, .side-col .countdown-card { flex: 1 !important; }
 
     /* 5. العداد */
     .pomo-box {
@@ -427,9 +426,9 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     }
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
 
-    /* 6. صندوق المهام الإجمالي (الذي يحتوي على خانة الإضافة والليستة) */
+    /* 6. صندوق المهام الإجمالي الرئيسي */
     .todo-box {
-        flex: 0 0 auto !important; /* قفل الصندوق الإجمالي ومنعه من التمدد لأسفل */
+        flex: 0 0 auto !important; /* منع الصندوق بالكامل من التمدد لأسفل الشاشة */
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
@@ -437,38 +436,30 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         box-sizing: border-box !important;
     }
 
-    /* 🎯 7. القفل الحديدي الصارم لحاوية عناصر المهام (والليستة) 🎯 */
+    /* 🎯 7. الحاوي السحري: قفل كامل للمساحة وإخفاء تام لأي مهمة إضافية 🎯 */
     .tasks-container, #todoList {
-        display: block !important; /* تحويلها لـ Block لإلغاء أي توزيع مرن من الـ Flexbox */
-        overflow-y: auto !important; /* تفعيل السكرول الداخلي للمهام الإضافية */
-        overflow-x: hidden !important;
+        display: block !important; /* كسر الـ Flexbox العنيد */
         
-        /* 👈 الارتفاع الصافي والوحيد لعنصر واحد فقط يمنع تمدد الصندوق نهائياً */
-        height: 52px !important; 
-        max-height: 52px !important; 
+        /* قفل الارتفاع بالملّي على مقاس أول مهمة فقط وتعمية الباقي 🛑 */
+        height: 46px !important; 
+        max-height: 46px !important; 
+        overflow: hidden !important; /* 👈 ممنوع السكرول وممنوع ظهور أي مهمة تانية نهائياً */
         
         padding: 0 !important;
         margin: 10px 0 0 0 !important;
-        border: none !important;
     }
 
-    /* 🔒 تثبيت أبعاد المهمة الواحدة بالملّي */
+    /* تثبيت أبعاد المهمة الأولى بدقة عشان تفرش البوكس */
     .tasks-container li, #todoList li, .task-item {
-        display: flex !important; /* الحفاظ على محاذاة النص والـ X بالداخل */
+        display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
         width: 100% !important;
-        height: 48px !important; /* الارتفاع الثابت الصارم لكل مهمة */
-        max-height: 48px !important;
-        margin: 0 0 20px 0 !important; /* عمل مسافة عزل سفلية كبيرة تخفي المهمة الثانية تحت الأرض تماماً */
+        height: 44px !important; /* الارتفاع الدقيق للمهمة */
+        max-height: 44px !important;
+        margin: 0 0 50px 0 !important; /* زق أي مهمة تانية بعيد جداً في الخفاء */
         box-sizing: border-box !important;
-        flex-shrink: 0 !important;
-    }
-
-    /* تخصيص مظهر شريط التمرير ليكون نحيفاً وشفافاً جداً كأنه تطبيق موبايل */
-    .tasks-container::-webkit-scrollbar, #todoList::-webkit-scrollbar { width: 4px; }
-    .tasks-container::-webkit-scrollbar-thumb, #todoList::-webkit-scrollbar-thumb {
-        background: rgba(255, 255, 255, 0.2); border-radius: 10px;
+        overflow: hidden !important;
     }
 }
 
