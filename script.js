@@ -82,10 +82,9 @@ window.onload = () => {
     // جلب التاريخ واللون المحفوظين
     document.getElementById('gradDateInput').value = graduationDate;
     
-    // 🎯 إصلاح الثغرة: التحقق من أن اللون ليس أسود تماماً أو فارغاً قبل الحقل
     let savedColor = localStorage.getItem('themeColor');
     if (!savedColor || savedColor === "#000000" || savedColor === "transparent") {
-        savedColor = "#6366f1"; // إرجاع اللون الأزرق النيون الافتراضي فوراً
+        savedColor = "#6366f1"; 
         localStorage.setItem('themeColor', savedColor);
     }
     document.getElementById('colorPicker').value = savedColor;
@@ -142,18 +141,16 @@ function applyLanguage(lang) {
     changeQuote();
 }
 
-// --- 4. زر الحفظ الرئيسي والتأكيد (اللغة، الاسم، الدقائق، إلخ) ---
+// --- 4. زر الحفظ الرئيسي والتأكيد ---
 document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
     e.preventDefault(); 
     
-    // حفظ وتطبيق اللغة
     const selectedLang = document.getElementById('langSelect').value;
     currentLang = selectedLang;
     localStorage.setItem('userLang', selectedLang);
     applyLanguage(selectedLang);
     displayDate(); 
 
-    // حفظ وتحديث الاسم
     const userNameInput = document.getElementById('userNameInput');
     const newName = userNameInput.value.trim() || (selectedLang === 'ar' ? "ملهم" : "Molham");
     localStorage.setItem('userName', newName);
@@ -163,21 +160,18 @@ document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
     document.getElementById('userNameDisplay').innerText = selectedLang === 'ar' ? `دكتور ${newName}` : `Dr. ${newName}`;
     document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${selectedLang === 'ar' ? 'دكتور' : 'Dr.'} ${newName}</span> 🩺`;
 
-    // حفظ وتحديث الدقائق
     const minsInput = document.getElementById('minsInput');
     const newMins = parseInt(minsInput.value) || 25;
     localStorage.setItem('userMins', newMins); 
 
-    // حفظ المظهر والتاريخ
     let newColor = document.getElementById('colorPicker').value;
-    if (!newColor || newColor === "#000000") { newColor = "#6366f1"; } // منع حفظ اللون الأسود
+    if (!newColor || newColor === "#000000") { newColor = "#6366f1"; } 
     document.documentElement.style.setProperty('--primary', newColor);
     localStorage.setItem('themeColor', newColor);
     
     graduationDate = document.getElementById('gradDateInput').value;
     localStorage.setItem('gradDate', graduationDate);
     
-    // تطبيق الدقائق فوراً على التايمر إذا كان واقفاً
     if (!isRunning) {
         timeLeft = newMins * 60;
         updateTimerDisplay();
@@ -277,84 +271,4 @@ function savePoints() {
     localStorage.setItem('userPoints', points);
     updatePointsDisplay();
 }
-function updatePointsDisplay() { document.getElementById('userPoints').innerText = points; }
-function resetPoints() {
-    if(confirm(i18n[currentLang].alertResetPoints)) {
-        points = 0;
-        savePoints();
-    }
-}
-
-// --- 7. الدوال المساعدة والعد التنازلي ---
-function changeQuote() {
-    const qElem = document.getElementById('motivationQuote');
-    const currentQuotes = quotes[currentLang];
-    if(qElem) qElem.innerText = currentQuotes[Math.floor(Math.random() * currentQuotes.length)];
-}
-
-function displayDate() {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
-    document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString(locale, options);
-}
-
-function startGraduationCountdown() {
-    setInterval(() => {
-        const now = new Date().getTime();
-        const gap = new Date(graduationDate).getTime() - now;
-        if (gap > 0) {
-            const second = 1000, minute = second * 60, hour = minute * 60, day = hour * 24, year = day * 365;
-            document.getElementById('years').innerText = Math.floor(gap / year);
-            document.getElementById('days').innerText = Math.floor((gap % year) / day);
-            document.getElementById('hours').innerText = Math.floor((gap % day) / hour);
-        }
-    }, 1000);
-}
-
-// --- 8. نظام إدارة المهام (To-Do List) - نسخة السكرول المحكم ---
-function addTask() {
-    const input = document.getElementById('taskInput');
-    const text = input.value.trim();
-    if (text === '') return;
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    tasks.push({ text: text, done: false });
-    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
-    input.value = '';
-    renderTasks();
-}
-
-// تعديل لضمان استدعاء الدوال بشكل صحيح من الـ HTML بدون مشاكل
-window.toggleTask = function(index) {
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    tasks[index].done = !tasks[index].done;
-    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
-    renderTasks();
-}
-
-window.deleteTask = function(index) {
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    tasks.splice(index, 1);
-    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
-    renderTasks();
-}
-
-function renderTasks() {
-    const taskList = document.getElementById('taskList');
-    if (!taskList) return;
-    
-    taskList.innerHTML = '';
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    
-    tasks.forEach((task, index) => {
-        const li = document.createElement('li');
-        li.className = 'fixed-task-item'; 
-        
-        li.innerHTML = `
-            <span style="cursor:pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
-                ${task.done ? '✅' : '⭕'} ${task.text}
-            </span>
-            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width:auto !important; background:none !important; border:none !important; cursor:pointer;">❌</button>
-        `;
-        taskList.appendChild(li);
-    });
-}
+function updatePointsDisplay() { document.getElementById('
