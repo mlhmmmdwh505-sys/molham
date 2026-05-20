@@ -31,7 +31,7 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* المنظومة الحديدية لمنع شريط السكرول بار نهائياً وتثبيت الشاشة */
+/* المنظومة الحديدية لمنع شريط السكرول بار الخارجي نهائياً وتثبيت الشاشة */
 html, body {
     width: 100%;
     height: 100vh;
@@ -52,7 +52,7 @@ body {
     padding: 0;
 }
 
-/* إخفاء السكرول بار تماماً من أي عنصر فرعي قد يتأثر برمجياً */
+/* إخفاء السكرول بار العام تماماً من أي عنصر فرعي غير المهام لتفادي اللغبطة */
 *::-webkit-scrollbar {
     width: 0px !important;
     height: 0px !important;
@@ -293,7 +293,7 @@ button:active {
 }
 
 /* ==========================================================================
-   📊 6. لوحة التحكم والـ Grid الأساسي (🎯 تم زيادة مسافة الـ Gap والتباعد)
+   📊 6. لوحة التحكم والـ Grid الأساسي 
    ========================================================================== */
 .dashboard-grid {
     width: 100%;
@@ -309,7 +309,6 @@ button:active {
     min-height: 0;
 }
 
-/* الكروت الزجاجية الداخلية للـ Grid */
 .info-card {
     background: rgba(255, 255, 255, 0.01);
     padding: 26px;
@@ -435,20 +434,20 @@ button:active {
 }
 
 /* ==========================================================================
-   📝 10. منظومة المهام الفخمة (🎯 تم تكبير وتوسيع المهام بالكامل لملء الفراغ)
+   📝 10. تفجير سكرول المهام والمغناطيس (⚠️ التحديث السحري المطلوب هنا)
    ========================================================================== */
 .todo-box {
-    flex: 1 1 auto !important; /* السماح للصندوق بالتمدد لملء عموده بالكامل */
+    flex: 1 1 auto !important; 
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
-    padding: 30px !important;  /* زيادة الحشو الداخلي لمنح مظهر فخم وعريض */
+    padding: 30px !important;  
     box-sizing: border-box !important;
-    min-height: 280px !important; /* زيادة الحد الأدنى لارتفاع الكرت ليصبح متناسق ومريح */
+    min-height: 280px !important; 
     overflow: hidden !important;
 }
 
-/* صف إدخال المهمة الجديد الممتد */
+/* صف حقل الإدخال وزر الإضافة (+) */
 .todo-box form, 
 .todo-input-row, 
 .input-section {
@@ -456,7 +455,7 @@ button:active {
     width: 100% !important;
     gap: 15px !important;
     align-items: center !important;
-    height: 52px !important;   /* زيادة الارتفاع ليتناسب مع التوسيع الكلي */
+    height: 52px !important;   
     max-height: 52px !important;
     margin-bottom: 0px !important;
 }
@@ -467,7 +466,7 @@ button:active {
     max-height: 52px !important;
     box-sizing: border-box !important;
     padding: 0 25px !important;
-    font-size: 16px !important; /* تكبير الخط الداخلي للراحة وبساطة القراءة */
+    font-size: 16px !important; 
     border-radius: 50px !important;
 }
 
@@ -475,7 +474,7 @@ button:active {
 .todo-box .add-btn, 
 .todo-box input[type="submit"], 
 .btn-add {
-    width: 85px !important;   /* زر إضافة عريض ومتناسق مع شريط الإدخال */
+    width: 85px !important;   
     height: 52px !important;
     box-sizing: border-box !important;
     display: inline-flex !important;
@@ -487,7 +486,7 @@ button:active {
     border-radius: 50px !important;
 }
 
-/* حاوية تمرير قائمة المهام الكبرى */
+/* 🧲 حاوية السكرول المغناطيسي الإجباري (حيث تحدث المعجزة) */
 .tasks-container, 
 #todoList, 
 #taskList, 
@@ -496,41 +495,59 @@ ul {
     display: flex !important;
     flex-direction: column !important;
     gap: 0px !important;
-    flex: 1 1 auto !important;  /* تم جعل القائمة مرنة وممتدة لتملأ المساحة الكلية لـ الكارد بدلاً من الطول الثابت القديم */
+    flex: 1 1 auto !important;  
     width: 100% !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    padding: 0 4px 0 0 !important;
-    margin: 20px 0 0 0 !important; /* تباعد كافي يفصل حقل الإدخال عن أول مهمة */
+    margin: 20px 0 0 0 !important; 
     text-align: right;
-    scroll-snap-type: y mandatory !important;
-    scroll-behavior: smooth !important;
+    
+    /* ⚡ تفعيل محاذاة السكرول المغناطيسي */
+    overflow-y: scroll !important;               /* إجبار ظهور السكرول الداخلي الوظيفي */
+    scroll-snap-type: y mandatory !important;    /* إجبار المتصفح على قفل الحركة رأسياً بصيغة مغناطيسية */
+    scroll-behavior: smooth !important;         /* جعل التمرير ناعم وانسيابي */
 }
 
-/* عناصر المهام الفرعية (🎯 تم تكبير الحجم والعرض والتباعد الأفقي والرأسي) */
+/* 🔧 إظهار شريط سكرول خفي دقيق جداً للمهام لكي يعرف المستخدم أنه يمكنه السحب */
+.tasks-container::-webkit-scrollbar, 
+#todoList::-webkit-scrollbar, 
+#taskList::-webkit-scrollbar, 
+ul::-webkit-scrollbar {
+    width: 5px !important;                      /* عرض نحيف جداً وأنيق */
+    background: transparent !important;
+}
+.tasks-container::-webkit-scrollbar-thumb, 
+#todoList::-webkit-scrollbar-thumb, 
+#taskList::-webkit-scrollbar-thumb, 
+ul::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15) !important; /* لون شفاف زجاجي لا يخرب التصميم */
+    border-radius: 10px !important;
+}
+
+/* 🧲 عنصر المهمة الفردية (تم ضبط نقطة الجذب المغناطيسي) */
 li, .fixed-task-item {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
     width: 100% !important;
-    height: 54px !important;   /* تم رفع الارتفاع الإجمالي للمهمة الفردية لتصبح ضخمة وواضحة */
-    max-height: 54px !important;
-    margin-bottom: 12px !important; /* مسافة أوسع بين كل مهمة وأخرى لمنع التكدس */
-    flex-shrink: 0 !important;
+    height: 56px !important;       /* رفع الارتفاع لتصبح المهمة ممتدة وضخمة وواضحة */
+    max-height: 56px !important;
+    margin-bottom: 12px !important; 
+    flex-shrink: 0 !important;     /* منع انكماش العنصر أثناء السحب */
     box-sizing: border-box !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-radius: 16px !important; /* حواف نصف قطرية متناسقة مع الأبعاد الكبيرة */
-    padding: 0 25px !important;    /* زيادة التباعد الداخلي الجانبي */
+    border-radius: 16px !important; 
+    padding: 0 25px !important;    
     background: rgba(255, 255, 255, 0.02) !important;
-    font-size: 17px !important;   /* حجم خط النص المكتوب للمهمة ليصبح عريض وفخم */
+    font-size: 17px !important;   
+    
+    /* ⚡ أمر قفل الجاذبية: إجبار العنصر على الالتصاق التام عند أعلى الحافة أثناء التمرير */
     scroll-snap-align: start !important;
+    scroll-snap-stop: always !important; /* يمنع تخطي المهام بسرعة أثناء السحب السريع */
 }
 
 /* ==========================================================================
    🖥️ 11. هندسة الحواسب والأجهزة المكتبية الكبيرة والماك بوك (1025px وأعلى)
    ========================================================================== */
 @media (min-width: 1025px) {
-    /* شريط الإعدادات بـ 5 أعمدة متساوية تماماً */
     .settings-bar {
         display: grid !important;
         grid-template-columns: repeat(5, 1fr) !important;
@@ -560,7 +577,6 @@ li, .fixed-task-item {
         box-sizing: border-box !important;
     }
 
-    /* طرد زر التأكيد لأسفل وتوسيطه المغناطيسي */
     .settings-bar button {
         grid-column: 1 / -1 !important;
         justify-self: center !important;
@@ -571,25 +587,24 @@ li, .fixed-task-item {
         padding: 0 !important;
     }
 
-    /* 🎯 تكبير الفراغات والمسافات (Gap) بين كروت لوحة التحكم للكمبيوتر واللاب توب */
     .dashboard-grid {
         display: grid !important;
         grid-template-columns: 1fr 1fr !important;
-        gap: 40px !important; /* زيادة المسافة الفاصلة بين العمودين إلى 40 بكسل للتنفس البصري الكامل */
+        gap: 40px !important; 
     }
 
     .main-col, .side-col {
-        gap: 30px !important; /* زيادة المسافة الفاصلة الرأسية بين الكروت بداخل نفس العمود */
+        gap: 30px !important; 
     }
 }
 
 /* ==========================================================================
-   📱 12. ملاءمة الشاشات المتوسطة والهواتف المحمولة والتابلت (إصلاح شامل للـ Grid)
+   📱 12. ملاءمة الشاشات المتوسطة والهواتف المحمولة والتابلت
    ========================================================================== */
 @media (max-width: 1024px) {
     html, body {
         height: auto !important;
-        overflow-y: auto !important; /* السماح بالتمرير الخارجي السلس والآمن للهواتف فقط */
+        overflow-y: auto !important; 
     }
     
     body {
@@ -604,7 +619,7 @@ li, .fixed-task-item {
         border-radius: 30px !important;
         display: flex !important;
         flex-direction: column !important;
-        gap: 35px !important; /* تكبير الفراغات بين الأقسام الكبرى على الهاتف */
+        gap: 35px !important; 
     }
 
     .date-tag, .mini-score {
@@ -618,7 +633,6 @@ li, .fixed-task-item {
         margin-bottom: 10px !important;
     }
 
-    /* إصلاح لقطة الشاشة: تحويل بار الإعدادات إلى مصفوفة طولية شديدة الانتظام */
     .settings-bar {
         display: flex !important;
         flex-direction: column !important;
@@ -627,24 +641,22 @@ li, .fixed-task-item {
         gap: 20px !important;
     }
 
-    /* فصل العنوان التوضيحي عن الكبسولة بشكل منتظم رأسي لحل تشوه اللقطات القديمة */
     .input-group, .setting-item {
         display: flex !important;
-        flex-direction: column !important; /* ترتيب رأسي نقي يمنع الالتواء والميلان */
+        flex-direction: column !important; 
         align-items: center !important;
         width: 100% !important;
         max-width: 320px !important;
         gap: 8px !important;
     }
 
-    /* توحيد أبعاد الكبسولات للهواتف لمنع الانكماش والقطع */
     input[type="text"], 
     input[type="number"], 
     input[type="date"], 
     select, 
     #colorPicker, 
     .settings-bar button {
-        width: 100% !important; /* جعل الكبسولة تأخذ العرض الكامل للمنطقة المحددة (320px) لتبدو فخمة */
+        width: 100% !important; 
         max-width: 280px !important;
         height: 44px !important;
         font-size: 15px !important;
@@ -656,7 +668,6 @@ li, .fixed-task-item {
         max-width: 200px !important;
     }
 
-    /* فك تداخل كروت لوحة التحكم على الهاتف */
     .dashboard-grid {
         display: flex !important;
         flex-direction: column !important;
@@ -688,7 +699,7 @@ li, .fixed-task-item {
     }
     .tasks-container, #todoList, #taskList, ul {
         height: auto !important;
-        max-height: 250px !important; /* مساحة عرض رحبة للمهام على الهواتف */
+        max-height: 260px !important; /* مساحة عريضة ممتازة ومغناطيسية للموبايل */
     }
 }
 
