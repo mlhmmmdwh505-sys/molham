@@ -304,7 +304,7 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
-// --- 8. نظام إدارة المهام الذكي (To-Do List) - نسخة المهمة الواحدة الثابتة ---
+// --- 8. نظام إدارة المهام (To-Do List) - نسخة السكرول المحكم ---
 function addTask() {
     const input = document.getElementById('taskInput');
     const text = input.value.trim();
@@ -331,30 +331,23 @@ function deleteTask(index) {
 }
 
 function renderTasks() {
-    // جلب الحاوية الصحيحة المستخدمة في الـ HTML
-    const taskList = document.getElementById('taskList') || document.getElementById('todoList');
+    const taskList = document.getElementById('taskList');
     if (!taskList) return;
     
     taskList.innerHTML = '';
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
-    // إذا لم يكن هناك مهام، اخرج ولا تعرض شيئاً
-    if (tasks.length === 0) return;
-    
-    // 🎯 السحر كله هنا: جلب "آخر مهمة فقط" المضافة حديثاً لعرضها وحجب الباقي
-    const lastIndex = tasks.length - 1;
-    const task = tasks[lastIndex];
-    
-    const li = document.createElement('li');
-    // إضافة الـ Class الصارم لضمان ربطه بالـ CSS ومقاسات الماك بوك
-    li.className = 'task-item'; 
-    
-    li.innerHTML = `
-        <span style="cursor:pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${lastIndex})">
-            ${task.done ? '✅' : '⭕'} ${task.text}
-        </span>
-        <button onclick="deleteTask(${lastIndex})" class="reset-mini" style="min-width:auto !important; background:none !important; border:none !important; cursor:pointer;">❌</button>
-    `;
-    
-    taskList.appendChild(li);
+    tasks.forEach((task, index) => {
+        const li = document.createElement('li');
+        // 🎯 إجبار العنصر على أخذ كلاس التثبيت لحجم المهمة
+        li.className = 'fixed-task-item'; 
+        
+        li.innerHTML = `
+            <span style="cursor:pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
+                ${task.done ? '✅' : '⭕'} ${task.text}
+            </span>
+            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width:auto !important; background:none !important; border:none !important; cursor:pointer;">❌</button>
+        `;
+        taskList.appendChild(li);
+    });
 }
