@@ -251,22 +251,22 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 
 /* ======================================================= */
-/* 💻 تنسيق شريط الإعدادات الأفقي الموحد والمحاذي بالملّي للماك بوك والكمبيوتر */
+/* 🎨 حل مشكلة خروج مربع اللون وتطبيقه على كافة الشاشات */
 /* ======================================================= */
+
+/* 1. ضبط شريط الإعدادات ليكون أفقيًا بالكامل وبأحجام متطابقة على الماك بوك والكمبيوتر */
 @media (min-width: 1025px) {
-    /* تحويل الشريط لـ Grid بـ 5 أعمدة متساوية المساحة تماماً */
     .settings-bar { 
         display: grid !important;
         grid-template-columns: repeat(5, 1fr) !important; 
         gap: 20px !important; 
-        align-items: flex-end !important; /* محاذاة جميع الخانات والزر على خط مستقيم من الأسفل */
+        align-items: flex-end !important;
         width: 100% !important; 
         max-width: 980px !important; 
         margin: 0 auto 35px auto !important;
     }
 
-    /* موازنة المسافات الرأسية للـ Labels فوق الخانات */
-    .input-group { 
+    .input-group, .setting-item { 
         display: flex !important;
         flex-direction: column !important; 
         gap: 8px !important;
@@ -274,7 +274,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         margin: 0 !important;
     }
 
-    /* توحيد أبعاد وعرض وارتفاع كل الخانات والأزرار بلا استثناء */
     input[type="text"], 
     input[type="number"], 
     input[type="date"], 
@@ -283,8 +282,8 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     #langSelect,
     #colorPicker,
     .settings-bar button { 
-        width: 100% !important; /* ملء العمود الخاص بكل عنصر بالتساوي */
-        height: 45px !important; /* ارتفاع موحد وثابت على نفس المسطرة 📏 */
+        width: 100% !important;
+        height: 45px !important;
         text-align: center !important; 
         font-size: 15px !important; 
         padding: 0 10px !important; 
@@ -292,30 +291,37 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         margin: 0 !important;
     }
 
-    /* ضبط خاص لخانة اختيار اللون لتطابق الارتفاع وتملأ العمود */
-    #colorPicker {
-        -webkit-appearance: none; 
-        appearance: none;
-        background-color: transparent;
-        border: 1px solid var(--primary) !important; 
-        border-radius: 50px !important;
-        cursor: pointer; 
-        overflow: hidden;
-        display: block !important;
-    }
-
-    /* موازنة عنصر اختيار اللون مع الـ Label الخاص به */
-    .setting-item {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        gap: 8px !important;
-        width: 100% !important;
-    }
-
-    /* جعل زر تأكيد الإعدادات يملأ عموده بالكامل ويصطف في نفس السطر */
     .settings-bar button {
         align-self: flex-end !important;
         padding: 0 !important;
     }
+}
+
+/* 2. الإصلاح الجذري لمنع خروج مربع اللون عن المنحنى الدائري */
+#colorPicker {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    background-color: transparent !important;
+    border: 1px solid var(--primary) !important; 
+    border-radius: 50px !important; /* جعل الإطار الخارجي دائريًا */
+    cursor: pointer !important; 
+    overflow: hidden !important; /* قص أي محتوى داخلي يخرج عن الدائرة ✂️ */
+    box-sizing: border-box !important;
+}
+
+/* قص وتدوير اللون الداخلي لمتصفحات كروم، إيدج، وسفاري (الماك بوك) */
+#colorPicker::-webkit-color-swatch-wrapper {
+    padding: 0 !important;
+    border-radius: 50px !important;
+}
+#colorPicker::-webkit-color-swatch {
+    border: none !important;
+    border-radius: 50px !important; /* إجبار مربع اللون على أخذ الشكل الدائري */
+}
+
+/* قص وتدوير اللون الداخلي لمتصفحات فايرفوكس */
+#colorPicker::-moz-color-swatch {
+    border: none !important;
+    border-radius: 50px !important;
 }
