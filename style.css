@@ -1,13 +1,22 @@
 /* الألوان والأساسيات */
-:root { --primary: #6366f1; }
+/* 1. تعديل الألوان والأساسيات: إجبار اللون على المقاومة */
+:root { 
+    --primary: #6366f1 !important; 
+}
 
+/* 2. تعديل الـ body: تأمين الخلفية الداكنة بالكامل */
 body {
-    background: #020617;
-    background-image: radial-gradient(circle at center, color-mix(in srgb, var(--primary) 10%, #0f172a), #020617);
-    font-family: 'Cairo', sans-serif; color: white;
-    min-height: 100vh; margin: 0; display: flex; justify-content: center; align-items: center;
-    overflow-x: hidden; /* منع التمرير الأفقي تماماً */
-    padding: 20px 10px;
+    background: #020617 !important;
+    background-image: radial-gradient(circle at center, color-mix(in srgb, var(--primary) 10%, #0f172a), #020617) !important;
+    font-family: 'Cairo', sans-serif; 
+    color: white;
+    min-height: 100vh; 
+    margin: 0; 
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    overflow-x: hidden;
+    padding: 20px 10px;
 }
 
 .glass-card {
