@@ -322,21 +322,39 @@ input[type="text"], input[type="number"], input[type="date"], select {
     border: 1px solid var(--primary) !important;
     border-radius: 50px !important;
     color: white !important;
-    padding: 10px 15px !important;
+    
+    /* 1. إصلاح التوسيط الرأسي تماماً ومنع اختفاء النصوص */
+    height: 42px !important;
+    line-height: 42px !important; /* يضمن إن النص يجي في السنتر بالملّي */
+    padding: 0 15px !important;   /* إلغاء الـ padding العلوي والسفلي اللي كان بيطرد الكلمة */
+    
     font-family: 'Cairo', sans-serif !important;
     font-weight: bold !important;
-    font-size: 16px !important;
+    font-size: 15px !important;
     outline: none !important;
     cursor: pointer;
-    box-sizing: border-box;
+    box-sizing: border-box !important;
     transition: 0.3s ease;
+    
+    /* 2. تأمين شامل لمنع انقلاب الكلام أو تشوهه */
+    transform: none !important;
+    text-transform: none !important;
+    writing-mode: horizontal-tb !important;
+}
+
+/* ضبط اتجاه قوائم الخيارات بداخل السلكت */
+select {
+    text-align: center !important;
+    text-align-last: center !important; /* يجبر كلمة "العربية" تظهر في السنتر جوه الكبسولة */
 }
 
 select option { 
     background-color: #0f172a !important; 
     color: white !important; 
     font-family: 'Cairo', sans-serif; 
+    padding: 10px;
 }
+
 input[type="text"]:focus, select:focus { 
     border-color: var(--primary) !important; 
     box-shadow: 0 0 10px var(--primary); 
