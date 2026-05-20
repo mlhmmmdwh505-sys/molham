@@ -12,26 +12,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Surgeon Dashboard D.MOLHAM MMDOH ❤️</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="glass-card">
         <div class="mini-score">
-            <span>💰 <span id="userPoints">0</span></span>
+            <span>🪙 <span id="userPoints">0</span></span>
             <button onclick="resetPoints()" class="reset-mini" title="تصفير النقاط">🗑️</button>
         </div>
 
         <div class="date-tag" id="dateDisplay"></div>
 
         <header>
-            <h1 id="mainTitle">لوحة تحكم <span id="mainTitleName">الطبيب</span> 🩺</h1>
+            <h1 id="mainTitle">لوحة تحكم <span id="mainTitleName">دكتور ملهم</span> 🩺</h1>
             <p class="welcome-msg"><span id="welcomeWord">مرحباً بك،</span> <span id="userNameDisplay">دكتور ملهم</span> ✨</p>
-            <p id="motivationQuote" style="color: var(--primary); font-style: italic; margin-top: 10px; min-height: 24px;"></p>
+            <p id="motivationQuote" style="color: var(--primary); font-style: italic; margin-top: 10px; min-height: 24px; font-weight: bold;"></p>
             
             <div class="settings-bar card">
                 <div class="setting-item">
                     <label id="langLabel">اللغة</label>
-                    <select id="langSelect">
+                    <select id="langSelect" onchange="applyLanguage(this.value)">
                         <option value="ar">العربية</option>
                         <option value="en">English</option>
                     </select>
@@ -81,7 +81,7 @@
                 <section class="info-card focus-card">
                     <div id="pomoDisplay">25:00</div>
                     <div class="pomo-actions">
-                       <button onclick="toggleTimer()" id="startBtn" class="btn-main">ابدأ المهمة</button>
+                        <button onclick="toggleTimer()" id="startBtn" class="btn-main">ابدأ المهمة</button>
                         <button onclick="resetTimer()" id="resetBtn">اعادة ضبط</button>
                     </div>
                 </section>
@@ -96,6 +96,7 @@
             </main>
         </div>
     </div>
+    
     <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
     <script src="script.js"></script>
 </body>
