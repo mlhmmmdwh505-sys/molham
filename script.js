@@ -304,7 +304,7 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
-// --- 8. نظام إدارة المهام (To-Do List) ---
+// --- 8. نظام إدارة المهام الذكي (To-Do List) - نسخة المهمة الواحدة الثابتة ---
 function addTask() {
     const input = document.getElementById('taskInput');
     const text = input.value.trim();
@@ -315,30 +315,46 @@ function addTask() {
     input.value = '';
     renderTasks();
 }
+
 function toggleTask(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks[index].done = !tasks[index].done;
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
     renderTasks();
 }
+
 function deleteTask(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks.splice(index, 1);
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
     renderTasks();
 }
+
 function renderTasks() {
-    const taskList = document.getElementById('taskList');
+    // جلب الحاوية الصحيحة المستخدمة في الـ HTML
+    const taskList = document.getElementById('taskList') || document.getElementById('todoList');
+    if (!taskList) return;
+    
     taskList.innerHTML = '';
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    tasks.forEach((task, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <span style="cursor:pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
-                ${task.done ? '✅' : '⭕'} ${task.text}
-            </span>
-            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width:auto !important; background:none !important; border:none !important;">❌</button>
-        `;
-        taskList.appendChild(li);
-    });
+    
+    // إذا لم يكن هناك مهام، اخرج ولا تعرض شيئاً
+    if (tasks.length === 0) return;
+    
+    // 🎯 السحر كله هنا: جلب "آخر مهمة فقط" المضافة حديثاً لعرضها وحجب الباقي
+    const lastIndex = tasks.length - 1;
+    const task = tasks[lastIndex];
+    
+    const li = document.createElement('li');
+    // إضافة الـ Class الصارم لضمان ربطه بالـ CSS ومقاسات الماك بوك
+    li.className = 'task-item'; 
+    
+    li.innerHTML = `
+        <span style="cursor:pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${lastIndex})">
+            ${task.done ? '✅' : '⭕'} ${task.text}
+        </span>
+        <button onclick="deleteTask(${lastIndex})" class="reset-mini" style="min-width:auto !important; background:none !important; border:none !important; cursor:pointer;">❌</button>
+    `;
+    
+    taskList.appendChild(li);
 }
