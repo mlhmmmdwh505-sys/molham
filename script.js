@@ -335,29 +335,37 @@ function renderTasks() {
     const taskList = document.getElementById('taskList');
     if (!taskList) return;
     
+    // 1. تنظيف القائمة
     taskList.innerHTML = '';
     
-    // 🧲 1. تفعيل الحركة المغناطيسية وتثبيت الارتفاع ليعرض مهمتين فقط بالملي ويمنع الانكماش
+    // 2. إجبار الكارد الخارجي الكبير نفسه (.todo-box) على التمدد بالعرض الكامل فوراً
+    const parentCard = taskList.closest('.todo-box') || taskList.parentElement;
+    if (parentCard) {
+        parentCard.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; min-width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; padding: 25px !important; overflow: hidden !important;";
+    }
+    
+    // 3. ضبط حاوية المهام (الـ ul) لتظهر بعرض كامل وتتسع لمهمتين بالظبط مع مغناطيس ناعم
     taskList.style.cssText = `
-        display: block !important; 
-        width: 100% !important; 
-        padding: 0 !important; 
-        margin: 15px 0 0 0 !important; 
-        text-align: right !important; 
-        height: 124px !important; 
-        max-height: 124px !important; 
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        min-width: 100% !important;
+        gap: 10px !important;
+        padding: 0 !important;
+        margin: 15px 0 0 0 !important;
+        text-align: right !important;
         box-sizing: border-box !important;
-        overflow-y: scroll !important; 
-        scroll-snap-type: y mandatory !important;    
-        scroll-behavior: smooth !important;         
-        -webkit-overflow-scrolling: touch !important;
+        height: 124px !important;
+        max-height: 124px !important;
+        overflow-y: scroll !important;
+        scroll-snap-type: y mandatory !important;
+        scroll-behavior: smooth !important;
     `;
 
-    // إخفاء شريط السكرول ليبقى التصميم نظيفاً وفخماً
-    const styleId = 'scroll-hide-style';
-    if (!document.getElementById(styleId)) {
+    // حقن ستايل مخفي لإخفاء شريط السكرول المزعج
+    if (!document.getElementById('scroll-hide-style')) {
         const style = document.createElement('style');
-        style.id = styleId;
+        style.id = 'scroll-hide-style';
         style.innerHTML = `#taskList::-webkit-scrollbar { width: 0px !important; background: transparent !important; }`;
         document.head.appendChild(style);
     }
@@ -368,22 +376,22 @@ function renderTasks() {
         const li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
-        // 🚀 2. تثبيت أبعاد المهمة الفردية لتتطابق مع الحسبة وربطها بنقاط الالتصاق المغناطيسي
+        // 4. كبسولة المهمة الفردية: مفرودة تماماً وواخدة العرض كله ومجهّزة للمغناطيس
         li.style.cssText = `
-            display: flex !important; 
-            flex-direction: row !important; 
-            align-items: center !important; 
-            justify-content: space-between !important; 
-            width: 100% !important; 
-            box-sizing: border-box !important; 
-            height: 52px !important; 
-            min-height: 52px !important; 
-            max-height: 52px !important; 
-            margin-bottom: 10px !important; 
-            background: rgba(255, 255, 255, 0.04) !important; 
-            border: 1px solid rgba(255, 255, 255, 0.1) !important; 
-            border-radius: 15px !important; 
-            padding: 0 20px !important; 
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+            min-width: 100% !important;
+            box-sizing: border-box !important;
+            height: 52px !important;
+            min-height: 52px !important;
+            max-height: 52px !important;
+            padding: 0 20px !important;
+            background: rgba(255, 255, 255, 0.04) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 15px !important;
             flex-shrink: 0 !important;
             scroll-snap-align: start !important;
             scroll-snap-stop: always !important;
