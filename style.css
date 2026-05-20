@@ -249,3 +249,73 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     .modern-timer { flex-wrap: wrap; gap: 15px; }
     .unit { flex: 1 1 40%; }
 }
+
+/* ======================================================= */
+/* 💻 تنسيق شريط الإعدادات الأفقي الموحد والمحاذي بالملّي للماك بوك والكمبيوتر */
+/* ======================================================= */
+@media (min-width: 1025px) {
+    /* تحويل الشريط لـ Grid بـ 5 أعمدة متساوية المساحة تماماً */
+    .settings-bar { 
+        display: grid !important;
+        grid-template-columns: repeat(5, 1fr) !important; 
+        gap: 20px !important; 
+        align-items: flex-end !important; /* محاذاة جميع الخانات والزر على خط مستقيم من الأسفل */
+        width: 100% !important; 
+        max-width: 980px !important; 
+        margin: 0 auto 35px auto !important;
+    }
+
+    /* موازنة المسافات الرأسية للـ Labels فوق الخانات */
+    .input-group { 
+        display: flex !important;
+        flex-direction: column !important; 
+        gap: 8px !important;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    /* توحيد أبعاد وعرض وارتفاع كل الخانات والأزرار بلا استثناء */
+    input[type="text"], 
+    input[type="number"], 
+    input[type="date"], 
+    select, 
+    #userNameInput, 
+    #langSelect,
+    #colorPicker,
+    .settings-bar button { 
+        width: 100% !important; /* ملء العمود الخاص بكل عنصر بالتساوي */
+        height: 45px !important; /* ارتفاع موحد وثابت على نفس المسطرة 📏 */
+        text-align: center !important; 
+        font-size: 15px !important; 
+        padding: 0 10px !important; 
+        box-sizing: border-box !important;
+        margin: 0 !important;
+    }
+
+    /* ضبط خاص لخانة اختيار اللون لتطابق الارتفاع وتملأ العمود */
+    #colorPicker {
+        -webkit-appearance: none; 
+        appearance: none;
+        background-color: transparent;
+        border: 1px solid var(--primary) !important; 
+        border-radius: 50px !important;
+        cursor: pointer; 
+        overflow: hidden;
+        display: block !important;
+    }
+
+    /* موازنة عنصر اختيار اللون مع الـ Label الخاص به */
+    .setting-item {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+
+    /* جعل زر تأكيد الإعدادات يملأ عموده بالكامل ويصطف في نفس السطر */
+    .settings-bar button {
+        align-self: flex-end !important;
+        padding: 0 !important;
+    }
+}
