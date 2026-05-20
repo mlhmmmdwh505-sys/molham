@@ -193,50 +193,34 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 
 @media (max-width: 480px) {
-    .glass-card { padding: 25px 15px; }
-    #pomoDisplay { font-size: 55px; min-width: 100%; }
-    
-    /* جعل شريط الإعدادات مرن وبجانب بعض على نفس المستوى */
-    .settings-bar { 
+    /* ... أي أكواد موبايل أخرى هنا ... */
+
+    /* حاوية خانة الإدخال والزر */
+    .input-section { 
         display: flex !important;
-        flex-direction: row !important; /* 👈 يخليهم جنب بعض مش تحت بعض */
-        flex-wrap: wrap !important; /* للسماح بنزول العناصر لو الشاشة صغيرة جداً */
-        justify-content: center !important; 
+        flex-direction: column !important; /* ترتيبهم تحت بعض بشكل متناسق */
         gap: 12px !important; 
         width: 100% !important; 
     }
-    
-    /* توحيد حجم وعرض كل عناصر الإدخال والـ select بالملّي */
-    .input-group, 
-    input[type="text"], 
-    input[type="number"], 
-    input[type="date"], 
-    select, 
-    #userNameInput, 
-    #langSelect { 
-        width: 130px !important; /* 👈 حجم موحد ومناسب جداً لعرض شاشة الموبايل */
-        max-width: 100% !important;
-        text-align: center !important; 
-        font-size: 14px !important; /* حجم خط متناسق */
-        padding: 8px 10px !important; /* بادينج موحد */
-        height: 42px !important; /* ارتفاع ثابت وموحد لكل الخانات */
+
+    /* توحيد الحجم والارتفاع بالظبط لخانة النص وللزر */
+    .input-section input, 
+    .btn-add { 
+        width: 100% !important; /* الخانة والزر هياخدوا نفس العرض الكامل */
+        height: 48px !important; /* ارتفاع موحد وثابت للاثنين منعا لأي تفاوت */
+        box-sizing: border-box !important;
+        border-radius: 50px !important; /* الحواف الدائرية المتناسقة */
+        font-size: 16px !important;
+        text-align: center !important;
+        padding: 0 20px !important;
+        margin: 0 !important;
     }
 
-    /* ضبط اختيار اللون والـ label عشان يمشوا على نفس المحاذاة */
-    .setting-item {
-        height: 42px !important;
+    /* تظبيط محاذاة علامة الزائد عمودياً جوة الزر */
+    .btn-add {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
+        line-height: 1 !important;
     }
-    #colorPicker {
-        height: 42px !important; /* نفس ارتفاع باقي الخانات */
-        width: 60px !important;
-    }
-
-    .store-grid { flex-direction: column; }
-    .modern-timer { flex-wrap: wrap; gap: 15px; }
-    .unit { flex: 1 1 40%; }
-    .input-section { flex-direction: column; gap: 10px; }
-    .btn-add { width: 100%; }
 }
