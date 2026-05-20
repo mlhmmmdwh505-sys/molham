@@ -434,7 +434,7 @@ button:active {
 }
 
 /* ==========================================================================
-   📝 10. منظومة المهام الفخمة (🎯 تم تصفير الجاب لحساب قطعي للمهمتين)
+   📝 10. منظومة المهام الفخمة والأبعاد الصارمة (🎯 الحل النهائي والقطعي)
    ========================================================================== */
 .todo-box {
     flex: 1 1 auto !important; 
@@ -488,34 +488,31 @@ button:active {
     border-radius: 50px !important;
 }
 
-/* 🧲 حاوية السكرول المغناطيسي - الحسبة الدقيقة لظهور مهمتين كاملين بالملي */
+/* 🧲 حاوية السكرول المغناطيسي - الحسبة الإمبراطورية الدقيقة */
 .tasks-container, 
 #todoList, 
 #taskList, 
 ul {
-    list-style: none;
-    display: flex !important;
-    flex-direction: column !important;
-    
-    /* منع المتصفح من إخفاء المهمة الثانية: جعل التباعد الداخلي 0 لضمان دقة الارتفاع */
-    gap: 0px !important; 
+    list-style: none !important;
+    display: block !important; /* 🎯 تحويلها إلى block بدلاً من flex لمنع المتصفح من كبس الارتفاع */
     width: 100% !important;
     margin: 20px 0 0 0 !important; 
-    text-align: right;
+    padding: 0 !important;
+    text-align: right !important;
     
-    /* 🎯 الحسبة الرياضية: (ارتفاع المهمة 54px + الهامش السفلي 12px) * 2 = 132px كاملين للمهمتين 
-       وزودنا عليها 25px بالملي عشان يظهر رأس المهمة الثالثة بوضوح تام وتعرف إن فيه سكرول */
-    height: 157px !important;
-    max-height: 157px !important;
+    /* 🎯 الارتفاع المثالي: 145px يضمن ظهور مهمتين (كل واحدة 54px + هامش 12px = إجمالي 132px) 
+       والـ 13px المتبقية تظهر بدقة شديدة تلميحة أو طرف المهمة الثالثة بالأسفل */
+    height: 145px !important;
+    max-height: 145px !important;
     
-    /* تفعيل الجذب المغناطيسي الصارم والسلس للاب توب */
+    /* تفعيل السكرول والمغناطيس الانسيابي */
     overflow-y: auto !important;               
     scroll-snap-type: y mandatory !important;    
     scroll-behavior: smooth !important;         
     -webkit-overflow-scrolling: touch !important; 
 }
 
-/* تصميم شريط سكرول خفي للماوس */
+/* تصميم شريط سكرول ميكروسكوبي مخصص لحركة الماوس */
 .tasks-container::-webkit-scrollbar, 
 #todoList::-webkit-scrollbar, 
 #taskList::-webkit-scrollbar, 
@@ -531,31 +528,33 @@ ul::-webkit-scrollbar-thumb {
     border-radius: 10px !important;
 }
 
-/* 🧲 عنصر المهمة الفردية الثابت بأبعاده الصارمة لمنع الاختفاء والقطع */
+/* 🧲 عنصر المهمة الفردية الثابت بأبعاده الحديدية */
 li, .fixed-task-item {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
     width: 100% !important;
     
-    /* تثبيت مطلق للأبعاد لمنع المتصفح من كبس العناصر */
+    /* 🎯 تثبيت مطلق وقاتل للارتفاع يمنع المتصفح تماماً من التقليص */
     height: 54px !important;       
+    min-height: 54px !important; /* إجبار المتصفح على عدم النزول عن 54 بكسل */
     max-height: 54px !important;
+    
+    /* مسافة التباعد بين المهمتين */
     margin-bottom: 12px !important; 
     flex-shrink: 0 !important;     
     
     box-sizing: border-box !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
     border-radius: 16px !important; 
-    padding: 0 25px !important;    
+    padding: 0 20px !important;    
     background: rgba(255, 255, 255, 0.02) !important;
-    font-size: 17px !important;   
+    font-size: 16px !important;   
     
-    /* المغناطيس الذكي */
+    /* إقفال نقطة الجذب المغناطيسية السلسة */
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important; 
 }
-
 /* ==========================================================================
    🖥️ 11. هندسة الحواسب والأجهزة المكتبية الكبيرة والماك بوك (1025px وأعلى)
    ========================================================================== */
