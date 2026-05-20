@@ -255,7 +255,12 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 /* ======================================================= */
 
 /* 1. ضبط شريط الإعدادات ليكون أفقيًا بالكامل وبأحجام متطابقة على الماك بوك والكمبيوتر */
+/* ======================================================= */
+/* 💻 تنسيق شريط الإعدادات الأفقي (ماك بوك / كمبيوتر) + إصلاح بوكس اللون الشامل */
+/* ======================================================= */
+
 @media (min-width: 1025px) {
+    /* الـ Grid الأفقي المتساوي تماماً */
     .settings-bar { 
         display: grid !important;
         grid-template-columns: repeat(5, 1fr) !important; 
@@ -272,8 +277,10 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         gap: 8px !important;
         width: 100% !important;
         margin: 0 !important;
+        align-items: center !important;
     }
 
+    /* توحيد مقاسات كل الخانات والزرار */
     input[type="text"], 
     input[type="number"], 
     input[type="date"], 
@@ -297,31 +304,42 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     }
 }
 
-/* 2. الإصلاح الجذري لمنع خروج مربع اللون عن المنحنى الدائري */
+/* 🎨 التعديل الجذري لمنع ظهور الهلال الأسود أو الفراغات في بوكس اللون */
 #colorPicker {
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
-    background-color: transparent !important;
-    border: 1px solid var(--primary) !important; 
-    border-radius: 50px !important; /* جعل الإطار الخارجي دائريًا */
-    cursor: pointer !important; 
-    overflow: hidden !important; /* قص أي محتوى داخلي يخرج عن الدائرة ✂️ */
+    background: transparent !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 50px !important;
+    cursor: pointer !important;
+    overflow: hidden !important;
+    padding: 0 !important;
     box-sizing: border-box !important;
 }
 
-/* قص وتدوير اللون الداخلي لمتصفحات كروم، إيدج، وسفاري (الماك بوك) */
+/* جعل اللون الداخلي يملأ كامل المساحة المتاحة بدون أي تمدد مشوه */
 #colorPicker::-webkit-color-swatch-wrapper {
     padding: 0 !important;
+    margin: 0 !important;
+    background: none !important;
     border-radius: 50px !important;
-}
-#colorPicker::-webkit-color-swatch {
-    border: none !important;
-    border-radius: 50px !important; /* إجبار مربع اللون على أخذ الشكل الدائري */
 }
 
-/* قص وتدوير اللون الداخلي لمتصفحات فايرفوكس */
+#colorPicker::-webkit-color-swatch {
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 0 !important; /* إلغاء التدوير الداخلي لمنع الفراغات الجانبية */
+    width: 100% !important;
+    height: 100% !important;
+    box-sizing: border-box !important;
+}
+
+/* دعم متصفح فايرفوكس لملء كامل المساحة */
 #colorPicker::-moz-color-swatch {
     border: none !important;
-    border-radius: 50px !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
 }
