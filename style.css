@@ -350,7 +350,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     height: 100% !important;
 }
 /* ======================================================= */
-/* 🖥️ الحل الحاسم: تثبيت حاوية المهام لعرض مهمة واحدة فقط */
+/* 🖥️ الحل الجذري النهائي: إجبار الصندوق على عرض مهمة واحدة فقط */
 /* ======================================================= */
 @media (min-width: 1025px) {
     /* 1. تثبيت الشاشة ومنع التمرير الخارجي */
@@ -427,40 +427,42 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     }
     #pomoDisplay { font-size: 60px !important; margin: 2px 0 !important; }
 
-    /* 6. صندوق المهام الإجمالي */
+    /* 6. صندوق المهام الإجمالي - منع التمدد التلقائي تماماً */
     .todo-box {
-        flex: 1 1 auto !important;
+        flex: 0 0 auto !important; /* 👈 منع المتصفح من مط البوكس لملء الفراغ السقلي */
         display: flex !important;
         flex-direction: column !important;
-        min-height: 0 !important; 
-        padding: 15px 25px !important;
-    }
-
-    /* 🎯 السحر هنا: تثبيت الارتفاع ليعرض مهمة واحدة فقط بدقة بالغة 🎯 */
-    .tasks-container, #todoList {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 8px !important;
-        overflow-y: auto !important; /* تفعيل السكرول عند إضافة مهام أكثر */
-        
-        /* 👈 تحديد الارتفاع الأقصى الصارم ليتسع لعنصر واحد فقط بالملّي */
-        max-height: 58px !important; 
-        height: 58px !important; 
-        
-        padding-right: 5px !important;
-        padding-bottom: 2px !important;
-        min-height: 0 !important;
-    }
-
-    /* إجبار عناصر المهام على عدم الانكماش والالتزام بحجمها الطبيعي */
-    .tasks-container li, #todoList li, .task-item {
-        flex-shrink: 0 !important; 
         width: 100% !important;
-        height: 48px !important; /* توحيد ارتفاع المهمة الزجاجية */
+        padding: 15px 25px !important;
         box-sizing: border-box !important;
     }
 
-    /* تصميم شريط التمرير (السكرول) ليكون مخفياً تقريباً وناعماً جداً */
+    /* 🎯 القفل الرياضي الحاسم لحاوية عناصر المهام 🎯 */
+    .tasks-container, #todoList {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0px !important; /* إلغاء الفراغات العشوائية المسببة للمط */
+        overflow-y: auto !important; /* تفعيل السكرول الداخلي للمهمات الإضافية */
+        
+        /* 👈 الارتفاع الصافي الدقيق جداً لعنصر واحد فقط ومنع فتح أي مساحة إضافية */
+        height: 52px !important; 
+        max-height: 52px !important; 
+        
+        padding: 0 !important;
+        margin: 5px 0 0 0 !important;
+        min-height: 0 !important;
+    }
+
+    /* تثبيت مواصفات المهمة الواحدة */
+    .tasks-container li, #todoList li, .task-item {
+        flex-shrink: 0 !important; 
+        width: 100% !important;
+        height: 50px !important; /* الارتفاع الثابت للمهمة */
+        margin: 0 0 2px 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* تجميل شريط التمرير (السكرول) ليكون مخفياً وناعماً جداً عند التمرير بين الـ 100 مهمة */
     .tasks-container::-webkit-scrollbar, #todoList::-webkit-scrollbar { width: 4px; }
     .tasks-container::-webkit-scrollbar-thumb, #todoList::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.2); border-radius: 10px;
