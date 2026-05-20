@@ -700,59 +700,66 @@ ul::-webkit-scrollbar-thumb {
 }
 
 /* ==========================================================================
-   🚀 الحل الجراحي النهائي: فرد وتثبيت حجم كارد المهام (د. ملهم)
+   👑 تفجير وفرد كارد المهام بالعرض الكامل (🎯 الحل القطعي للدكتور ملهم)
    ========================================================================== */
 
-/* 1. تكبير وفرد كارد المهام نفسه ومنعه من الانكماش نهائياً */
+/* 1. إجبار الكارد الخارجي على الفرد الأفقي الكامل بعرض الشاشة */
 .todo-box {
     display: flex !important;
     flex-direction: column !important;
+    
+    /* 🚀 الفرد بالعرض اللي بتدور عليه */
     width: 100% !important;
-    min-width: 100% !important;
+    min-width: 100% !important; 
+    max-width: 100% !important;
     
-    /* تثبيت الارتفاع الكلي للكارد عشان يتسع للمهمتين مستريحين */
-    height: 340px !important; 
-    min-height: 340px !important;
-    max-height: 340px !important;
+    /* الارتفاع المريح */
+    height: 300px !important;
+    min-height: 300px !important;
     
-    padding: 25px !important;  
+    padding: 25px !important;
     box-sizing: border-box !important;
     overflow: hidden !important;
 }
 
-/* 2. حاوية القائمة (الـ سكرول) - إعطائها مساحة مفرودة بالكامل */
-#taskList, .tasks-container, ul {
-    list-style: none !important;
-    display: block !important; 
+/* 2. إجبار الحاوية الأساسية (العمود اللي شايل الكارد) على التمدد */
+.side-col, .main-col {
     width: 100% !important;
-    margin: 20px 0 0 0 !important; 
-    padding: 0 !important;
-    text-align: right !important;
-    
-    /* ارتفاع داخلي ممتاز يعرض المهمتين كاملين وطرف الثالثة */
-    height: 165px !important; 
-    max-height: 165px !important;
-    overflow-y: auto !important; 
+    min-width: 100% !important;
+    flex: 1 1 auto !important;
 }
 
-/* 3. عنصر المهمة الفردي - يتمدد بكامل عرض الكارد الكبير */
+/* 3. حاوية القائمة الداخلية - تتفرد بكامل العرض الجديد */
+#taskList, .tasks-container, ul {
+    list-style: none !important;
+    display: block !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 20px 0 0 0 !important;
+    padding: 0 !important;
+    text-align: right !important;
+    height: 150px !important;
+    overflow-y: auto !important;
+}
+
+/* 4. عنصر المهمة نفسه - يتمدد أفيداً بكامل العرض الجديد للكارد */
 .fixed-task-item, li {
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: row !important; /* فرد العناصر أفدياً جنب بعض */
     align-items: center !important;
     justify-content: space-between !important;
+    
     width: 100% !important;
+    min-width: 100% !important;
     box-sizing: border-box !important;
     
-    /* ارتفاع المهمة */
-    height: 52px !important; 
-    min-height: 52px !important; 
-    max-height: 52px !important;
-    margin-bottom: 12px !important; 
+    height: 52px !important;
+    min-height: 52px !important;
+    margin-bottom: 10px !important;
     
-    background: rgba(255, 255, 255, 0.03) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 16px !important;
+    border-radius: 15px !important;
     padding: 0 20px !important;
-    flex-shrink: 0 !important; 
+    flex-shrink: 0 !important;
 }
