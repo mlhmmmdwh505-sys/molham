@@ -434,7 +434,7 @@ button:active {
 }
 
 /* ==========================================================================
-   📝 10. منظومة المهام الفخمة وتنشيط كرت اللاب توب هيدروليكياً
+   📝 10. منظومة المهام الفخمة وتثبيت عرض مهمتين على اللاب توب
    ========================================================================== */
 .todo-box {
     flex: 1 1 auto !important; 
@@ -446,7 +446,7 @@ button:active {
     min-height: 280px !important; 
     overflow: hidden !important;
     
-    /* 🛠️ تعديل اللاب توب: إجبار المعالج الرسومي على تنشيط كرت المهام ومنع التهنيج */
+    /* منع تهنيج كرت شاشة اللاب توب والبلور */
     transform: translateZ(0);
     -webkit-transform: translateZ(0);
 }
@@ -490,7 +490,7 @@ button:active {
     border-radius: 50px !important;
 }
 
-/* 🧲 حاوية السكرول المغناطيسي اللانهائي للاب توب والكمبيوتر */
+/* 🧲 حاوية السكرول المغناطيسي - تعديل الارتفاع لعرض مهمتين بالظبط */
 .tasks-container, 
 #todoList, 
 #taskList, 
@@ -503,18 +503,18 @@ ul {
     margin: 20px 0 0 0 !important; 
     text-align: right;
     
-    /* 🛠️ تعديل اللاب توب: إعطاء طول إجباري آمن في بيئة الـ desktop لتفعيل السكرول */
-    height: 160px !important;
-    max-height: 160px !important;
+    /* 🎯 الحسبة الذهبية: 150px تضمن ظهور مهمتين كاملين بالملّي مع تلميحة للمهمة الثالثة بالأسفل */
+    height: 150px !important;
+    max-height: 150px !important;
     
-    /* ⚡ هندسة المغناطيس الصارم المتوافقة مع المتصفحات المكتبية */
+    /* تفعيل السكرول والمغناطيس الانسيابي */
     overflow-y: auto !important;               
     scroll-snap-type: y mandatory !important;    
     scroll-behavior: smooth !important;         
-    -webkit-overflow-scrolling: touch !important; /* دعم إيماءات التاتش باد المودرن */
+    -webkit-overflow-scrolling: touch !important; 
 }
 
-/* 🔧 تصميم شريط سكرول ميكروسكوبي مخصص للاب توب والماوس */
+/* تصميم شريط سكرول ميكروسكوبي مخصص للاب توب والماوس */
 .tasks-container::-webkit-scrollbar, 
 #todoList::-webkit-scrollbar, 
 #taskList::-webkit-scrollbar, 
@@ -530,7 +530,7 @@ ul::-webkit-scrollbar-thumb {
     border-radius: 10px !important;
 }
 
-/* 🧲 كبسولة المهمة الفردية ممتدة بالكامل ومجهزة برمجياً للماوس */
+/* 🧲 كبسولة المهمة الواحدة */
 li, .fixed-task-item {
     display: flex !important;
     justify-content: space-between !important;
@@ -538,7 +538,7 @@ li, .fixed-task-item {
     width: 100% !important;
     height: 54px !important;       
     max-height: 54px !important;
-    margin-bottom: 12px !important; 
+    margin-bottom: 12px !important; /* مسافة التباعد الذكية بين المهمتين */
     flex-shrink: 0 !important;     
     box-sizing: border-box !important;
     border: 1px solid rgba(255, 255, 255, 0.12) !important;
@@ -547,7 +547,7 @@ li, .fixed-task-item {
     background: rgba(255, 255, 255, 0.02) !important;
     font-size: 17px !important;   
     
-    /* ⚡ إقفال نقطة الجذب المغناطيسية */
+    /* إقفال نقطة الجذب المغناطيسية */
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important; 
 }
@@ -706,7 +706,6 @@ li, .fixed-task-item {
         min-height: 0 !important;
     }
     
-    /* فك الطول الثابت على الموبايل ليعود مرناً وواسعاً تلقائياً */
     .tasks-container, #todoList, #taskList, ul {
         height: auto !important;
         max-height: 260px !important; 
