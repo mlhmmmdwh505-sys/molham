@@ -902,3 +902,68 @@ input[type="color"]::-moz-color-swatch {
     border: none !important;
     border-radius: 25px !important;
 }
+
+/* ==========================================================================
+   📱 ثورة التصميم الذكي للموبايل: إنقاذ اللوحة من الانضغاط (د. ملهم)
+   ========================================================================== */
+
+@media screen and (max-width: 768px) {
+    
+    /* 1. تحرير الحاوية الزجاجية الكبرى على الموبايل */
+    .glass-card, .container, .wrapper {
+        width: 92vw !important;
+        max-width: 92vw !important;
+        padding: 15px !important;
+        margin: 10px auto !important;
+        height: auto !important;
+    }
+
+    /* 2. تحويل توزيع الكروت من أفقي إلى رأسي (تحت بعض) ليعودوا لحجمهم الطبيعي */
+    .dashboard-grid, .main-layout {
+        display: flex !important;
+        flex-direction: column !important; /* فك الخنقة الجانبية */
+        width: 100% !important;
+        gap: 20px !important;
+    }
+
+    /* 3. إلغاء تقسيم الـ 50% وإعطاء الأعمدة العرض الكامل */
+    .main-col, .side-col, .left-column, .right-column {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 1 1 auto !important;
+        gap: 20px !important;
+    }
+
+    /* 4. كروت المهام والعداد والمتجر تتنفس وتأخذ العرض كله */
+    .todo-box, .timer-box, .info-card, .store-card, .chart-box {
+        width: 100% !important;
+        min-width: 100% !important;
+        height: auto !important; /* السماح للكارت بالتمدد حسب محتواه */
+        min-height: auto !important;
+        max-height: none !important;
+        padding: 20px 15px !important;
+    }
+
+    /* 5. إعادة ضبط حاوية المهام لتستوعب 3 مهام بمظهر رائع */
+    #taskList, .tasks-container, ul {
+        width: 100% !important;
+        height: 186px !important; /* ارتفاع الـ 3 مهام اللي طلبته */
+        max-height: 186px !important;
+        margin-top: 15px !important;
+    }
+
+    /* 6. عناصر القائمة الفردية تفرد بكامل العرض الجديد */
+    .fixed-task-item, li {
+        width: 100% !important;
+        height: 52px !important;
+        min-height: 52px !important;
+        padding: 0 15px !important;
+    }
+
+    /* 7. إصلاح نصوص العداد الضخمة حتى لا تنكسر لسطرين */
+    .timer-box h1, #timerDisplay, .time-display {
+        font-size: 45px !important; /* تصغير نسبي للنص ليناسب الموبايل */
+        line-height: 1 !important;
+        margin-bottom: 15px !important;
+    }
+}
