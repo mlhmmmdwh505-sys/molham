@@ -729,33 +729,36 @@ ul::-webkit-scrollbar-thumb {
     flex: 1 1 auto !important;
 }
 
-/* 3. حاوية القائمة الداخلية - تتفرد بكامل العرض الجديد */
+/* 🎯 ضبط الارتفاع الميكروسكوبي: عرض مهمتين فقط بالملي وبدون أي أطراف إضافية */
 #taskList, .tasks-container, ul {
     list-style: none !important;
     display: block !important;
     width: 100% !important;
-    min-width: 100% !important;
     margin: 20px 0 0 0 !important;
     padding: 0 !important;
     text-align: right !important;
-    height: 150px !important;
-    overflow-y: auto !important;
+    
+    /* 🚀 الحسبة الدقيقة: (مهمة 52px + هامش 10px) * 2 = 124px بالتمام والكمال */
+    height: 124px !important;
+    max-height: 124px !important;
+    
+    overflow-y: auto !important; /* السكرول شغال تمام لو ضفت رابعة وخامسة */
+    box-sizing: border-box !important;
 }
 
-/* 4. عنصر المهمة نفسه - يتمدد أفيداً بكامل العرض الجديد للكارد */
+/* تأكيد أبعاد المهمة الفردية لتتطابق مع الحسبة */
 .fixed-task-item, li {
     display: flex !important;
-    flex-direction: row !important; /* فرد العناصر أفدياً جنب بعض */
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
-    
     width: 100% !important;
-    min-width: 100% !important;
     box-sizing: border-box !important;
     
     height: 52px !important;
     min-height: 52px !important;
-    margin-bottom: 10px !important;
+    max-height: 52px !important;
+    margin-bottom: 10px !important; /* الهامش بين المهمتين */
     
     background: rgba(255, 255, 255, 0.04) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
