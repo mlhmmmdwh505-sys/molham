@@ -351,7 +351,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 }
 
 /* ======================================================= */
-/* 🖥️ المنظومة النهائية الشاملة: شاشة واحدة ثابتة + إظهار المهام كاملة */
+/* 🖥️ المنظومة النهائية الشاملة: حل مشكلة اختفاء المهمة الرابعة */
 /* ======================================================= */
 @media (min-width: 1025px) {
     /* 1. تثبيت نافذة المتصفح تماماً ومنع التمرير الخارجي */
@@ -368,7 +368,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     /* 2. ضبط أبعاد اللوحة الزجاجية الكبيرة واحتوائها */
     .glass-card { 
         width: 95vw !important;
-        height: 94vh !important; /* زيادة طفيفة في الارتفاع لتوفير متسع مريح */
+        height: 94vh !important; 
         max-width: 1440px !important; 
         padding: 20px 35px 25px 35px !important; 
         box-sizing: border-box !important;
@@ -379,9 +379,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     }
 
     /* 3. تنسيق مساحات الهيدر والترحيب */
-    header {
-        margin-bottom: 8px !important;
-    }
+    header { margin-bottom: 8px !important; }
     header h1 { font-size: 25px !important; margin-bottom: 2px !important; }
     header p { font-size: 14px !important; margin-bottom: 2px !important; }
     .subtitle { font-size: 13px !important; margin-bottom: 4px !important; }
@@ -405,20 +403,13 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         align-items: center !important;
     }
 
-    input[type="text"], 
-    input[type="number"], 
-    input[type="date"], 
-    select, 
-    #userNameInput, 
-    #langSelect,
-    #colorPicker { 
+    input[type="text"], input[type="number"], input[type="date"], select, #userNameInput, #langSelect, #colorPicker { 
         width: 100% !important;
         height: 40px !important;
         text-align: center !important; 
         font-size: 14px !important; 
         padding: 0 10px !important; 
         box-sizing: border-box !important;
-        margin: 0 !important;
     }
 
     /* زر تأكيد الإعدادات في المنتصف */
@@ -428,7 +419,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         width: 170px !important;
         height: 40px !important;
         margin-top: 8px !important;
-        padding: 0 !important;
     }
 
     /* 5. هيكلة الـ Grid السفلي وتوزيع الصناديق بالتساوي أفقياً */
@@ -437,11 +427,10 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         grid-template-columns: 1fr 1fr !important; 
         gap: 25px !important; 
         width: 100% !important;
-        flex: 1 !important; /* استهلاك المساحة المتاحة بدقة */
-        min-height: 0 !important; /* منع الصناديق من تجاوز حدود الكارت الزجاجي */
+        flex: 1 !important; 
+        min-height: 0 !important; 
     }
 
-    /* ضبط الأعمدة لتعبئة الارتفاع بمرونة */
     .main-col, .side-col { 
         display: flex !important;
         flex-direction: column !important; 
@@ -449,10 +438,9 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         height: 100% !important;
         width: 100% !important;
         justify-content: flex-start !important;
-        min-height: 0 !important; /* حماية ضرورية لملء الارتفاع المتاح */
+        min-height: 0 !important; 
     }
 
-    /* إجبار الكتل الداخلية على الانكماش الذكي داخل الارتفاع المتاح */
     .pomo-box, .todo-box, .store-card, .countdown-card {
         width: 100% !important;
         max-width: 100% !important;
@@ -460,42 +448,44 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         padding: 15px 25px !important;
     }
 
-    /* موازنة خط العداد الكبير */
-    #pomoDisplay {
-        font-size: 65px !important;
-        margin: 5px 0 !important;
-    }
+    #pomoDisplay { font-size: 65px !important; margin: 5px 0 !important; }
 
-    /* 6. 🎯 الحل الجذري لمنع قطع المهمة الأخيرة أسفل الصندوق */
+    /* 6. 🎯 التعديل الجذري والنهائي لحاوية المهام والسكرول */
     .todo-box {
         display: flex !important;
         flex-direction: column !important;
-        flex: 1 !important; /* جعل صندوق المهام يتمدد لملء العمود بالكامل */
-        min-height: 0 !important; /* يسمح للصندوق بالانكماش وتفعيل السكرول الداخلي */
+        flex: 1 !important; 
+        min-height: 0 !important; 
     }
     
-    /* الحاوية المباشرة للمهام (التي تحتوي على الليستة) */
+    /* ضبط حاوية القائمة لتقبل السكرول بشكل صحيح */
     .tasks-container, #todoList {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important; /* المسافة بين كل مهمة والثانية */
         flex: 1 !important;
-        overflow-y: auto !important; /* تفعيل سكرول داخلي ناعم وذكي 📜 */
+        overflow-y: auto !important; /* تفعيل السكرول الداخلي الذكي 📜 */
         padding-right: 8px !important;
-        padding-bottom: 20px !important; /* مسافة أمان سفلية تضمن ظهور المهمة الأخيرة كاملة */
+        padding-bottom: 30px !important; /* مساحة أمان مريحة جداً أسفل القائمة */
         min-height: 0 !important;
     }
 
-    /* تخصيص مظهر شريط التمرير الداخلي ليكون شفافاً وأنيقاً متناسقاً مع التصميم الزجاجي */
-    .tasks-container::-webkit-scrollbar, #todoList::-webkit-scrollbar {
-        width: 6px;
+    /* 🔥 السحر كله هنا: إجبار كل مهمة على الحفاظ على حجمها الكامل ومنع انكماشها */
+    .tasks-container li, #todoList li, .task-item {
+        flex-shrink: 0 !important; /* يمنع المتصفح من قشط أو ضغط المهمة الأخيرة 🚫 */
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
+
+    /* تخصيص مظهر شريط التمرير الداخلي ليكون شفافاً وأنيقاً */
+    .tasks-container::-webkit-scrollbar, #todoList::-webkit-scrollbar { width: 6px; }
     .tasks-container::-webkit-scrollbar-thumb, #todoList::-webkit-scrollbar-thumb {
         background: rgba(255, 255, 255, 0.2);
         border-radius: 10px;
     }
 }
 
-/* ======================================================= */
-/* 🎨 التثبيت الجذري لمدخل اختيار اللون (منع الهلال الأسود والفراغات) */
-/* ======================================================= */
+/* 🎨 قفل الهلال الأسود لبوكس اللون */
 #colorPicker {
     -webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important;
     background: transparent !important; border: 1px solid var(--primary) !important;
