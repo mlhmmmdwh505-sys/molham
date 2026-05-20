@@ -863,3 +863,42 @@ ul::-webkit-scrollbar-thumb {
     min-width: 100% !important;
     box-sizing: border-box !important;
 }
+
+/* ==========================================================================
+   🎨 تحسين مظهر حقل اختيار اللون على الموبايل (د. ملهم)
+   ========================================================================== */
+
+/* 1. ضبط الحاوية أو المدخل نفسه */
+input[type="color"] {
+    -webkit-appearance: none !important; /* إلغاء ستايل أبل وأندرويد الافتراضي */
+    -moz-appearance: none !important;
+    appearance: none !important;
+    
+    width: 100% !important;
+    height: 45px !important; /* ارتفاع أنيق ومتناسق مع باقي الحقول */
+    background: transparent !important; /* إلغاء الخلفية البيضاء */
+    border: 2px solid rgba(255, 0, 0, 0.5) !important; /* حدود ناعمة بلون الثيم */
+    border-radius: 25px !important; /* حواف مستديرة بالكامل متناسقة مع الموقع */
+    cursor: pointer !important;
+    box-sizing: border-box !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+/* 2. تنظيف وتحسين شكل المربع اللوني الداخلي على متصفحات كروم وأندرويد وSafari */
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0 !important;
+    border-radius: 25px !important;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none !important;
+    border-radius: 25px !important;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3) !important; /* ظل داخلي فخم للون */
+}
+
+/* 3. تنظيف وتعديل الشكل لمتصفحات فايرفوكس */
+input[type="color"]::-moz-color-swatch {
+    border: none !important;
+    border-radius: 25px !important;
+}
