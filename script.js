@@ -342,12 +342,15 @@ function renderTasks() {
         const li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
+        // 🚀 هندسة مرنة تفرد المهمة بكامل العرض وتملأ كل الفراغات المتاحة جنب الزرار
         li.innerHTML = `
-            <div style="display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; cursor: pointer; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}" onclick="toggleTask(${index})">
-                <span style="flex-shrink: 0; font-size: 18px;">${task.done ? '✅' : '⭕'}</span>
-                <span style="flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: right; font-weight: 600;">${task.text}</span>
+            <div style="display: flex; align-items: center; gap: 10px; width: 100%; min-width: 0; cursor: pointer; direction: rtl;" onclick="toggleTask(${index})">
+                <span style="flex-shrink: 0; font-size: 16px; margin-left: 4px;">${task.done ? '✅' : '⭕'}</span>
+                <span style="flex-grow: 1; white-space: normal; word-break: break-word; text-align: right; font-weight: 500; font-size: 15px; ${task.done ? 'text-decoration: line-through; opacity: 0.5;' : ''}">
+                    ${task.text}
+                </span>
             </div>
-            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width: auto !important; background: none !important; border: none !important; cursor: pointer; padding: 0 5px !important; flex-shrink: 0; font-size: 14px; color: #ff4444;">❌</button>
+            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer; padding: 0 5px !important; flex-shrink: 0; font-size: 14px; margin-right: auto;">❌</button>
         `;
         taskList.appendChild(li);
     });
