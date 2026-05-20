@@ -700,20 +700,27 @@ ul::-webkit-scrollbar-thumb {
 }
 
 /* ==========================================================================
-   🎯 الحل النهائي والقطعي لفرد المهام وملء الفراغات (د. ملهم)
+   🚀 الحل الجراحي النهائي: فرد وتثبيت حجم كارد المهام (د. ملهم)
    ========================================================================== */
 
-/* 1. تجديد كارد المهام ومنحه مساحة مستريحة جداً */
+/* 1. تكبير وفرد كارد المهام نفسه ومنعه من الانكماش نهائياً */
 .todo-box {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
+    min-width: 100% !important;
+    
+    /* تثبيت الارتفاع الكلي للكارد عشان يتسع للمهمتين مستريحين */
+    height: 340px !important; 
+    min-height: 340px !important;
+    max-height: 340px !important;
+    
     padding: 25px !important;  
     box-sizing: border-box !important;
-    height: 320px !important; 
-    min-height: 320px !important;
     overflow: hidden !important;
 }
+
+/* 2. حاوية القائمة (الـ سكرول) - إعطائها مساحة مفرودة بالكامل */
 #taskList, .tasks-container, ul {
     list-style: none !important;
     display: block !important; 
@@ -721,23 +728,31 @@ ul::-webkit-scrollbar-thumb {
     margin: 20px 0 0 0 !important; 
     padding: 0 !important;
     text-align: right !important;
-    height: 160px !important; 
-    max-height: 160px !important;
+    
+    /* ارتفاع داخلي ممتاز يعرض المهمتين كاملين وطرف الثالثة */
+    height: 165px !important; 
+    max-height: 165px !important;
     overflow-y: auto !important; 
 }
+
+/* 3. عنصر المهمة الفردي - يتمدد بكامل عرض الكارد الكبير */
 .fixed-task-item, li {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
     width: 100% !important;
     box-sizing: border-box !important;
-    height: 54px !important; 
-    min-height: 54px !important; 
-    max-height: 54px !important;
+    
+    /* ارتفاع المهمة */
+    height: 52px !important; 
+    min-height: 52px !important; 
+    max-height: 52px !important;
     margin-bottom: 12px !important; 
+    
     background: rgba(255, 255, 255, 0.03) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 15px !important;
+    border-radius: 16px !important;
     padding: 0 20px !important;
     flex-shrink: 0 !important; 
 }
