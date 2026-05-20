@@ -259,8 +259,12 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
 /* 💻 تنسيق شريط الإعدادات الأفقي (ماك بوك / كمبيوتر) + إصلاح بوكس اللون الشامل */
 /* ======================================================= */
 
+/* ======================================================= */
+/* 💻 تنسيق شريط الإعدادات الأفقي (ماك بوك / كمبيوتر) + جعل الزر في المنتصف */
+/* ======================================================= */
+
 @media (min-width: 1025px) {
-    /* الـ Grid الأفقي المتساوي تماماً */
+    /* 1. تقسيم الخانات فقط إلى 5 أعمدة متساوية بدون الزر */
     .settings-bar { 
         display: grid !important;
         grid-template-columns: repeat(5, 1fr) !important; 
@@ -268,7 +272,7 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         align-items: flex-end !important;
         width: 100% !important; 
         max-width: 980px !important; 
-        margin: 0 auto 35px auto !important;
+        margin: 0 auto 25px auto !important;
     }
 
     .input-group, .setting-item { 
@@ -280,15 +284,14 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         align-items: center !important;
     }
 
-    /* توحيد مقاسات كل الخانات والزرار */
+    /* 2. توحيد مقاسات وأبعاد كل الخانات بلا استثناء */
     input[type="text"], 
     input[type="number"], 
     input[type="date"], 
     select, 
     #userNameInput, 
     #langSelect,
-    #colorPicker,
-    .settings-bar button { 
+    #colorPicker { 
         width: 100% !important;
         height: 45px !important;
         text-align: center !important; 
@@ -298,13 +301,18 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
         margin: 0 !important;
     }
 
+    /* 3. إخراج زر التأكيد من نظام الـ Grid وجعله متمركزاً في المنتصف تماماً أسفلهم 🎯 */
     .settings-bar button {
-        align-self: flex-end !important;
+        grid-column: 1 / -1 !important; /* يجبر الزر على اتخاذ مساحة مستقلة ممتدة تحت الـ Grid */
+        justify-self: center !important; /* يضع الزر في المنتصف الأفقي بالملّي */
+        width: 180px !important; /* عرض مريح ومناسب جداً للزر في المنتصف */
+        height: 45px !important; /* نفس الارتفاع الزجاجي الموحد */
+        margin-top: 15px !important; /* مسافة رأسية أنيقة تفصله عن الخانات فوقه */
         padding: 0 !important;
     }
 }
 
-/* 🎨 التعديل الجذري لمنع ظهور الهلال الأسود أو الفراغات في بوكس اللون */
+/* 🎨 التعديل الجذري الثابت لمنع ظهور الهلال الأسود في بوكس اللون */
 #colorPicker {
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
@@ -318,7 +326,6 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     box-sizing: border-box !important;
 }
 
-/* جعل اللون الداخلي يملأ كامل المساحة المتاحة بدون أي تمدد مشوه */
 #colorPicker::-webkit-color-swatch-wrapper {
     padding: 0 !important;
     margin: 0 !important;
@@ -330,13 +337,12 @@ input[type="text"]:focus, select:focus { border-color: var(--primary) !important
     border: none !important;
     padding: 0 !important;
     margin: 0 !important;
-    border-radius: 0 !important; /* إلغاء التدوير الداخلي لمنع الفراغات الجانبية */
+    border-radius: 0 !important;
     width: 100% !important;
     height: 100% !important;
     box-sizing: border-box !important;
 }
 
-/* دعم متصفح فايرفوكس لملء كامل المساحة */
 #colorPicker::-moz-color-swatch {
     border: none !important;
     border-radius: 0 !important;
