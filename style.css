@@ -823,3 +823,43 @@ ul::-webkit-scrollbar-thumb {
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important;
 }
+
+/* ==========================================================================
+   📐 الضبط النهائي: تصغير حجم الموقع ولمّ الكروت بشكل أنيق (د. ملهم)
+   ========================================================================== */
+
+/* 1. تقليص حجم الحاوية الكبرى للموقع وتوسيطها في الشاشة */
+.glass-card, .container, .wrapper {
+    width: 85vw !important;        /* تصغير العرض ليكون ملموم ومريح للعين */
+    max-width: 1250px !important;  /* وضع حد أقصى للحجم عشان ميتفرش بزيادة */
+    margin: 4vh auto !important;   /* توسيط الموقع بالملي وترك مسافة من فوق وتحت */
+    padding: 30px !important;
+    box-sizing: border-box !important;
+}
+
+/* 2. الحفاظ على تقسيم الشاشة المرن للكروت */
+.dashboard-grid, .main-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+    gap: 25px !important;
+}
+
+/* 3. العمود الأيمن والأيسر ينكمشان بالتوازي مع الحجم الصغير الجديد */
+.main-col, .side-col, .left-column, .right-column {
+    flex: 1 !important;
+    width: 50% !important;
+    max-width: 50% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+}
+
+/* 4. إجبار الكروت الداخلية على الانصياع للحجم الأصغر والأنيق */
+.todo-box, .timer-box, .info-card, .store-card, .chart-box {
+    width: 100% !important;
+    min-width: 100% !important;
+    box-sizing: border-box !important;
+}
