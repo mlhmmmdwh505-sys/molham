@@ -81,7 +81,13 @@ window.onload = () => {
     
     // جلب التاريخ واللون المحفوظين
     document.getElementById('gradDateInput').value = graduationDate;
-    const savedColor = localStorage.getItem('themeColor') || "#6366f1";
+    
+    // 🎯 إصلاح الثغرة: التحقق من أن اللون ليس أسود تماماً أو فارغاً قبل الحقل
+    let savedColor = localStorage.getItem('themeColor');
+    if (!savedColor || savedColor === "#000000" || savedColor === "transparent") {
+        savedColor = "#6366f1"; // إرجاع اللون الأزرق النيون الافتراضي فوراً
+        localStorage.setItem('themeColor', savedColor);
+    }
     document.getElementById('colorPicker').value = savedColor;
     document.documentElement.style.setProperty('--primary', savedColor);
     
@@ -163,7 +169,8 @@ document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
     localStorage.setItem('userMins', newMins); 
 
     // حفظ المظهر والتاريخ
-    const newColor = document.getElementById('colorPicker').value;
+    let newColor = document.getElementById('colorPicker').value;
+    if (!newColor || newColor === "#000000") { newColor = "#6366f1"; } // منع حفظ اللون الأسود
     document.documentElement.style.setProperty('--primary', newColor);
     localStorage.setItem('themeColor', newColor);
     
@@ -316,14 +323,15 @@ function addTask() {
     renderTasks();
 }
 
-function toggleTask(index) {
+// تعديل لضمان استدعاء الدوال بشكل صحيح من الـ HTML بدون مشاكل
+window.toggleTask = function(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks[index].done = !tasks[index].done;
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
     renderTasks();
 }
 
-function deleteTask(index) {
+window.deleteTask = function(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks.splice(index, 1);
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
@@ -339,7 +347,6 @@ function renderTasks() {
     
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
-        // 🎯 إجبار العنصر على أخذ كلاس التثبيت لحجم المهمة
         li.className = 'fixed-task-item'; 
         
         li.innerHTML = `
