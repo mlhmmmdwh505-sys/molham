@@ -38,7 +38,7 @@ const i18n = {
         resetBtn: "اعادة ضبط", taskPlaceholder: "أضف مهمة جديدة...",
         alertSave: "تم حفظ وتأكيد الإعدادات والاسم بنجاح! 🩺",
         alertBreak: "تم شراء استراحة بنجاح! ☕", alertNoPoints: "عذراً، النقاط غير كافية! 💪", alertResetPoints: "تصفير النقاط؟"
-    },
+    ],
     en: {
         welcome: "Welcome,", mainTitle: "Dashboard of ",
         langLabel: "Lang", nameLabel: "Name", colorLabel: "Color", dateLabel: "Date", minsLabel: "Mins",
@@ -62,7 +62,7 @@ window.onload = () => {
     startGraduationCountdown();
     
     currentLang = localStorage.getItem('userLang') || "ar";
-    temporaryLang = currentLang; // مزامنة المتغير المؤقت عند الإقلاع
+    temporaryLang = currentLang; 
     
     if(document.getElementById('langSelect')) {
         document.getElementById('langSelect').value = currentLang;
@@ -75,7 +75,6 @@ window.onload = () => {
         document.getElementById('userNameInput').value = savedName;
     }
     
-    const savedMins = localStorage.getItem('userMins') || "25";
     if(document.getElementById('minsInput')) {
         document.getElementById('minsInput').value = savedMins;
     }
@@ -90,7 +89,7 @@ window.onload = () => {
     }
     document.documentElement.style.setProperty('--primary', savedColor);
     
-    timeLeft = parseInt(savedMins) * 60;
+    timeLeft = Math.floor(savedMins * 60);
     updateTimerDisplay();
     
     if(document.getElementById('taskInput')) {
@@ -142,49 +141,40 @@ function applyLanguage(lang) {
     renderTasks(); 
 }
 
-// 🛠️ التعديل الجراحي هنا: عند تغيير القائمة نقوم بتحديث المتغير المؤقت فقط ولا نغير لغة الموقع
 if(document.getElementById('langSelect')) {
     document.getElementById('langSelect').addEventListener('change', function(e) {
-        temporaryLang = e.target.value; // احتفاظ بالاختيار سرًا بدون تطبيق فوري
+        temporaryLang = e.target.value; 
     });
 }
 
 // --- 4. زر الحفظ الرئيسي المطور والمصلح ---
 document.getElementById('mainSaveBtn').addEventListener('click', function() {
-    // 1. تثبيت وحفظ اللغة المعتمدة من المتغير المؤقت الآن
     currentLang = temporaryLang;
     localStorage.setItem('userLang', currentLang);
 
-    // 2. جلب وحفظ الاسم فوراً
     const userNameInput = document.getElementById('userNameInput');
     const newName = userNameInput.value.trim() || (currentLang === 'ar' ? "ملهم" : "Molham");
     localStorage.setItem('userName', newName);
 
-    // 3. جلب وحفظ الدقائق
     const minsInput = document.getElementById('minsInput');
-    const newMins = parseInt(minsInput.value) || 25;
+    const newMins = parseFloat(minsInput.value) || 25;
     localStorage.setItem('userMins', newMins); 
 
-    // 4. جلب وحفظ اللون المختار للثيم
     let newColor = document.getElementById('colorPicker').value || "#6366f1";
     document.documentElement.style.setProperty('--primary', newColor);
     localStorage.setItem('themeColor', newColor);
     
-    // 5. جلب وحفظ تاريخ التخرج
     graduationDate = document.getElementById('gradDateInput').value;
     localStorage.setItem('gradDate', graduationDate);
     
-    // 6. إذا كان المؤقت واقفاً، يتم تحديث زمن المؤقت فوراً طبقاً للدقائق الجديدة
     if (!isRunning) {
-        timeLeft = newMins * 60;
+        timeLeft = Math.floor(newMins * 60);
         updateTimerDisplay();
     }
 
-    // 🚀 تطبيق التغييرات اللغوية والاسم فورا عند الضغط الحقيقي
     applyLanguage(currentLang);
     displayDate(); 
 
-    // ✨ تحويل الزر للشكل الأخضر التأكيدي اللحظي
     const saveBtn = document.getElementById('mainSaveBtn');
     const originalText = i18n[currentLang].saveBtn;
     
@@ -193,7 +183,6 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     saveBtn.style.setProperty('border-color', 'var(--success)', 'important');
     saveBtn.style.pointerEvents = "none"; 
 
-    // إعادة الزر لوضعه الطبيعي بعد ثانيتين
     setTimeout(() => {
         saveBtn.innerText = originalText;
         saveBtn.style.backgroundColor = "";
@@ -216,7 +205,6 @@ function playAlarm() {
         const context = new AudioContext();
         const now = context.currentTime;
         
-        // نغمة تين
         const osc1 = context.createOscillator();
         const gain1 = context.createGain();
         osc1.type = 'sine';
@@ -226,7 +214,6 @@ function playAlarm() {
         osc1.connect(gain1);
         gain1.connect(context.destination);
         
-        // نغمة تون
         const osc2 = context.createOscillator();
         const gain2 = context.createGain();
         osc2.type = 'sine';
@@ -300,28 +287,24 @@ function toggleTimer() {
 }
 
 function addPoints() {
-    const minsInput = parseInt(document.getElementById('minsInput').value) || 25;
+    const minsInput = parseFloat(document.getElementById('minsInput').value) || 25;
     const totalSecondsSeconds = minsInput * 60;
-    
-    // حساب الثواني اللي انقضت بالفعل
     const secondsWorked = totalSecondsSeconds - timeLeft;
     
-    // شرط حماة الثغرة: لازم يكون اشتغل أكتر من 20 ثانية حقيقية، وميكونش المؤقت لسه مشحون بالكامل
     if (secondsWorked >= 20 && timeLeft < totalSecondsSeconds) {
         const newPoints = Math.floor(secondsWorked / 20); 
         points += newPoints;
         savePoints();
-        
-        // 🔒 تصفير الثواني المحسوبة داخلياً عن طريق جعل timeLeft مساوياً للوقت الكلي منعاً للتكرار
         timeLeft = totalSecondsSeconds; 
     }
 }
+
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
     document.getElementById('startBtn').innerText = i18n[currentLang].startBtnJob;
     const mins = parseFloat(document.getElementById('minsInput').value) || 25;
-    timeLeft = mins * 60;
+    timeLeft = Math.floor(mins * 60);
     updateTimerDisplay();
 }
 
@@ -331,41 +314,39 @@ function updateTimerDisplay() {
     document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
-
 function buyBreak(min) {
     const cost = min * 15; 
     const trans = i18n[currentLang];
     
     if (points >= cost) {
-        // 1. خصم النقاط فوراً
         points -= cost;
         savePoints();
         
-        // 2. إيقاف أي مؤقت قديم تماماً وتصفير حالته
         clearInterval(timer);
         isRunning = false;
-        
-        // 3. تفعيل راية الاستراحة (قفل حنفية المكافآت)
         isBreak = true; 
         
-        // 4. شحن وقت الاستراحة الجديد على الشاشة (بأمان وبدون تشغيل تلقائي)
         timeLeft = min * 60;
         updateTimerDisplay();
         
-        // 5. تحديث نص الزرار ليصبح "ابدأ الاستراحة ☕" وينتظر ضغطتك
         document.getElementById('startBtn').innerText = trans.startBtnBreak;
-        
         alert(trans.alertBreak);
     } else {
         alert(trans.alertNoPoints);
     }
 }
-// دالة حفظ النقاط
+
 function savePoints() {
     localStorage.setItem('userPoints', points);
     updatePointsDisplay();
 }
-function updatePointsDisplay() { document.getElementById('userPoints').innerText = points; }
+
+function updatePointsDisplay() { 
+    if(document.getElementById('userPoints')) {
+        document.getElementById('userPoints').innerText = points; 
+    }
+}
+
 function resetPoints() {
     if(confirm(i18n[currentLang].alertResetPoints)) {
         points = 0;
@@ -373,7 +354,6 @@ function resetPoints() {
     }
 }
 
-// --- 7. العد التنازلي ---
 function changeQuote() {
     const qElem = document.getElementById('motivationQuote');
     const currentQuotes = quotes[currentLang];
@@ -399,7 +379,18 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
-// --- 8. إدارة المهام ---
+function addTask() {
+    const taskInput = document.getElementById('taskInput');
+    if (!taskInput) return;
+    const text = taskInput.value.trim();
+    if (text === '') return;
+
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    tasks.push({ text: text, done: false });
+    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
+    taskInput.value = '';
+    renderTasks();
+}
 
 window.toggleTask = function(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
