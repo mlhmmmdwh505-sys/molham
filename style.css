@@ -1,1046 +1,522 @@
 /* ==========================================================================
-   🎨 1. المتغيرات والأساسيات الشاملة (Root & Reset System)
+   🎯 ملف الـ CSS الكامل والشامل لجميع الشاشات (تليفون، لاب توب، ماك، كمبيوتر)
    ========================================================================== */
+
+/* --- 1. المتغيرات والتحسينات البصرية الأساسية --- */
 :root {
-    --primary: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-glow: rgba(99, 102, 241, 0.3);
-    --bg-dark: #020617;
-    --bg-gradient-core: #0f172a;
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-border-light: rgba(255, 255, 255, 0.05);
+    --primary: #00e676; /* اللون الأخضر المضيء الافتراضي المستوحى من تصميمك */
+    --bg-dark: #09111e; /* لون الخلفية الداكنة الفخمة */
+    --card-bg: rgba(13, 24, 41, 0.6);
+    --card-border: rgba(255, 255, 255, 0.05);
     --text-main: #ffffff;
     --text-muted: #94a3b8;
-    --text-darker: #64748b;
-    --gold: #ffd700;
-    --gold-glow: rgba(255, 215, 0, 0.1);
-    --gold-border: rgba(255, 215, 0, 0.3);
-    --danger: #ff4444;
-    --success: #22c55e;
-    --success-bg: rgba(34, 197, 94, 0.05);
-    --success-hover: rgba(34, 197, 94, 0.1);
+    --transition-fast: opacity 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-/* التصفير الشامل وتأمين شاشات العرض */
+/* تصفير الهوامش القياسية وضبط سلوك الأبعاد */
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box !important;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* المنظومة الحديدية لمنع شريط السكرول بار الخارجي نهائياً وتثبيت الشاشة */
-html, body {
-    width: 100%;
-    height: 100vh;
-    height: 100dvh;
-    overflow: hidden !important;
-    background: var(--bg-dark);
-    color: var(--text-main);
-    font-family: 'Cairo', sans-serif;
+/* تهيئة التمرير وجسم الصفحة */
+html {
+    scroll-behavior: smooth;
+    height: 100%;
 }
 
 body {
-    background-image: radial-gradient(circle at center, color-mix(in srgb, var(--primary) 10%, var(--bg-gradient-core)), var(--bg-dark));
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow-x: hidden !important;
-    overflow-y: hidden !important;
-    padding: 0;
-}
-
-/* إخفاء السكرول بار العام تماماً لتفادي المشاكل البصرية */
-*::-webkit-scrollbar {
-    width: 0px !important;
-    height: 0px !important;
-    background: transparent !important;
-}
-* {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-}
-
-/* ==========================================================================
-   🖼️ 2. الهيكل الزجاجي الرئيسي (Glassmorphism Core Card)
-   ========================================================================== */
-.glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(25px);
-    -webkit-backdrop-filter: blur(25px);
-    border-radius: 40px;
-    width: 95vw;
-    /* 🚀 التعديل: جعل الارتفاع مرناً حسب المحتوى مع حد أدنى مريح لحماية الأبعاد */
-    height: auto !important;
-    min-height: 85vh !important;
-    max-width: 1440px;
-    padding: 30px 40px;
-    border: 1px solid var(--glass-border);
-    position: relative;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
-    gap: 20px;
-    overflow: visible !important; /* السماح للعناصر بالتنفس */
-}
-
-/* Tags العلوية المطلقة */
-.date-tag {
-    position: absolute;
-    top: 25px;
-    left: 40px;
-    font-size: 14px;
-    color: var(--text-darker);
-    font-weight: 500;
-}
-
-.mini-score {
-    position: absolute;
-    top: 20px;
-    right: 40px;
-    background: var(--gold-glow);
-    padding: 6px 18px;
-    border-radius: 50px;
-    border: 1px solid var(--gold-border);
-    color: var(--gold);
-    display: flex;
     align-items: center;
-    gap: 12px;
-    font-weight: bold;
-    font-size: 18px;
-    z-index: 10;
+    padding: 40px 20px;
+    overflow-x: hidden;
+    position: relative;
 }
 
-.reset-mini {
-    background: none !important;
-    border: none !important;
-    color: var(--danger) !important;
-    cursor: pointer;
-    font-size: 14px;
-    opacity: 0.6;
-    padding: 0 !important;
-    min-width: auto !important;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-}
-.reset-mini:hover {
-    opacity: 1;
-    transform: scale(1.2);
+/* الحاوية الكبرى للموقع لضمان عدم التمدد العشوائي على الشاشات الضخمة */
+.dashboard-container {
+    width: 100%;
+    max-width: 1140px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
-/* رأس الصفحة */
+/* --- 2. الهيدر وأقسام الترحيب العلوي --- */
 header {
     text-align: center;
-    margin-bottom: 15px;
-    flex: 0 0 auto;
-}
-header h1 {
-    font-size: 28px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
-    background: linear-gradient(to bottom, #ffffff, #cbd5e1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* ==========================================================================
-   ⚙️ 3. شريط الإعدادات الذكي (Settings Bar Area)
-   ========================================================================== */
-.settings-bar {
     width: 100%;
-    margin: 0 auto 20px auto;
-    flex: 0 0 auto;
-}
-
-.input-group {
+    margin-bottom: 15px;
+    position: relative;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 6px;
-    font-size: 13px;
-    color: var(--text-muted);
-    text-align: center;
-    width: 100%;
 }
 
-.setting-item {
+h1#mainTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-main);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+}
+
+#welcomeWord {
     color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+#dateDisplay {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+/* زاوية عرض النقاط الإجمالية أعلى الصفحة */
+.points-top-display {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 6px 14px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
     font-size: 14px;
 }
 
-/* ==========================================================================
-   🎮 4. عناصر الإدخال والأزرار (Form Elements & Standard Buttons)
-   ========================================================================== */
-input[type="text"], 
-input[type="number"], 
-input[type="date"], 
-select {
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid var(--primary) !important;
-    border-radius: 50px !important;
-    color: var(--text-main) !important;
-    height: 44px !important;
-    line-height: 44px !important;
-    padding: 0 15px !important;
-    font-family: 'Cairo', sans-serif !important;
-    font-weight: bold !important;
-    font-size: 15px !important;
-    outline: none !important;
-    cursor: pointer;
-    box-sizing: border-box !important;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
-    text-align: center !important;
-}
-
-input[type="text"]:focus, 
-select:focus,
-input[type="date"]:focus,
-input[type="number"]:focus {
-    border-color: var(--primary) !important;
-    box-shadow: 0 0 12px var(--primary-glow);
-}
-
-select {
-    text-align-last: center !important;
-    padding-right: 20px !important;
-    appearance: none;
-    -webkit-appearance: none;
-}
-select option {
-    background-color: #0f172a !important;
-    color: var(--text-main) !important;
-    font-family: 'Cairo', sans-serif;
-    padding: 10px;
-}
-
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(1);
-    cursor: pointer;
-}
-
-#userNameInput { width: 100% !important; }
-#langSelect { width: 100% !important; }
-
-button {
-    background: rgba(255, 255, 255, 0.05) !important;
-    color: var(--text-main) !important;
-    border: 1px solid var(--primary) !important;
-    padding: 0 22px;
-    border-radius: 50px !important;
-    cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s, box-shadow 0.3s, transform 0.2s;
-    font-family: 'Cairo';
-    min-width: 90px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-button:hover {
-    background: var(--primary) !important;
-    box-shadow: 0 0 15px var(--primary);
-}
-button:active {
-    transform: scale(0.98);
-}
-
-/* ==========================================================================
-   🎨 5. هندسة كبسولة اللون الاحترافية (Color Picker Mastery)
-   ========================================================================== */
-#colorPicker {
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-    width: 100% !important;
-    height: 44px !important;
-    background-color: transparent !important;
-    border: 1px solid var(--primary) !important;
-    border-radius: 50px !important;
-    cursor: pointer !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-    box-sizing: border-box !important;
-}
-#colorPicker::-webkit-color-swatch-wrapper {
-    padding: 0 !important;
-    margin: 0 !important;
-    background: none !important;
-    border-radius: 50px !important;
-}
-#colorPicker::-webkit-color-swatch {
-    border: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border-radius: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    box-sizing: border-box !important;
-}
-#colorPicker::-moz-color-swatch {
-    border: none !important;
-    border-radius: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-/* ==========================================================================
-   📊 6. لوحة التحكم والـ Grid الأساسي 
-   ========================================================================== */
-.dashboard-grid {
-    width: 100%;
-    display: flex !important; /* تحويلها إلى flex لضمان مرونة الأعمدة */
-    flex-direction: row !important;
-    gap: 30px !important;
-    align-items: flex-start !important;
-}
-
-.main-col, .side-col {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 50% !important; /* تقسيم الشاشة نصفين متساويين تماماً 50% لكل جانب */
-    gap: 25px !important; /* تباعد عمودي أنيق بين الكروت */
-}
-
-.info-card {
-    background: rgba(255, 255, 255, 0.01);
-    padding: 25px;
-    border-radius: 35px;
-    border: 1px solid var(--glass-border-light);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    box-sizing: border-box !important;
-}
-/* ==========================================================================
-   ⏱️ 7. منظومة بومودورو والعداد (Timer & Pomodoro Engine)
-   ========================================================================== */
-.pomo-box {
-    flex: 0 0 auto !important;
-    padding: 25px 30px !important;
-}
-
-#pomoDisplay {
-    font-size: 70px;
-    font-weight: 800;
-    color: var(--primary);
-    margin-bottom: 15px;
-    text-shadow: 0 0 25px rgba(99, 102, 241, 0.3);
-}
-
-.pomo-actions {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    width: 100%;
-}
-.pomo-actions button {
-    height: 44px;
-    font-size: 15px;
-}
-
-/* العداد المتطور المودرن */
-.countdown-card {
-    flex: 1 1 auto !important;
-}
-.modern-timer {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    margin-top: 15px;
-}
-.unit {
-    text-align: center;
-}
-.unit span {
-    font-size: 42px;
-    font-weight: 800;
-    color: var(--primary);
-    display: block;
-}
-.unit label {
-    font-size: 13px;
-    color: var(--text-darker);
-    text-transform: uppercase;
-    font-weight: bold;
-    margin-top: 4px;
-    display: block;
-}
-
-/* ==========================================================================
-   🎯 8. منظومة تثبيت ومنع رعشة الأرقام (Anti-Flicker Monospace System)
-   ========================================================================== */
-#years, 
-#days, 
-#hours, 
-#pomoDisplay, 
-.unit span, 
-.minutes-display, 
-.item span {
-    font-family: 'Orbitron', sans-serif !important;
-    direction: ltr !important;
-    unicode-bidi: bidi-override !important;
-    display: inline-block;
-    font-variant-numeric: tabular-nums;
-    min-width: 1.5ch;
-    text-align: center;
-}
-#pomoDisplay {
-    min-width: 180px;
-}
-
-/* ==========================================================================
-   🛍️ 9. متجر التميز الجمالي (The Premium Store Card)
-   ========================================================================== */
-.store-card {
-    flex: 1 1 auto !important;
-}
-.store-grid {
-    display: flex;
-    gap: 15px;
-    margin-top: 15px;
-    width: 100%;
-}
-.item {
-    flex: 1;
-    background: var(--success-bg);
-    padding: 18px 12px;
-    border-radius: 20px;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: border-color 0.3s ease, background 0.3s ease, transform 0.2s ease;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-}
-.item:hover {
-    border-color: var(--success);
-    background: var(--success-hover);
-    transform: scale(1.03);
-}
-/* ==========================================================================
-   📝 10. منظومة المهام الفخمة (🎯 فرض الأبعاد لمنع الدهس والانكماش)
-   ========================================================================== */
-.todo-box {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    padding: 25px !important;  
-    box-sizing: border-box !important;
-    /* 🚀 تثبيت الارتفاع الكلي لكارد المهام ليصبح مستريحاً جداً */
-    height: 320px !important; 
-    min-height: 320px !important;
-    overflow: hidden !important;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 35px;
-}
-
-/* صف حقل الإدخال وزر الإضافة (+) */
-.todo-box form, 
-.todo-input-row, 
-.input-section {
-    display: flex !important;
-    width: 100% !important;
-    gap: 15px !important;
-    align-items: center !important;
-    height: 52px !important;   
-    max-height: 52px !important;
-    margin-bottom: 0px !important;
-    flex-shrink: 0 !important; /* منع حقل الإدخال من الانكماش نهائياً */
-}
-
-#taskInput, .input-section input {
-    flex: 1 !important;
-    height: 52px !important;
-    max-height: 52px !important;
-    box-sizing: border-box !important;
-    padding: 0 25px !important;
-    font-size: 16px !important; 
-    border-radius: 50px !important;
-}
-
-.todo-box button, 
-.todo-box .add-btn, 
-.todo-box input[type="submit"], 
-.btn-add {
-    width: 60px !important;   
-    height: 52px !important;
-    box-sizing: border-box !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    font-size: 24px !important;
-    border-radius: 50px !important;
-    flex-shrink: 0 !important;
-}
-
-/* 🧲 حاوية السكرول المغناطيسي - الحسبة الإمبراطورية الدقيقة جداً للمهمتين */
-.tasks-container, 
-#todoList, 
-#taskList, ul {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 10px !important;
-    padding: 0 !important;
-    margin: 15px 0 0 0 !important;
-    overflow-y: auto !important;
-    height: 145px !important; /* مساحة ممتازة لعرض مهمتين كاملتين وطرف الثالثة */
-}
-
-/* تصميم شريط سكرول ناعم مخصص */
-ul::-webkit-scrollbar {
-    width: 6px !important;                      
-    background: transparent !important;
-}
-ul::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15) !important; 
-    border-radius: 10px !important;
-}
-
-/* 🧲 عنصر المهمة الفردية مفرود ومحمي بالكامل */
-.fixed-task-item, li {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    min-height: 50px !important; /* ارتفاع مريح وثابت يحمي المهمة */
-    height: auto !important; 
-    background: rgba(255, 255, 255, 0.03) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 15px !important;
-    padding: 10px 15px !important;
-    flex-shrink: 0 !important; /* يمنع المتصفح من كبس العنصر عمودياً */
-}
-/* ==========================================================================
-   🖥️ 11. هندسة الحواسب والأجهزة المكتبية الكبيرة والماك بوك (1025px وأعلى)
-   ========================================================================== */
-@media (min-width: 1025px) {
-    .settings-bar {
-        display: grid !important;
-        grid-template-columns: repeat(5, 1fr) !important;
-        gap: 20px !important;
-        align-items: flex-end !important;
-        max-width: 1150px !important;
-    }
-
-    .input-group, .setting-item {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 8px !important;
-        width: 100% !important;
-        margin: 0 !important;
-        align-items: center !important;
-    }
-
-    input[type="text"], 
-    input[type="number"], 
-    input[type="date"], 
-    select, 
-    #colorPicker {
-        width: 100% !important;
-        height: 42px !important;
-        line-height: 42px !important;
-        font-size: 15px !important;
-        box-sizing: border-box !important;
-    }
-
-    .settings-bar button {
-        grid-column: 1 / -1 !important;
-        justify-self: center !important;
-        width: 200px !important;
-        height: 42px !important;
-        line-height: 42px !important;
-        margin-top: 15px !important;
-        padding: 0 !important;
-    }
-
-    .dashboard-grid {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 40px !important; 
-    }
-
-    .main-col, .side-col {
-        gap: 30px !important; 
-    }
-}
-
-/* ==========================================================================
-   📱 12. ملاءمة الشاشات المتوسطة والهواتف المحمولة والتابلت
-   ========================================================================== */
-@media (max-width: 1024px) {
-    html, body {
-        height: auto !important;
-        overflow-y: auto !important; 
-    }
-    
-    body {
-        padding: 25px 15px;
-    }
-
-    .glass-card {
-        width: 100% !important;
-        height: auto !important;
-        max-height: none !important;
-        padding: 35px 25px !important;
-        border-radius: 30px !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 35px !important; 
-    }
-
-    .date-tag, .mini-score {
-        position: static !important;
-        text-align: center !important;
-        justify-content: center !important;
-        margin: 8px auto !important;
-    }
-
-    header {
-        margin-bottom: 10px !important;
-    }
-
-    .settings-bar {
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        width: 100% !important;
-        gap: 20px !important;
-    }
-
-    .input-group, .setting-item {
-        display: flex !important;
-        flex-direction: column !important; 
-        align-items: center !important;
-        width: 100% !important;
-        max-width: 320px !important;
-        gap: 8px !important;
-    }
-
-    input[type="text"], 
-    input[type="number"], 
-    input[type="date"], 
-    select, 
-    #colorPicker, 
-    .settings-bar button {
-        width: 100% !important; 
-        max-width: 280px !important;
-        height: 44px !important;
-        font-size: 15px !important;
-        padding: 0 15px !important;
-    }
-
-    .settings-bar button {
-        margin-top: 10px !important;
-        max-width: 200px !important;
-    }
-
-    .dashboard-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 35px !important;
-    }
-
-    .main-col, .side-col {
-        height: auto !important;
-        gap: 35px !important;
-    }
-
-    .store-grid {
-        flex-direction: column !important;
-        gap: 15px !important;
-    }
-
-    .modern-timer {
-        flex-wrap: wrap !important;
-        gap: 20px !important;
-    }
-    .unit {
-        flex: 1 1 40% !important;
-    }
-
-    .todo-box {
-        height: auto !important;
-        max-height: none !important;
-        min-height: 0 !important;
-    }
-    
-    .tasks-container, #todoList, #taskList, ul {
-        height: auto !important;
-        max-height: 260px !important; 
-    }
-}
-
-/* تأمين كامل للهواتف الصغيرة جداً */
-@media (max-width: 360px) {
-    input[type="text"], input[type="number"], input[type="date"], select, #colorPicker, .settings-bar button {
-        max-width: 240px !important;
-    }
-}
-
-/* ==========================================================================
-   🧲 إعادة تفعيل الحركة المغناطيسية لـ مهمتين بالظبط (د. ملهم)
-   ========================================================================== */
-
-/* 1. الحاوية الأساسية - تفعيل المغناطيس الرأسي */
-#taskList, .tasks-container, ul {
-    list-style: none !important;
-    display: block !important;
-    width: 100% !important;
-    margin: 20px 0 0 0 !important;
-    padding: 0 !important;
-    text-align: right !important;
-    
-    /* الارتفاع المحكم لمهمتين */
-    height: 124px !important;
-    max-height: 124px !important;
-    box-sizing: border-box !important;
-    
-    /* 🚀 تشغيل التثبيت المغناطيسي */
-    overflow-y: scroll !important; /* إجبار السكرول على العمل دائماً لدعم المغناطيس */
-    scroll-snap-type: y mandatory !important;    
-    scroll-behavior: smooth !important;         
-    -webkit-overflow-scrolling: touch !important; 
-}
-
-/* أخفاء شريط السكرول الافتراضي لجعل الشكل فخم ونظيف */
-#taskList::-webkit-scrollbar, ul::-webkit-scrollbar {
-    width: 0px !important;
-    background: transparent !important;
-}
-
-/* 2. عنصر المهمة الفردية - إجباره على الالتصاق المغناطيسي */
-.fixed-task-item, li {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    
-    height: 52px !important;
-    min-height: 52px !important;
-    max-height: 52px !important;
-    margin-bottom: 10px !important;
-    
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 15px !important;
-    padding: 0 20px !important;
-    flex-shrink: 0 !important;
-    
-    /* 🚀 نقطة الالتصاق المغناطيسي عند السكرول */
-    scroll-snap-align: start !important;
-    scroll-snap-stop: always !important; 
-}
-
-/* ==========================================================================
-   👑 الحل الفجر: فرد وتكبير جميع كروت اللوحة بالعرض الكامل (د. ملهم)
-   ========================================================================== */
-
-/* 1. تحرير الحاوية الزجاجية الكبرى للموقع لتأخذ كامل عرض الشاشة */
-.glass-card, .container, .wrapper {
-    width: 96vw !important;       /* فرش الموقع بالكامل بعرض الشاشة */
-    max-width: 1800px !important;  /* السماح بالتمدد الأقصى على الشاشات الكبيرة */
-    margin: 0 auto !important;
-    padding: 25px 30px !important;
-    height: auto !important;       /* إعطاء مرونة عمودية عشان الكروت متنكتمش */
-}
-
-/* 2. توزيع شبكة الكروت (Dashboard Grid) نصفين متساويين مفرودين */
-.dashboard-grid, .main-layout {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: flex-start !important;
-    width: 100% !important;
-    gap: 30px !important;          /* مسافة أنيقة بين الجانبين */
-}
-
-/* 3. إجبار العمود الأيمن والعمود الأيسر على أخذ 50% بالملي من العرض الجديد الواسع */
-.main-col, .side-col, .left-column, .right-column {
-    flex: 1 !important;
-    width: 50% !important;        /* تقسيم عادل وفرد كامل للكروت */
-    max-width: 50% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 25px !important;          /* تباعد عمودي فخم بين الكروت */
-}
-
-/* 4. تفجير كارت المهام وكارت العداد والمتجر ليتمددوا لأقصى عرض متاح */
-.todo-box, .timer-box, .info-card, .store-card, .chart-box {
-    width: 100% !important;       /* تملأ الفراغ بالكامل */
-    min-width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* 5. ضبط حاوية قائمة المهام الداخلية لعرض مهمتين فقط مع المغناطيس */
-#taskList, .tasks-container, ul {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    gap: 10px !important;
-    padding: 0 !important;
-    margin: 20px 0 0 0 !important;
-    height: 124px !important;     /* ارتفاع مهمتين بالظبط */
-    max-height: 124px !important;
-    overflow-y: scroll !important;
-    scroll-snap-type: y mandatory !important;
-    scroll-behavior: smooth !important;
-}
-
-/* 6. عنصر المهمة الفردي مفرود ومنصاع للمغناطيس */
-.fixed-task-item, li {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    height: 52px !important;
-    min-height: 52px !important;
-    flex-shrink: 0 !important;
-    scroll-snap-align: start !important;
-    scroll-snap-stop: always !important;
-}
-
-/* ==========================================================================
-   📐 الضبط النهائي: تصغير حجم الموقع ولمّ الكروت بشكل أنيق (د. ملهم)
-   ========================================================================== */
-
-/* 1. تقليص حجم الحاوية الكبرى للموقع وتوسيطها في الشاشة */
-.glass-card, .container, .wrapper {
-    width: 85vw !important;        /* تصغير العرض ليكون ملموم ومريح للعين */
-    max-width: 1250px !important;  /* وضع حد أقصى للحجم عشان ميتفرش بزيادة */
-    margin: 4vh auto !important;   /* توسيط الموقع بالملي وترك مسافة من فوق وتحت */
-    padding: 30px !important;
-    box-sizing: border-box !important;
-}
-
-/* 2. الحفاظ على تقسيم الشاشة المرن للكروت */
-.dashboard-grid, .main-layout {
-    display: flex !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: flex-start !important;
-    width: 100% !important;
-    gap: 25px !important;
-}
-
-/* 3. العمود الأيمن والأيسر ينكمشان بالتوازي مع الحجم الصغير الجديد */
-.main-col, .side-col, .left-column, .right-column {
-    flex: 1 !important;
-    width: 50% !important;
-    max-width: 50% !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 20px !important;
-}
-
-/* 4. إجبار الكروت الداخلية على الانصياع للحجم الأصغر والأنيق */
-.todo-box, .timer-box, .info-card, .store-card, .chart-box {
-    width: 100% !important;
-    min-width: 100% !important;
-    box-sizing: border-box !important;
-}
-
-/* ==========================================================================
-   🎨 تحسين مظهر حقل اختيار اللون على الموبايل (د. ملهم)
-   ========================================================================== */
-
-/* 1. ضبط الحاوية أو المدخل نفسه */
-input[type="color"] {
-    -webkit-appearance: none !important; /* إلغاء ستايل أبل وأندرويد الافتراضي */
-    -moz-appearance: none !important;
-    appearance: none !important;
-    
-    width: 100% !important;
-    height: 45px !important; /* ارتفاع أنيق ومتناسق مع باقي الحقول */
-    background: transparent !important; /* إلغاء الخلفية البيضاء */
-    border: 2px solid rgba(255, 0, 0, 0.5) !important; /* حدود ناعمة بلون الثيم */
-    border-radius: 25px !important; /* حواف مستديرة بالكامل متناسقة مع الموقع */
-    cursor: pointer !important;
-    box-sizing: border-box !important;
-    padding: 0 !important;
-    overflow: hidden !important;
-}
-
-/* 2. تنظيف وتحسين شكل المربع اللوني الداخلي على متصفحات كروم وأندرويد وSafari */
-input[type="color"]::-webkit-color-swatch-wrapper {
-    padding: 0 !important;
-    border-radius: 25px !important;
-}
-
-input[type="color"]::-webkit-color-swatch {
-    border: none !important;
-    border-radius: 25px !important;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3) !important; /* ظل داخلي فخم للون */
-}
-
-/* 3. تنظيف وتعديل الشكل لمتصفحات فايرفوكس */
-input[type="color"]::-moz-color-swatch {
-    border: none !important;
-    border-radius: 25px !important;
-}
-
-/* ==========================================================================
-   📱 ثورة التصميم الذكي للموبايل: إنقاذ اللوحة من الانضغاط (د. ملهم)
-   ========================================================================== */
-
-@media screen and (max-width: 768px) {
-    
-    /* 1. تحرير الحاوية الزجاجية الكبرى على الموبايل */
-    .glass-card, .container, .wrapper {
-        width: 92vw !important;
-        max-width: 92vw !important;
-        padding: 15px !important;
-        margin: 10px auto !important;
-        height: auto !important;
-    }
-
-    /* 2. تحويل توزيع الكروت من أفقي إلى رأسي (تحت بعض) ليعودوا لحجمهم الطبيعي */
-    .dashboard-grid, .main-layout {
-        display: flex !important;
-        flex-direction: column !important; /* فك الخنقة الجانبية */
-        width: 100% !important;
-        gap: 20px !important;
-    }
-
-    /* 3. إلغاء تقسيم الـ 50% وإعطاء الأعمدة العرض الكامل */
-    .main-col, .side-col, .left-column, .right-column {
-        width: 100% !important;
-        max-width: 100% !important;
-        flex: 1 1 auto !important;
-        gap: 20px !important;
-    }
-
-    /* 4. كروت المهام والعداد والمتجر تتنفس وتأخذ العرض كله */
-    .todo-box, .timer-box, .info-card, .store-card, .chart-box {
-        width: 100% !important;
-        min-width: 100% !important;
-        height: auto !important; /* السماح للكارت بالتمدد حسب محتواه */
-        min-height: auto !important;
-        max-height: none !important;
-        padding: 20px 15px !important;
-    }
-
-    /* 5. إعادة ضبط حاوية المهام لتستوعب 3 مهام بمظهر رائع */
-    #taskList, .tasks-container, ul {
-        width: 100% !important;
-        height: 134px !important; /* ارتفاع الـ 3 مهام اللي طلبته */
-        max-height: 134px !important;
-        margin-top: 15px !important;
-    }
-
-    /* 6. عناصر القائمة الفردية تفرد بكامل العرض الجديد */
-    .fixed-task-item, li {
-        width: 100% !important;
-        height: 52px !important;
-        min-height: 52px !important;
-        padding: 0 15px !important;
-    }
-
-    /* 7. إصلاح نصوص العداد الضخمة حتى لا تنكسر لسطرين */
-    .timer-box h1, #timerDisplay, .time-display {
-        font-size: 45px !important; /* تصغير نسبي للنص ليناسب الموبايل */
-        line-height: 1 !important;
-        margin-bottom: 15px !important;
-    }
-}
-
-/* ==========================================================================
-   🎯 القفل الجراحي الحاسم: إجبار اللابتوب والموبايل على مهمتين فقط (د. ملهم)
-   ========================================================================== */
-
-#taskList, .tasks-container, ul {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    /* تقليص الفجوة والارتفاع الإجمالي لمنع تسريب المهمة الثالثة */
-    gap: 8px !important; 
-    padding: 0 !important;
-    margin: 15px 0 0 0 !important;
-    text-align: right !important;
-    box-sizing: border-box !important;
-    
-    /* الارتفاع المحبوك بالملي لمهمتين فقط */
-    height: 114px !important;     
-    max-height: 114px !important; 
-    
-    overflow-y: scroll !important;
-    scroll-snap-type: y mandatory !important;
-    scroll-behavior: smooth !important;
-}
-
-/* ضبط العناصر الفردية للمهام لمنع انكماشها وإجبارها على ملء المساحة */
-.fixed-task-item, #taskList li {
-    flex-shrink: 0 !important;
-    height: 52px !important;
-    min-height: 52px !important;
-    max-height: 52px !important;
-    box-sizing: border-box !important;
-    scroll-snap-align: start !important;
-    scroll-snap-stop: always !important;
-}
-
-/* =================================================== */
-/* كود تعديل لوحة الإعدادات للترتيب الأفقي الأصلي */
-/* =================================================== */
-
-/* الحاوية الكبرى للإعدادات: تحويلها لترتيب أفقي */
+/* --- 3. قفل لوحة الإعدادات الأفقية الدائرية بالملي --- */
 .settings-panel {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 25px;
+    width: 100%;
+    
+    /* فرض الترتيب الأفقي والربط الشبكي المتناسق */
     display: flex !important;
     flex-direction: row !important;
-    flex-wrap: wrap !important; /* للسماح بالالتفاف التلقائي على الشاشات الصغيرة */
-    gap: 15px !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
     align-items: flex-end !important;
-    justify-content: space-between !important;
+    gap: 15px !important;
 }
 
-/* المجموعات الداخلية (العنوان + المدخل الخاص به) أفقياً */
+/* المجموعات الداخلية (كل حقل والوصف المخصص فوقه) */
 .setting-group {
     display: flex !important;
     flex-direction: column !important;
+    align-items: center !important;
     gap: 8px !important;
-    flex: 1 1 calc(18% - 15px) !important; 
-    min-width: 140px !important;
+    flex: 1 1 calc(18% - 15px) !important;
+    min-width: 150px !important;
+    max-width: 200px !important;
+    box-sizing: border-box !important;
 }
 
-/* ضبط مقاسات حقول الإدخال والقوائم */
+.setting-group label {
+    font-size: 13px !important;
+    color: var(--text-muted) !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+
+/* الحقول الدائرية المنحنية المستوحاة من لقطات الشاشة المرفقة */
 .settings-panel input, 
 .settings-panel select {
     width: 100% !important;
     height: 42px !important;
-    box-sizing: border-box !important;
+    border-radius: 21px !important;
+    border: 1px solid var(--primary) !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-align: center !important;
+    outline: none !important;
+    padding: 0 15px !important;
+    transition: var(--transition-fast) !important;
 }
 
-/* إجبار زر تأكيد الإعدادات على النزول في سطر جديد بمفرده وتوسطه */
+.settings-panel input:focus, 
+.settings-panel select:focus {
+    box-shadow: 0 0 8px rgba(0, 230, 118, 0.2) !important;
+}
+
+/* معالجة مظهر منتقي الألوان المستدير */
+input[type="color"]#colorPicker {
+    padding: 0 !important;
+    cursor: pointer !important;
+    appearance: none !important;
+    -webkit-appearance: none !important;
+}
+input[type="color"]#colorPicker::-webkit-color-swatch-wrapper {
+    padding: 0 !important;
+}
+input[type="color"]#colorPicker::-webkit-color-swatch {
+    border: none !important;
+    border-radius: 21px !important;
+}
+
+/* فصل زر "تأكيد الإعدادات" في سطر جديد ومستقل تماماً بالمنتصف السفلي */
 button#mainSaveBtn {
     display: block !important;
+    flex-basis: 100% !important; /* كسر السطر لضمان الاستقلالية */
     width: auto !important;
     min-width: 160px !important;
+    max-width: 180px !important;
     height: 42px !important;
-    flex-basis: 100% !important; /* يأخذ السطر بالكامل ليجبر نفسه على النزول */
-    margin: 15px auto 0 auto !important; /* التوسط في المنتصف */
+    margin: 20px auto 0 auto !important;
+    background: transparent !important;
+    color: #ffffff !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 21px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
     text-align: center !important;
+    transition: var(--transition-fast) !important;
+}
+button#mainSaveBtn:hover {
+    background: var(--primary) !important;
+    color: #09111e !important;
+    box-shadow: 0 0 15px var(--primary) !important;
+}
+
+/* --- 4. التخطيط الهيكلي الشبكي (Grid) لكروت الموقع السفلي --- */
+.main-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    width: 100%;
+}
+
+/* الهيكل القياسي الموحد لجميع الكروت داخل المنصة */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    box-sizing: border-box;
+}
+
+.card-title {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+/* --- 5. نظام كارت مؤقت البومودورو وعناصر التحكم --- */
+.timer-card {
+    align-items: center;
+    justify-content: center;
+}
+
+#pomoDisplay {
+    font-size: 84px;
+    font-weight: 800;
+    color: var(--primary);
+    text-shadow: 0 0 25px rgba(0, 230, 118, 0.25);
+    margin: 10px 0 25px 0;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 1px;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+}
+
+.timer-controls button {
+    height: 42px;
+    padding: 0 24px;
+    border-radius: 21px;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    border: 1px solid var(--primary);
+    background: transparent;
+    color: #ffffff;
+    transition: var(--transition-fast);
+}
+
+#startBtn {
+    background: rgba(0, 230, 118, 0.08) !important;
+}
+#startBtn:hover {
+    background: var(--primary) !important;
+    color: #09111e !important;
+    box-shadow: 0 0 12px var(--primary);
+}
+#resetBtn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #ffffff;
+}
+
+/* --- 6. نظام كارت العد التنازلي لحلم التخرج --- */
+.countdown-display {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    margin: auto 0;
+}
+
+.countdown-box {
+    text-align: center;
+}
+
+.countdown-box span:first-child {
+    display: block;
+    font-size: 38px;
+    font-weight: 800;
+    color: var(--primary);
+}
+
+.countdown-box span:last-child {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+/* --- 7. نظام متجر الطاقة المستهلكة --- */
+.store-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    width: 100%;
+    margin: auto 0;
+}
+
+.store-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 18px 10px;
+    border-radius: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: center;
+    justify-content: center;
+}
+
+.store-item font, 
+.store-item small {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.store-item small {
+    color: var(--primary);
+}
+
+.store-item:hover {
+    border-color: var(--primary);
+    background: rgba(0, 230, 118, 0.04);
+}
+
+/* --- 8. قفل نظام إدارة قائمة المهام الموزونة بالملي (To-Do List) --- */
+.todo-input-wrapper {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+#taskInput {
+    flex: 1;
+    height: 42px;
+    border-radius: 21px;
+    border: 1px solid var(--primary);
+    background: rgba(15, 23, 42, 0.6);
+    color: #ffffff;
+    padding: 0 20px;
+    outline: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* زر الزائد الدائري الصغير بجانب حقل النص */
+.todo-input-wrapper button {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid var(--primary);
+    background: rgba(0, 230, 118, 0.08);
+    color: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition-fast);
+}
+.todo-input-wrapper button:hover {
+    background: var(--primary);
+    color: #09111e;
+}
+
+/* قفل الحاوية الحديدي بارتفاع مهمتين كاملتين ومستقرتين لحل مشكلة اللاب توب */
+#taskList {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 10px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    height: 114px !important;
+    max-height: 114px !important;
+    overflow-y: scroll !important;
+    scroll-snap-type: y mandatory !important;
+    scroll-behavior: smooth !important;
+}
+
+/* إخفاء السكرول بار للمتصفحات الحديثة للحفاظ على الواجهة */
+#taskList::-webkit-scrollbar {
+    width: 0px !important;
+    background: transparent !important;
+}
+
+/* التنسيق البرمجي الثابت لعنصر المهمة الفردية داخل القائمة */
+.fixed-task-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    flex: 0 0 52px !important;
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    padding: 0 15px !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    border: 1px solid rgba(255, 255, 255, 0.06) !important;
+    border-radius: 16px !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
+}
+
+/* --- 9. نظام الاقتباسات وجمل التحفيز --- */
+#motivationQuote {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-style: italic;
+    color: var(--primary);
+    margin-top: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.6;
+}
+
+/* ==========================================================================
+   📱 💻 🖥️ قسم الـ Media Queries الشامل لدعم جميع الشاشات (Responsive)
+   ========================================================================== */
+
+/* 1. الشاشات الكبيرة والماك وأجهزة الكمبيوتر (أكبر من 1024px) */
+@media screen and (min-width: 1025px) {
+    .dashboard-container {
+        max-width: 1140px;
+    }
+}
+
+/* 2. شاشات اللاب توب المتوسطة والشاشات الدارجة (من 769px إلى 1024px) */
+@media screen and (max-width: 1024px) {
+    .dashboard-container {
+        max-width: 95%;
+        gap: 20px;
+    }
+    .setting-group {
+        flex: 1 1 calc(33.33% - 15px) !important; /* توزيع العناصر على سطرين بالتساوي */
+        max-width: none !important;
+    }
+    #pomoDisplay {
+        font-size: 74px;
+    }
+}
+
+/* 3. شاشات التابلت والأجهزة اللوحية (من 481px إلى 768px) */
+@media screen and (max-width: 768px) {
+    body {
+        padding: 20px 15px;
+    }
+    .main-grid {
+        grid-template-columns: 1fr; /* تحويل التخطيط لكارت واحد ممتد لأسفل */
+        gap: 20px;
+    }
+    .setting-group {
+        flex: 1 1 calc(50% - 15px) !important; /* تحويل العناصر أفقياً ثنائياً */
+    }
+    .points-top-display {
+        position: static;
+        margin-bottom: 15px;
+        align-self: center;
+    }
+    header {
+        margin-bottom: 10px;
+    }
+}
+
+/* 4. الهواتف الذكية والتليفونات بمختلف أحجامها الصغيرة (أقل من 480px) */
+@media screen and (max-width: 480px) {
+    body {
+        padding: 15px 10px;
+    }
+    h1#mainTitle {
+        font-size: 22px;
+    }
+    .settings-panel {
+        padding: 15px;
+        gap: 12px !important;
+    }
+    .setting-group {
+        flex: 1 1 100% !important; /* تفريد الحقول أفقياً بالكامل بما يتناسب مع حجم التليفون الصغير */
+        max-width: none !important;
+    }
+    #pomoDisplay {
+        font-size: 60px;
+    }
+    .store-grid {
+        grid-template-columns: 1fr; /* تحويل المتجر لعمود واحد لسهولة اللمس */
+        gap: 10px;
+    }
+    .countdown-display {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .timer-controls {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .timer-controls button {
+        width: 100%;
+    }
 }
