@@ -969,61 +969,36 @@ input[type="color"]::-moz-color-swatch {
 }
 
 /* ==========================================================================
-   👑 تثبيت العرض: مهمتين فقط بالظبط على اللاب توب والموبايل (د. ملهم)
+   🎯 القفل الجراحي الحاسم: إجبار اللابتوب والموبايل على مهمتين فقط (د. ملهم)
    ========================================================================== */
 
-/* إجبار القائمة على مقاس مهمتين فقط في كل الشاشات ومنع ظهور الثالثة */
 #taskList, .tasks-container, ul {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
-    gap: 10px !important;
+    /* تقليص الفجوة والارتفاع الإجمالي لمنع تسريب المهمة الثالثة */
+    gap: 8px !important; 
     padding: 0 !important;
     margin: 15px 0 0 0 !important;
     text-align: right !important;
     box-sizing: border-box !important;
     
-    height: 124px !important;     /* الارتفاع السحري المقاس لمهمتين بالظبط */
-    max-height: 124px !important; /* قفل الارتفاع بإحكام لمنع تمدد الكارت */
+    /* الارتفاع المحبوك بالملي لمهمتين فقط */
+    height: 114px !important;     
+    max-height: 114px !important; 
+    
     overflow-y: scroll !important;
     scroll-snap-type: y mandatory !important;
     scroll-behavior: smooth !important;
 }
 
-/* 🎨 الحفاظ على كود فرد اللون بالكامل ومنع الفراغات الجانبية */
-input[type="color"] {
-    -webkit-appearance: none !important;
-    -moz-appearance: none !important;
-    appearance: none !important;
-    width: 100% !important;
+/* ضبط العناصر الفردية للمهام لمنع انكماشها وإجبارها على ملء المساحة */
+.fixed-task-item, #taskList li {
+    flex-shrink: 0 !important;
     height: 52px !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: 25px !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    overflow: hidden !important;
-    cursor: pointer !important;
-}
-
-input[type="color"]::-webkit-color-swatch-wrapper {
-    padding: 0 !important;
-    margin: 0 !important;
-    border-radius: 25px !important;
-    height: 100% !important;
-    width: 100% !important;
-}
-
-input[type="color"]::-webkit-color-swatch {
-    border: none !important;
-    border-radius: 25px !important;
-    width: 100% !important;
-    height: 100% !important;
-}
-
-input[type="color"]::-moz-color-swatch {
-    border: none !important;
-    border-radius: 25px !important;
-    width: 100% !important;
-    height: 100% !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    box-sizing: border-box !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
 }
