@@ -335,13 +335,13 @@ function renderTasks() {
     var taskList = document.getElementById('taskList');
     if (!taskList) return;
     
-    // 1. تصفير المحتوى
+    // 1. تصفير المحتوى بالكامل
     taskList.innerHTML = '';
     
     // 2. القفل الحديدي للحاوية بارتفاع مهمتين كاملتين (114px)
     taskList.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important; padding: 0 !important; margin: 15px 0 0 0 !important; box-sizing: border-box !important; height: 114px !important; max-height: 114px !important; overflow-y: scroll !important; scroll-snap-type: y mandatory !important; scroll-behavior: smooth !important;";
 
-    // 3. تأمين إخفاء السكرول بار برمجياً
+    // 3. تأمين إخفاء السكرول بار المزعج
     if (!document.getElementById('scroll-hide-style')) {
         var scrollStyle = document.createElement('style');
         scrollStyle.id = 'scroll-hide-style';
@@ -351,39 +351,32 @@ function renderTasks() {
     
     var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
-    // معرفة لغة الموقع الحالية
+    // معرفة لغة الموقع الحالية (عربي أو إنجليزي)
     var currentLang = document.documentElement.lang || 'ar';
     var isAr = currentLang === 'ar';
     
-    // 4. بناء المهام
+    // 4. بناء المهام بتوزيع هندسي ثابت ومضمون
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
-        // تثبيت البنية لتكون flex-direction طبيعي، والتحكم بالاتجاه بناءً على الترتيب الداخلي
-        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
+        // تثبيت البنية: الاتجاه دايماً طبيعي ومستقيم في اللغتين لمنع اللخبطة
+        var mainDirection = isAr ? "direction: rtl !important;" : "direction: ltr !important;";
+        
+        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; " + mainDirection + " scroll-snap-align: start !important; scroll-snap-stop: always !important;";
         
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
-        // زر الحذف المنفصل
-        var deleteBtn = '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important;">❌</button>';
-        
-        // حاوية الدائرة والنص (دائماً ملتصقين ببعض)
-        var textDirection = isAr ? "direction: rtl !important; text-align: right !important;" : "direction: ltr !important; text-align: left !important;";
-        var contentWrapper = '<div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important; ' + textDirection + '" onclick="toggleTask(' + index + ')">' +
-            '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
-            '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
-            '</div>';
-            
-        // التوزيع الجراحي المطلق حسب لغة الواجهة
-        if (isAr) {
-            // عربي: حاوية النص والـ ⭕ في اليمين أولاً، والـ ❌ في اليسار ثانياً
-            li.innerHTML = contentWrapper + deleteBtn;
-        } else {
-            // إنجليزي: نعكس الترتيب في الـ HTML تماماً لتصبح الـ ❌ في اليمين أولاً، وحاوية النص والـ ⭕ في اليسار ثانياً
-            li.innerHTML = deleteBtn + contentWrapper;
-        }
+        // الترتيب ثابت هندسياً في الـ HTML للغتين: (الدائرة + النص) متلازمين في حاوية، وزر الـ ❌ في طرف لوحده تماماً
+        li.innerHTML = 
+            /* حاوية الدائرة والنص ملتصقين تماماً */
+            '<div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
+                '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
+                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
+            '</div>' +
+            /* زر الحذف يندفع تلقائياً وبأمان لأقصى الطرف الآخر بفضل الـ justify-content */
+            '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important;">❌</button>';
             
         taskList.appendChild(li);
     });
