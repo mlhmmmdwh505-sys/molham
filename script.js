@@ -299,20 +299,30 @@ function updateTimerDisplay() {
 function buyBreak(min) {
     const cost = min * 15; 
     const trans = i18n[currentLang];
+    
     if (points >= cost) {
+        // 1. خصم نقاط ثمن الاستراحة فوراً
         points -= cost;
         savePoints();
+        
+        // 2. 🔒 قفل المؤقت تماماً وإيقاف الـ Interval عشان مفيش نقط تتدبل في الخلفية
         clearInterval(timer);
         isRunning = false;
+        
+        // 3. 🔒 تكة الأمان: نجعل الـ timeLeft مساوياً للوقت الإجمالي قبل الشحن عشان دالة addPoints متتخدعش
+        const minsInput = parseInt(document.getElementById('minsInput').value) || 25;
+        timeLeft = minsInput * 60; 
+        
+        // 4. الحين نشحن وقت الاستراحة الجديد بنظافة وأمان
         timeLeft = min * 60;
         updateTimerDisplay();
+        
         document.getElementById('startBtn').innerText = trans.startBtnBreak;
         alert(trans.alertBreak);
     } else {
         alert(trans.alertNoPoints);
     }
 }
-
 // دالة حفظ النقاط
 function savePoints() {
     localStorage.setItem('userPoints', points);
