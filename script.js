@@ -6,6 +6,7 @@ let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem(
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 let currentLang = localStorage.getItem('userLang') || "ar"; 
 let temporaryLang = currentLang; // 🧲 متغير مؤقت لحفظ اللغة المختارة حتى يتم التأكيد
+let isBreak = false; // 🔒 راية أمان لمعرفة هل الوقت الحالي للمذاكرة أم للاستراحة
 
 const quotes = {
     ar: [
@@ -222,7 +223,6 @@ function toggleTimer() {
     const trans = i18n[currentLang];
     
     if (!isRunning) {
-        // 🔒 تكة الحماية: لو المؤقت كان مخلص (واقف عند 0)، نعيد شحنه بالوقت المطلوب قبل ما يبدأ يحسب نقاط
         if (timeLeft <= 0) {
             const mins = parseInt(document.getElementById('minsInput').value) || 25;
             timeLeft = mins * 60;
@@ -232,12 +232,13 @@ function toggleTimer() {
         isRunning = true;
         btn.innerText = trans.startBtnPause;
         
-        let startTime = Date.now();
-        let initialTimeLeft = timeLeft;
+        // 🎯 اللحظة الحقيقية: حساب وقت النهاية الفعلي بناءً على ساعة الجهاز الحالية (مستحيل تتأخر)
+        const endTime = Date.now() + (timeLeft * 1000);
 
         timer = setInterval(() => {
-            let elapsed = Math.floor((Date.now() - startTime) / 1000);
-            timeLeft = initialTimeLeft - elapsed;
+            // طرح وقت النهاية الثابت من ساعة الجهاز الحركية الآن
+            const remainingMillis = endTime - Date.now();
+            timeLeft = Math.ceil(remainingMillis / 1000);
 
             if (timeLeft <= 0) {
                 timeLeft = 0;
@@ -245,24 +246,32 @@ function toggleTimer() {
                 isRunning = false;
                 btn.innerText = trans.startBtnJob;
                 
-                // الحساب العادل ونهاية الوقت
-                addPoints(); 
+                // 🔒 حماية: توزيع النقاط للمذاكرة فقط، وممنوع لو كانت استراحة
+                if (!isBreak) {
+                    addPoints(); 
+                }
+                
                 playAlarm();
                 changeQuote();
 
-                // 🔒 إعادة شحن المؤقت فوراً بعد انتهاء الجلسة عشان الدوسة الجاية تبدأ بنظافة
+                // العودة للحالة الطبيعية بعد انتهاء الوقت
+                isBreak = false; 
+
                 const mins = parseInt(document.getElementById('minsInput').value) || 25;
                 timeLeft = mins * 60;
                 updateTimerDisplay();
             }
             updateTimerDisplay();
-        }, 1000);
+        }, 200); // تحديث سريع جداً كل 200 مللي ثانية لضمان الدقة المطلقة والسلاسة
     } else {
-        // إذا ضغط إيقاف مؤقت، نحسب له نقاطه على الشغل اللي أنجزه حتى تلك اللحظة
         clearInterval(timer);
         isRunning = false;
         btn.innerText = trans.startBtnResume;
-        addPoints(); 
+        
+        // حماية عند الإيقاف المؤقت
+        if (!isBreak) {
+            addPoints(); 
+        }
     }
 }
 
@@ -305,23 +314,25 @@ function buyBreak(min) {
     const trans = i18n[currentLang];
     
     if (points >= cost) {
-        // 1. خصم نقاط ثمن الاستراحة فوراً
         points -= cost;
         savePoints();
         
-        // 2. 🔒 قفل المؤقت تماماً وإيقاف الـ Interval عشان مفيش نقط تتدبل في الخلفية
+        // إيقاف أي مؤقت قديم تماماً
         clearInterval(timer);
         isRunning = false;
         
-        // 3. 🔒 تكة الأمان: نجعل الـ timeLeft مساوياً للوقت الإجمالي قبل الشحن عشان دالة addPoints متتخدعش
-        const minsInput = parseInt(document.getElementById('minsInput').value) || 25;
-        timeLeft = minsInput * 60; 
+        // 🔒 تفعيل راية الاستراحة لقفل حنفية النقاط
+        isBreak = true; 
         
-        // 4. الحين نشحن وقت الاستراحة الجديد بنظافة وأمان
+        // شحن وقت الاستراحة الجديد بدقة
         timeLeft = min * 60;
         updateTimerDisplay();
         
         document.getElementById('startBtn').innerText = trans.startBtnBreak;
+        
+        // 🚀 تشغيل مؤقت الاستراحة فوراً وبنفس الدقة الذرية المعتمدة على ساعة الجهاز
+        toggleTimer(); 
+        
         alert(trans.alertBreak);
     } else {
         alert(trans.alertNoPoints);
@@ -367,15 +378,22 @@ function startGraduationCountdown() {
 }
 
 // --- 8. إدارة المهام ---
-function addTask() {
-    const input = document.getElementById('taskInput');
-    const text = input.value.trim();
-    if (text === '') return;
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    tasks.push({ text: text, done: false });
-    localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
-    input.value = '';
-    renderTasks();
+function addPoints() {
+    const minsInput = parseInt(document.getElementById('minsInput').value) || 25;
+    const totalSecondsSeconds = minsInput * 60;
+    
+    // حساب الثواني الحقيقية التي مرت بدقة
+    const secondsWorked = totalSecondsSeconds - timeLeft;
+    
+    // شرط الأمان: أن يكون اشتغل فعلياً أكتر من 20 ثانية ولم يكن العداد مشحوناً بالكامل
+    if (secondsWorked >= 20 && timeLeft < totalSecondsSeconds) {
+        const newPoints = Math.floor(secondsWorked / 20); 
+        points += newPoints;
+        savePoints();
+        
+        // تصفير مؤقت داخلي منعاً للتكرار الثغري
+        timeLeft = totalSecondsSeconds; 
+    }
 }
 
 window.toggleTask = function(index) {
