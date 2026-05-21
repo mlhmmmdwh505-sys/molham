@@ -263,9 +263,19 @@ function updateTimerDisplay() {
 
 // --- 6. متجر الطاقة والنقاط ---
 function addPoints() {
-    const minsWorked = parseInt(document.getElementById('minsInput').value) || 25;
-    points += (minsWorked * 3);  
-    savePoints();
+    // 1. جلب إجمالي الدقائق المحددة وتحويلها لثوانٍ لمعرفة الوقت الأصلي للجلسة
+    const minsInput = parseInt(document.getElementById('minsInput').value) || 25;
+    const totalSecondsSeconds = minsInput * 60;
+    
+    // 2. حساب عدد الثواني الفردية التي ذاكرتها بالفعل (الوقت الأصلي ناقص الوقت المتبقي)
+    const secondsWorked = totalSecondsSeconds - timeLeft;
+    
+    // 3. الحسبة السحرية: كل 20 ثانية تعادل 1 نقطة بالظبط
+    if (secondsWorked > 0) {
+        const newPoints = Math.floor(secondsWorked / 20); // Math.floor لمنع الكسور العشري في النقاط
+        points += newPoints;
+        savePoints();
+    }
 }
 
 function buyBreak(min) {
