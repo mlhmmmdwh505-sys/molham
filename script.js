@@ -7,6 +7,8 @@ let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 let currentLang = localStorage.getItem('userLang') || "ar"; 
 let temporaryLang = currentLang; 
 let isBreak = false; 
+let isPaused = false; // متغير جديد برا الدالة عشان يعرف لو كنا عاملين إيقاف مؤقت
+
 
 const quotes = {
     ar: [
@@ -234,52 +236,48 @@ function playAlarm() {
 }
 
 function toggleTimer() {
-    const btn = document.getElementById('startBtn');
-    const trans = i18n[currentLang];
+    const button = document.getElementById('start-btn');
     
-    if (!isRunning) {
-        let mins = parseFloat(document.getElementById('minsInput').value) || 25;
-
-        if (timeLeft <= 0) {
-            timeLeft = Math.floor(mins * 60);
-            updateTimerDisplay();
-        }
-
-        isRunning = true;
-        btn.innerText = trans.startBtnPause;
+    if (timer === null) {
+        // بداية التشغيل أو الاستئناف
+        button.innerText = isBreak ? "إيقاف مؤقت للراحة ☕" : "إيقاف مؤقت للمهمة ⏸️";
         
+        // ضبط وقت النهاية الجديد بناءً على الثواني المتبقية الحالية بالظبط
         const endTime = Date.now() + (timeLeft * 1000);
-
+        
         timer = setInterval(() => {
             const remainingMillis = endTime - Date.now();
             timeLeft = Math.ceil(remainingMillis / 1000);
-
+            
             if (timeLeft <= 0) {
-                timeLeft = 0;
                 clearInterval(timer);
-                isRunning = false;
-                btn.innerText = trans.startBtnJob;
+                timer = null;
+                playAlarm();
                 
                 if (!isBreak) {
-                    addPoints(); 
+                    addPoints();
+                    showNewQuote();
                 }
                 
-                playAlarm(); 
-                changeQuote();
-
-                isBreak = false; 
-
-                const resetMins = parseFloat(document.getElementById('minsInput').value) || 25;
-                timeLeft = Math.floor(resetMins * 60);
-                updateTimerDisplay();
+                // إعادة ضبط بعد الانتهاء
+                isBreak = false;
+                timeLeft = parseFloat(document.getElementById('work-duration').value || 25) * 60;
+                updateDisplay();
+                button.innerText = "ابدأ المهمة 🚀";
+            } else {
+                updateDisplay();
             }
-            updateTimerDisplay();
-        }, 200); 
-    } else {
-        clearInterval(timer);
-        isRunning = false;
-        btn.innerText = trans.startBtnResume;
+        }, 1000);
         
+    } else {
+        // هنا الضغط على "إيقاف مؤقت"
+        clearInterval(timer);
+        timer = null;
+        
+        // بنحفظ الـ timeLeft الحالي زي ما هو بدون تغيير
+        button.innerText = isBreak ? "استئناف الراحة ☕" : "استئناف المهمة ▶️";
+        
+        // لو مش في وقت راحة، احسب له نقاطه على الشغل اللي أنجزه لحد ثانية الإيقاف
         if (!isBreak) {
             addPoints(); 
         }
