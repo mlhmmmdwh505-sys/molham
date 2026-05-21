@@ -1,13 +1,14 @@
-// --- 1. المتغيرات والبيانات المحفوظة --- 
-let timer;
-let timeLeft;
-let isRunning = false;
+// ==========================================
+// 1️⃣ المتغيرات والبيانات المحفوظة (State)
+// ==========================================
+let timer = null;
+let timeLeft = null;
+let isBreak = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 let currentLang = localStorage.getItem('userLang') || "ar"; 
 let temporaryLang = currentLang;  
-let isPaused = false; // متغير جديد برا الدالة عشان يعرف لو كنا عاملين إيقاف مؤقت
-
+let totalSecondsWorked = 0; // لحساب ثواني العمل الفعلية بدقة فائقة من أجل النقاط
 
 const quotes = {
     ar: [
@@ -35,8 +36,8 @@ const i18n = {
         saveBtn: "تأكيد الإعدادات", countdownTitle: "⏳ حلم التخرج",
         years: "سنة", days: "يوم", hours: "ساعة", storeTitle: "☕ متجر الطاقة 1د = 15ن",
         break5: "5 د = <small>75ن</small>", break10: "10 د = <small>150ن</small>", break15: "15 د = <small>225ن</small>",
-        startBtnJob: "ابدأ المهمة", startBtnPause: "إيقاف مؤقت", startBtnResume: "استئناف", startBtnBreak: "ابدأ الاستراحة ☕",
-        resetBtn: "اعادة ضبط", taskPlaceholder: "أضف مهمة جديدة...",
+        startBtnJob: "ابدأ المهمة 🚀", startBtnPause: "إيقاف مؤقت ⏸️", startBtnResume: "استئناف ▶️", startBtnBreak: "ابدأ الاستراحة ☕",
+        resetBtn: "إعادة ضبط 🔄", taskPlaceholder: "أضف مهمة جديدة...",
         alertSave: "تم حفظ وتأكيد الإعدادات والاسم بنجاح! 🩺",
         alertBreak: "تم شراء استراحة بنجاح! ☕", alertNoPoints: "عذراً، النقاط غير كافية! 💪", alertResetPoints: "تصفير النقاط؟"
     },
@@ -46,14 +47,16 @@ const i18n = {
         saveBtn: "Confirm Settings", countdownTitle: "⏳ Graduation Dream",
         years: "Years", days: "Days", hours: "Hours", storeTitle: "☕ Energy Store 1m = 15p",
         break5: "5 Min = <small>75p</small>", break10: "10 Min = <small>150p</small>", break15: "15 Min = <small>225p</small>",
-        startBtnJob: "Start Task", startBtnPause: "Pause", startBtnResume: "Resume", startBtnBreak: "Start Break ☕",
-        resetBtn: "Reset", taskPlaceholder: "Add a new task...",
+        startBtnJob: "Start Task 🚀", startBtnPause: "Pause ⏸️", startBtnResume: "Resume ▶️", startBtnBreak: "Start Break ☕",
+        resetBtn: "Reset 🔄", taskPlaceholder: "Add a new task...",
         alertSave: "Settings and Name saved successfully! 🩺",
         alertBreak: "Break purchased successfully! ☕", alertNoPoints: "Sorry, not enough points! 💪", alertResetPoints: "Reset points?"
     }
 };
 
-// --- 2. دالة تهيئة الصفحة ---
+// ==========================================
+// 2️⃣ دالة تهيئة الصفحة (Onload)
+// ==========================================
 window.onload = () => {
     updatePointsDisplay();
     startGraduationCountdown();
@@ -87,6 +90,7 @@ window.onload = () => {
     }
     document.documentElement.style.setProperty('--primary', savedColor);
     
+    // ضبط الوقت الابتدائي بدون تعليق برمي الخوارزمية
     timeLeft = Math.floor(savedMins * 60);
     updateTimerDisplay();
     
@@ -97,7 +101,9 @@ window.onload = () => {
     }
 };
 
-// --- 3. دالة تطبيق اللغة وتحديث النصوص الشاشية ---
+// ==========================================
+// 3️⃣ دالة تطبيق اللغة وتحديث النصوص الشاشية
+// ==========================================
 function applyLanguage(lang) {
     currentLang = lang;
     document.documentElement.setAttribute('lang', lang);
@@ -107,32 +113,38 @@ function applyLanguage(lang) {
     const trans = i18n[lang];
     const savedName = localStorage.getItem('userName') || (lang === 'ar' ? "ملهم" : "Molham");
     
-    document.getElementById('welcomeWord').innerText = trans.welcome;
-    document.getElementById('userNameDisplay').innerText = `${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}`;
-    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}</span> 🩺`;
+    if(document.getElementById('welcomeWord')) document.getElementById('welcomeWord').innerText = trans.welcome;
+    if(document.getElementById('userNameDisplay')) document.getElementById('userNameDisplay').innerText = `${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}`;
+    if(document.getElementById('mainTitle')) document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}</span> 🩺`;
     
-    document.getElementById('langLabel').innerText = trans.langLabel;
-    document.getElementById('nameLabel').innerText = trans.nameLabel;
-    document.getElementById('colorLabel').innerText = trans.colorLabel;
-    document.getElementById('dateLabel').innerText = trans.dateLabel;
-    document.getElementById('minsLabel').innerText = trans.minsLabel;
-    document.getElementById('mainSaveBtn').innerText = trans.saveBtn;
+    if(document.getElementById('langLabel')) document.getElementById('langLabel').innerText = trans.langLabel;
+    if(document.getElementById('nameLabel')) document.getElementById('nameLabel').innerText = trans.nameLabel;
+    if(document.getElementById('colorLabel')) document.getElementById('colorLabel').innerText = trans.colorLabel;
+    if(document.getElementById('dateLabel')) document.getElementById('dateLabel').innerText = trans.dateLabel;
+    if(document.getElementById('minsLabel')) document.getElementById('minsLabel').innerText = trans.minsLabel;
+    if(document.getElementById('mainSaveBtn')) document.getElementById('mainSaveBtn').innerText = trans.saveBtn;
     
-    document.getElementById('countdownTitle').innerText = trans.countdownTitle;
-    document.getElementById('labelYears').innerText = trans.years;
-    document.getElementById('labelDays').innerText = trans.days;
-    document.getElementById('labelHours').innerText = trans.hours;
+    if(document.getElementById('countdownTitle')) document.getElementById('countdownTitle').innerText = trans.countdownTitle;
+    if(document.getElementById('labelYears')) document.getElementById('labelYears').innerText = trans.years;
+    if(document.getElementById('labelDays')) document.getElementById('labelDays').innerText = trans.days;
+    if(document.getElementById('labelHours')) document.getElementById('labelHours').innerText = trans.hours;
     
-    document.getElementById('storeTitle').innerText = trans.storeTitle;
-    document.getElementById('itemBreak5').innerHTML = trans.break5;
-    document.getElementById('itemBreak10').innerHTML = trans.break10;
-    document.getElementById('itemBreak15').innerHTML = trans.break15;
+    if(document.getElementById('storeTitle')) document.getElementById('storeTitle').innerText = trans.storeTitle;
+    if(document.getElementById('itemBreak5')) document.getElementById('itemBreak5').innerHTML = trans.break5;
+    if(document.getElementById('itemBreak10')) document.getElementById('itemBreak10').innerHTML = trans.break10;
+    if(document.getElementById('itemBreak15')) document.getElementById('itemBreak15').innerHTML = trans.break15;
     
-    document.getElementById('resetBtn').innerText = trans.resetBtn;
-    document.getElementById('taskInput').setAttribute('placeholder', trans.taskPlaceholder);
+    if(document.getElementById('resetBtn')) document.getElementById('resetBtn').innerText = trans.resetBtn;
+    if(document.getElementById('taskInput')) document.getElementById('taskInput').setAttribute('placeholder', trans.taskPlaceholder);
     
-    if (!isRunning) {
-        document.getElementById('startBtn').innerText = trans.startBtnJob;
+    // تحديث نص زر العداد حسب الحالة الحالية
+    const startBtn = document.getElementById('startBtn');
+    if (startBtn) {
+        if (timer === null) {
+            startBtn.innerText = isBreak ? trans.startBtnBreak : trans.startBtnJob;
+        } else {
+            startBtn.innerText = trans.startBtnPause;
+        }
     }
     
     changeQuote();
@@ -145,7 +157,9 @@ if(document.getElementById('langSelect')) {
     });
 }
 
-// --- 4. زر الحفظ الرئيسي المطور والمصلح ---
+// ==========================================
+// 4️⃣ زر الحفظ الرئيسي
+// ==========================================
 document.getElementById('mainSaveBtn').addEventListener('click', function() {
     currentLang = temporaryLang;
     localStorage.setItem('userLang', currentLang);
@@ -165,7 +179,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     graduationDate = document.getElementById('gradDateInput').value;
     localStorage.setItem('gradDate', graduationDate);
     
-    if (!isRunning) {
+    if (timer === null) {
         timeLeft = Math.floor(newMins * 60);
         updateTimerDisplay();
     }
@@ -189,7 +203,159 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     }, 2000);
 });
 
-// --- 5. نظام المؤقت ---
+// ==========================================
+// 5️⃣ نظام المؤقت الذكي المصلح (إيقاف مؤقت / استئناف)
+// ==========================================
+function toggleTimer() {
+    const startBtn = document.getElementById('startBtn');
+    const minsInput = document.getElementById('minsInput');
+    const trans = i18n[currentLang];
+    
+    if (timeLeft === null || timeLeft <= 0) {
+        const mins = parseFloat(minsInput.value) || 25;
+        timeLeft = Math.floor(mins * 60);
+    }
+    
+    if (timer === null) {
+        // حالة البداية أو الاستئناف
+        startBtn.innerText = trans.startBtnPause;
+        
+        const endTime = Date.now() + (timeLeft * 1000);
+        
+        timer = setInterval(() => {
+            const remainingMillis = endTime - Date.now();
+            timeLeft = Math.ceil(remainingMillis / 1000);
+            
+            if (!isBreak) {
+                totalSecondsWorked++; // تجميع الثواني الفعلية للدراسة فقط
+            }
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                timer = null;
+                playAlarm();
+                
+                if (!isBreak) {
+                    addPoints();
+                    changeQuote();
+                }
+                
+                // إعادة ضبط المؤقت تلقائياً بعد الانتهاء
+                isBreak = false;
+                const mins = parseFloat(minsInput.value) || 25;
+                timeLeft = Math.floor(mins * 60);
+                totalSecondsWorked = 0;
+                updateTimerDisplay();
+                startBtn.innerText = trans.startBtnJob;
+            } else {
+                updateTimerDisplay();
+            }
+        }, 1000);
+        
+    } else {
+        // حالة الإيقاف المؤقت (Pause)
+        clearInterval(timer);
+        timer = null;
+        
+        startBtn.innerText = trans.startBtnResume;
+        
+        // حساب نقاطك فوراً عما أنجزته حتى ثانية الإيقاف
+        if (!isBreak) {
+            addPoints(); 
+        }
+    }
+}
+
+function resetTimer() {
+    if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+    }
+    isBreak = false;
+    totalSecondsWorked = 0;
+    
+    const minsInput = document.getElementById('minsInput');
+    const mins = parseFloat(minsInput ? minsInput.value : 25) || 25;
+    timeLeft = Math.floor(mins * 60);
+    
+    updateTimerDisplay();
+    
+    const startBtn = document.getElementById('startBtn');
+    if (startBtn) {
+        startBtn.innerText = i18n[currentLang].startBtnJob;
+    }
+}
+
+function updateTimerDisplay() {
+    const m = Math.floor(timeLeft / 60);
+    const s = timeLeft % 60;
+    const displayElem = document.getElementById('pomoDisplay');
+    if (displayElem) {
+        displayElem.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+    }
+}
+
+// ==========================================
+// 6️⃣ متجر الطاقة وحساب النقاط بدقة
+// ==========================================
+function addPoints() {
+    // كل 20 ثانية عمل حقيقي تساوي 1 نقطة (الدقيقة بـ 3 نقاط)
+    if (totalSecondsWorked >= 20) {
+        const newPoints = Math.floor(totalSecondsWorked / 20); 
+        points += newPoints;
+        savePoints();
+        
+        // الاحتفاظ بالثواني المتبقية التي لم تكتمل لـ 20
+        totalSecondsWorked = totalSecondsWorked % 20; 
+    }
+}
+
+function buyBreak(min) {
+    const cost = min * 15; 
+    const trans = i18n[currentLang];
+    
+    if (points >= cost) {
+        if (timer !== null) {
+            clearInterval(timer);
+            timer = null;
+        }
+        
+        points -= cost;
+        savePoints();
+        
+        isBreak = true;
+        timeLeft = min * 60;
+        totalSecondsWorked = 0; // تصفير العداد لعدم حساب نقاط في الراحة
+        
+        updateTimerDisplay();
+        document.getElementById('startBtn').innerText = trans.startBtnBreak;
+        alert(trans.alertBreak);
+    } else {
+        alert(trans.alertNoPoints);
+    }
+}
+
+function savePoints() {
+    localStorage.setItem('userPoints', points);
+    updatePointsDisplay();
+}
+
+function updatePointsDisplay() { 
+    if(document.getElementById('userPoints')) {
+        document.getElementById('userPoints').innerText = points; 
+    }
+}
+
+function resetPoints() {
+    if(confirm(i18n[currentLang].alertResetPoints)) {
+        points = 0;
+        savePoints();
+    }
+}
+
+// ==========================================
+// 7️⃣ المنبه الذكي وخلفية الصوت
+// ==========================================
 function playAlarm() {
     try {
         const bgTrack = document.getElementById('bgTrack');
@@ -218,7 +384,7 @@ function playAlarm() {
         const osc2 = context.createOscillator();
         const gain2 = context.createGain();
         osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(392.00, now + 0.15); 
+        osc2.frequency.setValueAtTime(659.25, now + 0.15); 
         gain2.gain.setValueAtTime(0.3, now + 0.15);
         gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3); 
         osc2.connect(gain2);
@@ -234,132 +400,9 @@ function playAlarm() {
     }
 }
 
-// تأكد أن المتغيرات دي متعرّفة في أول الملف برة أي دالة
-let timer = null;
-let timeLeft = parseFloat(document.getElementById('work-duration')?.value || 25) * 60;
-let isBreak = false;
-
-function toggleTimer() {
-    const button = document.getElementById('start-btn');
-    const workInput = document.getElementById('work-duration');
-    
-    // لو الـ timeLeft مش متعرّف أو قيمته صفر، خده من الخانة فوراً
-    if (!timeLeft || timeLeft <= 0) {
-        timeLeft = parseFloat(workInput.value || 25) * 60;
-    }
-    
-    if (timer === null) {
-        // بداية التشغيل أو الاستئناف
-        button.innerText = isBreak ? "إيقاف مؤقت للراحة ☕" : "إيقاف مؤقت للمهمة ⏸️";
-        
-        // حساب وقت النهاية الحقيقي بدقة سويسري
-        const endTime = Date.now() + (timeLeft * 1000);
-        
-        timer = setInterval(() => {
-            const remainingMillis = endTime - Date.now();
-            timeLeft = Math.ceil(remainingMillis / 1000);
-            
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                timer = null;
-                playAlarm();
-                
-                if (!isBreak) {
-                    addPoints();
-                    showNewQuote();
-                }
-                
-                // إعادة ضبط السيستم تلقائياً بعد الانتهاء
-                isBreak = false;
-                timeLeft = parseFloat(workInput.value || 25) * 60;
-                updateDisplay();
-                button.innerText = "ابدأ المهمة 🚀";
-            } else {
-                updateDisplay();
-            }
-        }, 1000);
-        
-    } else {
-        // حالة الإيقاف المؤقت
-        clearInterval(timer);
-        timer = null;
-        
-        button.innerText = isBreak ? "استئناف الراحة ☕" : "استئناف المهمة ▶️";
-        
-        // إضافة نقاط جزئية لو عمل إيقاف مؤقت أثناء المذاكرة
-        if (!isBreak) {
-            addPoints(); 
-        }
-    }
-}
-
-function resetTimer() {
-    clearInterval(timer);
-    isRunning = false;
-    document.getElementById('startBtn').innerText = i18n[currentLang].startBtnJob;
-    const mins = parseFloat(document.getElementById('minsInput').value) || 25;
-    timeLeft = Math.floor(mins * 60);
-    updateTimerDisplay();
-}
-
-function updateTimerDisplay() {
-    const m = Math.floor(timeLeft / 60);
-    const s = timeLeft % 60;
-    document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
-}
-
-// --- 6. متجر الطاقة والنقاط ---
-function addPoints() {
-    const minsInput = parseFloat(document.getElementById('minsInput').value) || 25;
-    const totalSeconds = minsInput * 60;
-    const secondsWorked = totalSeconds - timeLeft;
-    
-    // يمنح نقطة لكل 20 ثانية عمل حقيقية انقضت
-    if (secondsWorked >= 20 && timeLeft < totalSeconds) {
-        const newPoints = Math.floor(secondsWorked / 20); 
-        points += newPoints;
-        savePoints();
-        timeLeft = totalSeconds; 
-    }
-}
-
-function buyBreak(min) {
-    const cost = min * 15; 
-    const trans = i18n[currentLang];
-    if (points >= cost) {
-        points -= cost;
-        savePoints();
-        clearInterval(timer);
-        isRunning = false;
-        isBreak = true;
-        timeLeft = min * 60;
-        updateTimerDisplay();
-        document.getElementById('startBtn').innerText = trans.startBtnBreak;
-        alert(trans.alertBreak);
-    } else {
-        alert(trans.alertNoPoints);
-    }
-}
-
-function savePoints() {
-    localStorage.setItem('userPoints', points);
-    updatePointsDisplay();
-}
-
-function updatePointsDisplay() { 
-    if(document.getElementById('userPoints')) {
-        document.getElementById('userPoints').innerText = points; 
-    }
-}
-
-function resetPoints() {
-    if(confirm(i18n[currentLang].alertResetPoints)) {
-        points = 0;
-        savePoints();
-    }
-}
-
-// --- 7. العد التنازلي ---
+// ==========================================
+// 8️⃣ العداد التنازلي للتخرج والاقتباسات
+// ==========================================
 function changeQuote() {
     const qElem = document.getElementById('motivationQuote');
     const currentQuotes = quotes[currentLang];
@@ -369,7 +412,9 @@ function changeQuote() {
 function displayDate() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
-    document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString(locale, options);
+    if(document.getElementById('dateDisplay')) {
+        document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString(locale, options);
+    }
 }
 
 function startGraduationCountdown() {
@@ -378,14 +423,16 @@ function startGraduationCountdown() {
         const gap = new Date(graduationDate).getTime() - now;
         if (gap > 0) {
             const second = 1000, minute = second * 60, hour = minute * 60, day = hour * 24, year = day * 365;
-            document.getElementById('years').innerText = Math.floor(gap / year);
-            document.getElementById('days').innerText = Math.floor((gap % year) / day);
-            document.getElementById('hours').innerText = Math.floor((gap % day) / hour);
+            if(document.getElementById('years')) document.getElementById('years').innerText = Math.floor(gap / year);
+            if(document.getElementById('days')) document.getElementById('days').innerText = Math.floor((gap % year) / day);
+            if(document.getElementById('hours')) document.getElementById('hours').innerText = Math.floor((gap % day) / hour);
         }
     }, 1000);
 }
 
-// --- 8. إدارة المهام ---
+// ==========================================
+// 9️⃣ إدارة المهام (To-Do List)
+// ==========================================
 function addTask() {
     const input = document.getElementById('taskInput');
     if (!input) return;
