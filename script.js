@@ -335,13 +335,13 @@ function renderTasks() {
     var taskList = document.getElementById('taskList');
     if (!taskList) return;
     
-    // 1. تصفير المحتوى القديم
+    // 1. تصفير المحتوى
     taskList.innerHTML = '';
     
-    // 2. القفل الحديدي الموزون للحاوية بارتفاع مهمتين كاملتين (114px)
+    // 2. القفل الحديدي للحاوية بارتفاع مهمتين كاملتين (114px)
     taskList.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important; padding: 0 !important; margin: 15px 0 0 0 !important; box-sizing: border-box !important; height: 114px !important; max-height: 114px !important; overflow-y: scroll !important; scroll-snap-type: y mandatory !important; scroll-behavior: smooth !important;";
 
-    // 3. تأمين إخفاء سكرول بار المتصفح برمجياً
+    // 3. تأمين إخفاء السكرول بار برمجياً
     if (!document.getElementById('scroll-hide-style')) {
         var scrollStyle = document.createElement('style');
         scrollStyle.id = 'scroll-hide-style';
@@ -351,32 +351,31 @@ function renderTasks() {
     
     var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
-    // معرفة لغة الموقع الحالية (ar أو en)
+    // معرفة لغة الموقع الحالية لتحديد اتجاه نصوص المهام وتناسق المحاذاة
     var currentLang = document.documentElement.lang || 'ar';
     var isAr = currentLang === 'ar';
+    var textAlignment = isAr ? "text-align: right !important;" : "text-align: left !important;";
     
-    // 4. بناء المهام بتوزيع هندسي مرن وتلقائي
+    // 4. بناء المهام بتوزيع مرن ثابت البنية (الهيكل موحد والاتجاه تفرضه لغة المتصفح طبيعياً)
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
-        // يعتمد الاتجاه (row أو row-reverse) تلقائياً على لغة الصفحة لرمي العناصر في الأطراف الصحيحة
-        var directionStyle = isAr ? "flex-direction: row-reverse !important;" : "flex-direction: row !important;";
-        var textAlignStyle = isAr ? "text-align: right !important;" : "text-align: left !important;";
-        
-        li.style.cssText = "display: flex !important; " + directionStyle + " align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
+        // التثبيت الجراحي: التوزيع دايماً row عادي، والمتصفح هيرتبهم حسب اتجاه اللغة (RTL أو LTR) بشكل طبيعي
+        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
         
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
-        // هنا السر: الدائرة والنص في حاوية واحدة ليلتصقوا ببعض، وزر الـ ❌ حر تماماً ليذهب للطرف المقابل
+        // ترتيب العناصر في الـ HTML ثابت: حاوية (الدائرة + النص) أولاً، ثم زر الـ ❌ ثانياً.
+        // الـ justify-content: space-between الإجباري في الـ li هيقذف بالـ ❌ لأقصى الطرف المعاكس تلقائياً!
         li.innerHTML = 
-            /* حاوية الدائرة + النص (تلتزم باتجاه النص حسب اللغة) */
-            '<div style="display: flex !important; ' + directionStyle + ' align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;" onclick="toggleTask(' + index + ')">' +
+            /* حاوية الدائرة والنص ملتصقين تماماً */
+            '<div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;" onclick="toggleTask(' + index + ')">' +
                 '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
-                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; ' + textAlignStyle + ' font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
+                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; ' + textAlignment + ' font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
             '</div>' +
-            /* زر الحذف منفصل تماماً في الطرف الآخر */
+            /* زر الحذف حر بالطرف الآخر تماماً */
             '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important;">❌</button>';
             
         taskList.appendChild(li);
