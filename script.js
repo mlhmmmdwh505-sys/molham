@@ -351,32 +351,39 @@ function renderTasks() {
     
     var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
-    // معرفة لغة الموقع الحالية لتحديد اتجاه نصوص المهام وتناسق المحاذاة
+    // معرفة لغة الموقع الحالية
     var currentLang = document.documentElement.lang || 'ar';
     var isAr = currentLang === 'ar';
-    var textAlignment = isAr ? "text-align: right !important;" : "text-align: left !important;";
     
-    // 4. بناء المهام بتوزيع مرن ثابت البنية (الهيكل موحد والاتجاه تفرضه لغة المتصفح طبيعياً)
+    // 4. بناء المهام
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
-        // التثبيت الجراحي: التوزيع دايماً row عادي، والمتصفح هيرتبهم حسب اتجاه اللغة (RTL أو LTR) بشكل طبيعي
+        // تثبيت البنية لتكون flex-direction طبيعي، والتحكم بالاتجاه بناءً على الترتيب الداخلي
         li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
         
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
-        // ترتيب العناصر في الـ HTML ثابت: حاوية (الدائرة + النص) أولاً، ثم زر الـ ❌ ثانياً.
-        // الـ justify-content: space-between الإجباري في الـ li هيقذف بالـ ❌ لأقصى الطرف المعاكس تلقائياً!
-        li.innerHTML = 
-            /* حاوية الدائرة والنص ملتصقين تماماً */
-            '<div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;" onclick="toggleTask(' + index + ')">' +
-                '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
-                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; ' + textAlignment + ' font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
-            '</div>' +
-            /* زر الحذف حر بالطرف الآخر تماماً */
-            '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important;">❌</button>';
+        // زر الحذف المنفصل
+        var deleteBtn = '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important;">❌</button>';
+        
+        // حاوية الدائرة والنص (دائماً ملتصقين ببعض)
+        var textDirection = isAr ? "direction: rtl !important; text-align: right !important;" : "direction: ltr !important; text-align: left !important;";
+        var contentWrapper = '<div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important; ' + textDirection + '" onclick="toggleTask(' + index + ')">' +
+            '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
+            '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
+            '</div>';
+            
+        // التوزيع الجراحي المطلق حسب لغة الواجهة
+        if (isAr) {
+            // عربي: حاوية النص والـ ⭕ في اليمين أولاً، والـ ❌ في اليسار ثانياً
+            li.innerHTML = contentWrapper + deleteBtn;
+        } else {
+            // إنجليزي: نعكس الترتيب في الـ HTML تماماً لتصبح الـ ❌ في اليمين أولاً، وحاوية النص والـ ⭕ في اليسار ثانياً
+            li.innerHTML = deleteBtn + contentWrapper;
+        }
             
         taskList.appendChild(li);
     });
