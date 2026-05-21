@@ -54,9 +54,10 @@ const i18n = {
 // --- 2. دالة تهيئة الصفحة ---
 window.onload = () => {
     
+    updatePointsDisplay();
+
     points += 75; savePoints();
     
-    updatePointsDisplay();
     startGraduationCountdown();
     
     currentLang = localStorage.getItem('userLang') || "ar";
