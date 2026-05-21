@@ -202,20 +202,20 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     }, 2000);
 });
 
-// --- 5. نظام المؤقت ---
 function playAlarm() {
     try {
-        // استدعاء العنصر الثابت المخزن في الـ HTML
         const alarmAudio = document.getElementById('alarmSound');
         
         if (alarmAudio) {
             alarmAudio.volume = 1.0; // أعلى درجة صوت
-            alarmAudio.currentTime = 0; // إعادة الصوت من البداية في كل مرة
+            alarmAudio.currentTime = 0; // يبدأ من أول ثانية
+            alarmAudio.play();
             
-            // تشغيل غصب عن قيود الخلفية
-            alarmAudio.play().catch(e => {
-                console.log("المتصفح حظر التكرار التلقائي في الخلفية.");
-            });
+            // ⏱️ كتم وإيقاف الصوت تماماً بعد 0.3 ثانية (300 مللي ثانية)
+            setTimeout(() => {
+                alarmAudio.pause();
+                alarmAudio.currentTime = 0; // تصفير العداد للمرة الجاية
+            }, 300); 
         }
     } catch (e) { 
         console.log("خطأ في نظام الصوت:", e); 
