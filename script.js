@@ -205,20 +205,26 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
 // --- 5. نظام المؤقت ---
 function playAlarm() {
     try {
-        // 🔔 استخدام ملف صوتي حقيقي ورابط مباشر يدعم التشغيل التلقائي
-        const alarmAudio = new Audio("https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg");
+        // صوت منبه رقمي قصير ونظيف ومباشر
+        const alarmAudio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav");
         
-        // ضبط مستوى الصوت (من 0 إلى 1)
-        alarmAudio.volume = 0.8; 
+        alarmAudio.volume = 1.0; // أعلى درجة صوت
         
-        // أمر التشغيل الفوري
-        alarmAudio.play().catch(e => {
-            console.log("المتصفح حظر الصوت تلقائياً، محاولة تشغيل بديلة:", e);
-        });
+        // إجبار المتصفح على التشغيل
+        let playPromise = alarmAudio.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log("حظر التصفح التلقائي نشط: ", error);
+                // حل بديل: إظهار الرعب للمتصفح كـ تذكير بصري لو الصوت اتحظر
+                alert("⏰ انتهى الوقت الحين! (تم حظر الصوت من المتصفح)");
+            });
+        }
     } catch (e) { 
-        console.log("خطأ في تشغيل الصوت:", e); 
+        console.log("خطأ في النظام الصوتي:", e); 
     }
 }
+
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     const trans = i18n[currentLang];
@@ -309,30 +315,28 @@ function updateTimerDisplay() {
 }
 
 
-
 function buyBreak(min) {
     const cost = min * 15; 
     const trans = i18n[currentLang];
     
     if (points >= cost) {
+        // 1. خصم النقاط فوراً
         points -= cost;
         savePoints();
         
-        // إيقاف أي مؤقت قديم تماماً
+        // 2. إيقاف أي مؤقت قديم تماماً وتصفير حالته
         clearInterval(timer);
         isRunning = false;
         
-        // 🔒 تفعيل راية الاستراحة لقفل حنفية النقاط
+        // 3. تفعيل راية الاستراحة (قفل حنفية المكافآت)
         isBreak = true; 
         
-        // شحن وقت الاستراحة الجديد بدقة
+        // 4. شحن وقت الاستراحة الجديد على الشاشة (بأمان وبدون تشغيل تلقائي)
         timeLeft = min * 60;
         updateTimerDisplay();
         
+        // 5. تحديث نص الزرار ليصبح "ابدأ الاستراحة ☕" وينتظر ضغطتك
         document.getElementById('startBtn').innerText = trans.startBtnBreak;
-        
-        // 🚀 تشغيل مؤقت الاستراحة فوراً وبنفس الدقة الذرية المعتمدة على ساعة الجهاز
-        toggleTimer(); 
         
         alert(trans.alertBreak);
     } else {
