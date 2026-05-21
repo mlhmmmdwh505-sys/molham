@@ -204,7 +204,14 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
 
 function playAlarm() {
     try {
-        // 🐧 إنشاء نظام صوتي نقي ومباشر من نواة المتصفح
+        // 1. تشغيل مسار الخلفية الصامت لإجبار المتصفح يفضل صاحي وأنت بتلعب
+        const bgTrack = document.getElementById('bgTrack');
+        if (bgTrack) {
+            bgTrack.src = "data:video/mp4;base64,AAAAHGZ0eXBtcDQyAAAAAG1wZD1tcDQyAG1vb3YAAABsbXZoZAAAAADXg4bS14OG0gAABeXgAAA+gAABAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
+            bgTrack.play().catch(() => {});
+        }
+
+        // 2. ⚡ توليد الزنة الإلكترونية الخاطفة (0.3 ثانية) ذاتياً غصب عن المتصفح
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return;
         
@@ -215,19 +222,15 @@ function playAlarm() {
         oscillator.connect(gainNode);
         gainNode.connect(context.destination);
         
-        // نوع الموجة وترددها (زنة إلكترونية خاطفة وقوية)
         oscillator.type = 'sine'; 
-        oscillator.frequency.setValueAtTime(880, context.currentTime); // تردد 880 هرتز
+        oscillator.frequency.setValueAtTime(880, context.currentTime); // تردد التنبيه
+        gainNode.gain.setValueAtTime(1.0, context.currentTime); // أعلى صوت
         
-        // قوة الصوت (أعلى درجة)
-        gainNode.gain.setValueAtTime(1.0, context.currentTime);
-        
-        // ⏱️ التشغيل والإيقاف الإجباري بعد 0.3 ثانية بالظبط (بدون أي رسائل)
         oscillator.start();
-        oscillator.stop(context.currentTime + 0.3); 
+        oscillator.stop(context.currentTime + 0.3); // يقف بعد 0.3 ثانية بالظبط
         
     } catch (e) {
-        console.log("حماية المتصفح منعت الصوت تلقائياً.");
+        console.log("Audio block bypass error:", e);
     }
 }
 
