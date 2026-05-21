@@ -358,18 +358,17 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
    ========================================================================== */
 #taskList {
     display: flex !important;
-    flex-direction: column !important; /* رص عمودي */
-    width: 100% !important;
+    flex-direction: column !important; /* رص عمودي مغناطيسي طبيعي */
+    width: 100% !important; /* العرض الكامل للكارد */
     
-    /* 📐 الحسبة الهندسية لظهور مهمتين بالظبط */
-    height: 110px !important;
-    max-height: 110px !important;
+    /* 🛠️ التغيير الأساسي هنا: نلغي البكسلات ونخلي الارتفاع حر */
+    height: auto !important; 
+    max-height: none !important; 
+    overflow: visible !important; /* شطبنا على overflow-y: scroll عشان السكرول بار يختفي تماماً */
     
-    overflow: visible !important; /* السكرول إجباري */ 
-    
-    gap: 10px !important; 
+    gap: 10px !important; /* مسافة المغناطيس الثابتة بين المهام */
     margin-top: 15px !important;
-    padding: 0 !important; 
+    padding: 0 !important;
     list-style: none !important;
     box-sizing: border-box !important;
 
