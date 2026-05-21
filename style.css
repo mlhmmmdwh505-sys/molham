@@ -360,27 +360,31 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 /* ==========================================================================
    📝 منظومة السكرول المغناطيسي (عرض مهمتين فقط والباقي سكرول)
    ========================================================================== */
+/* ==========================================================================
+   📝 المنظومة المغناطيسية الذكية المحدثة (تثبيت مهمتين + سكرول ناعم)
+   ========================================================================== */
 #taskList {
     display: flex !important;
-    flex-direction: column !important; /* ترتيب عمودي مغناطيسي */
+    flex-direction: column !important; /* رص عمودي مغناطيسي صارم */
     width: 100% !important; /* العرض الكامل للكارد */
     
-    /* 📐 السر هنا: حساب ارتفاع مهمتين (52px + 52px) مع الـ gap (10px) ومساحة الحشو */
-    max-height: 120px !important; 
-    overflow-y: auto !important; /* تفعيل السكرول العمودي تلقائياً عند زيادة المهام عن 2 */
-    overflow-x: hidden !important; /* منع أي سكرول أفقي مشوه */
+    /* 📐 تحديد ارتفاع محكوم ومناسب تماماً لظهور مهمتين فقط */
+    height: 130px !important; 
+    max-height: 130px !important;
+    overflow-y: auto !important; /* تفعيل التمرير العمودي عند زيادة المهام عن 2 */
+    overflow-x: hidden !important; /* منع التمرير الأفقي المشوه */
     
-    gap: 10px !important; /* المسافة المغناطيسية بين المهام */
+    gap: 10px !important; /* مسافة المغناطيس الثابتة بين كل مهمة وأختها */
     margin-top: 20px !important;
-    padding: 0 5px 0 0 !important; /* حشو بسيط جهة اليمين لترك مساحة لشريط السكرول */
+    padding: 0 5px 0 0 !important; /* مساحة أمان جانبية لشريط التمرير */
     list-style: none !important;
     
-    /* 🎛️ تحسين شكل شريط السكرول ليصبح ناعم ومتناسق مع التصميم الزجاجي */
-    scrollbar-width: thin !important; /* للمتصفحات الحديثة مثل فايرفوكس */
+    /* 🎛️ تنعيم شكل شريط السكرول ليناسب الثيم الزجاجي */
+    scrollbar-width: thin !important;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent !important;
 }
 
-/* 🎨 تخصيص شريط السكرول لمتصفحات Chrome و Safari ليصبح خفياً وفخماً */
+/* 🎨 تخصيص شريط السكرول لمتصفحات Chrome و Safari */
 #taskList::-webkit-scrollbar {
     width: 6px !important;
 }
@@ -395,21 +399,23 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     background: rgba(255, 255, 255, 0.3) !important;
 }
 
-/* تنسيق حبة المهمة العريضة */
+/* تنسيق حبة المهمة المرنة العريضة */
 #taskList li {
-    width: 100% !important;
-    min-height: 52px !important; /* الارتفاع الثابت للمهمة الواحدة */
-    height: 52px !important; 
+    width: 100% !important; /* تفرد بكامل العرض المتوفر */
+    min-height: 55px !important; /* حد أدنى ثابت ومريح للحبة */
+    height: auto !important; /* ترك الارتفاع يتنفس لمنع القص التراكمي */
+    flex-shrink: 0 !important; /* منع انضغاط الحبات عند السكرول */
     box-sizing: border-box !important;
+    
     background: rgba(255, 255, 255, 0.04) !important;
     border-radius: 12px !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    padding: 0 20px !important; /* ضبط الحشو أفقياً فقط ليناسب الارتفاع الثابت */
+    padding: 10px 20px !important; /* حشو داخلي متناسق */
+    
     display: flex !important;
     flex-direction: row !important;
     justify-content: space-between !important;
     align-items: center !important;
-    flex-shrink: 0 !important; /* يمنع انضغاط أو تشوه حبة المهمة أثناء السكرول */
 }
 .btn-add { 
     width: 52px !important; 
