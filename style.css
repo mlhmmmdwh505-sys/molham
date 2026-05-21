@@ -952,20 +952,20 @@ input[type="color"]::-moz-color-swatch {
 }
 
 /* ==========================================================================
-   🎯 القفل الحديدي المشترك: فرض مهمتين فقط على (اللابتوب + الموبايل) 
+   🚫 الحل الجراحي النهائي: نسف التعارض وعرض مهمتين فقط (د. ملهم)
    ========================================================================== */
 
-#taskList, .tasks-container, #todoList, ul {
+/* 1. توحيد حاوية القائمة بالكامل وقفلها على ارتفاع مهمتين بالظبط */
+.tasks-container, #todoList, #taskList, ul {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
-    gap: 8px !important; /* فجوة محبوكة تمنع تسريب أي بكسل للمهمة الثالثة */
+    gap: 8px !important; /* فجوة محبوكة تمنع تسريب أي بكسل إضافي */
     padding: 0 !important;
     margin: 15px 0 0 0 !important;
-    text-align: right !important;
     box-sizing: border-box !important;
     
-    /* 👑 الارتفاع السحري الحاسم والنهائي */
+    /* قفل الارتفاع الإجمالي للمهمتين (52 + 8 + 52 = 112px) */
     height: 112px !important;     
     max-height: 112px !important; 
     
@@ -974,9 +974,9 @@ input[type="color"]::-moz-color-swatch {
     scroll-behavior: smooth !important;
 }
 
-/* ضبط العناصر الفردية للمهام لمنع انكماشها وإجبارها على أخذ مساحتها كاملة */
+/* 2. إجبار المهمة الفردية على الالتزام بارتفاع 52px وممنوع تنكمش أو تصغر */
 .fixed-task-item, #taskList li, li {
-    flex-shrink: 0 !important;
+    flex: 0 0 52px !important; /* السحر الحقيقي لمنع المتصفح من حشر المهمة الثالثة */
     height: 52px !important;
     min-height: 52px !important;
     max-height: 52px !important;
@@ -984,7 +984,6 @@ input[type="color"]::-moz-color-swatch {
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important;
 }
-
 /* ==========================================================================
    ⛔ القفل الفولاذي الموحد: منع انكماش المهام وعرض 2 فقط (د. ملهم)
    ========================================================================== */
