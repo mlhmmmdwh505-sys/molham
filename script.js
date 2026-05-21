@@ -205,19 +205,20 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
 // --- 5. نظام المؤقت ---
 function playAlarm() {
     try {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        const oscillator = context.createOscillator();
-        const gainNode = context.createGain();
-        oscillator.type = 'sawtooth'; 
-        oscillator.frequency.setValueAtTime(400, context.currentTime); 
-        gainNode.gain.setValueAtTime(5, context.currentTime); 
-        oscillator.connect(gainNode);
-        gainNode.connect(context.destination);
-        oscillator.start();
-        setTimeout(() => oscillator.stop(), 300); 
-    } catch (e) { console.log("Audio Blocked"); }
+        // 🔔 استخدام ملف صوتي حقيقي ورابط مباشر يدعم التشغيل التلقائي
+        const alarmAudio = new Audio("https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg");
+        
+        // ضبط مستوى الصوت (من 0 إلى 1)
+        alarmAudio.volume = 0.8; 
+        
+        // أمر التشغيل الفوري
+        alarmAudio.play().catch(e => {
+            console.log("المتصفح حظر الصوت تلقائياً، محاولة تشغيل بديلة:", e);
+        });
+    } catch (e) { 
+        console.log("خطأ في تشغيل الصوت:", e); 
+    }
 }
-
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     const trans = i18n[currentLang];
