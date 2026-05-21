@@ -25,6 +25,7 @@ const quotes = {
     ]
 };
 
+// قاموس الترجمة الكامل المتوافق مع الـ HTML
 const i18n = {
     ar: {
         welcome: "مرحباً بك،",
@@ -54,7 +55,7 @@ const i18n = {
     }
 };
 
-// --- 2. دالة تهيئة الصفحة وتشغيلها عند الففتح ---
+// --- 2. دالة تهيئة الصفحة وتشغيلها عند الفتح ---
 window.onload = () => {
     updatePointsDisplay();
     startGraduationCountdown();
@@ -252,13 +253,13 @@ function resetTimer() {
     updateTimerDisplay();
 }
 
+// --- 6. نظام النقاط ومتجر الطاقة ---
 function updateTimerDisplay() {
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
     document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
-// --- 6. نظام النقاط ومتجر الطاقة ---
 function addPoints() {
     const minsWorked = parseInt(document.getElementById('minsInput').value) || 25;
     points += (minsWorked * 3);  
@@ -361,21 +362,23 @@ function renderTasks() {
     
     taskList.innerHTML = '';
     var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    var isAr = currentLang === 'ar';
+    var textAlignment = isAr ? 'text-align: right !important;' : 'text-align: left !important;';
     
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
         
-        // الأبعاد والبادنج الأصليين لملفك بدون أي تغيير
+        // كود الستايل الأصلي والكامل بتاعك بدون أي أبعاد مفروضة أو إضافات
         li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; padding: 12px 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 10px !important;";
         
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
-        // الهيكل والخصائص الأصلية وترتيب الأوامر السليم للتنفيذ والاتجاهات
         li.innerHTML = 
-            '<div onclick="toggleTask(' + index + ')" style="display: flex !important; flex-direction: row !important; align-items: center !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
+            /* الهيكل الأصلي والكامل للمهام لتعود للعمل بكفاءة تامة */
+            '<div onclick="toggleTask(' + index + ')" style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
                 '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
-                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; margin-inline-start: 12px !important; text-align: start !important; ' + strikeStyle + '">' + task.text + '</span>' +
+                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + textAlignment + ' ' + strikeStyle + '">' + task.text + '</span>' +
             '</div>' +
             '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important; margin-inline-start: 15px !important;">❌</button>';
             
