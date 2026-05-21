@@ -984,3 +984,43 @@ input[type="color"]::-moz-color-swatch {
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important;
 }
+
+/* ==========================================================================
+   ⛔ الحكم النهائي: كبس الكارت الخارجي والداخلي معاً على مهمتين (د. ملهم)
+   ========================================================================== */
+
+/* 1. إجبار الكارت الخارجي للمهام على الانكماش وعدم التمدد لأسفل */
+.todo-box, .todo-card, [class*="todo"] {
+    height: auto !important;
+    max-height: none !important;
+}
+
+/* 2. قفل حاوية القائمة بالملي على 110px لتختفي المهمة الثالثة تماماً */
+#taskList, .tasks-container, ul {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 8px !important; 
+    padding: 0 !important;
+    margin: 15px 0 0 0 !important;
+    box-sizing: border-box !important;
+    
+    height: 110px !important;     /* تقليص إضافي جراحي محبوك */
+    max-height: 110px !important; /* ممنوع تتعدى هذا الارتفاع */
+    
+    overflow: hidden !important;        /* إخفاء أي عنصر يخرج برة الـ 110 بكسل */
+    overflow-y: auto !important;        /* السماح بالسكرول الداخلي فقط */
+    scroll-snap-type: y mandatory !important;
+    scroll-behavior: smooth !important;
+}
+
+/* 3. التأكيد على أن كل مهمة فردية تأخذ 52 بكسل كاملة بدون انضغاط */
+.fixed-task-item, #taskList li, li {
+    flex: 0 0 52px !important; /* منع المتصفح من تصغير حجم المهمة لتبدو 3 مهام */
+    height: 52px !important;
+    min-height: 52px !important;
+    max-height: 52px !important;
+    box-sizing: border-box !important;
+    scroll-snap-align: start !important;
+    scroll-snap-stop: always !important;
+}
