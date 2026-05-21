@@ -250,20 +250,20 @@ function toggleTimer() {
     const trans = i18n[currentLang];
     
     if (!isRunning) {
+        // 👇 التعديل الجوهري هنا: استبدل parseInt بـ parseFloat في السطر ده
+        let mins = parseFloat(document.getElementById('minsInput').value) || 25;
+
         if (timeLeft <= 0) {
-          const resetMins = parseFloat(document.getElementById('minsInput').value) || 1;
-timeLeft = Math.floor(resetMins * 60);
+            timeLeft = Math.floor(mins * 60); // تحويل الدقائق لثوانٍ بدقة (0.1 دقيقة = 6 ثوانٍ)
             updateTimerDisplay();
         }
 
         isRunning = true;
         btn.innerText = trans.startBtnPause;
         
-        // 🎯 اللحظة الحقيقية: حساب وقت النهاية الفعلي بناءً على ساعة الجهاز الحالية (مستحيل تتأخر)
         const endTime = Date.now() + (timeLeft * 1000);
 
         timer = setInterval(() => {
-            // طرح وقت النهاية الثابت من ساعة الجهاز الحركية الآن
             const remainingMillis = endTime - Date.now();
             timeLeft = Math.ceil(remainingMillis / 1000);
 
@@ -273,29 +273,27 @@ timeLeft = Math.floor(resetMins * 60);
                 isRunning = false;
                 btn.innerText = trans.startBtnJob;
                 
-                // 🔒 حماية: توزيع النقاط للمذاكرة فقط، وممنوع لو كانت استراحة
                 if (!isBreak) {
                     addPoints(); 
                 }
                 
-                playAlarm();
+                playAlarm(); // جرس التين تون شغال هنا غصب عن المتصفح 🔔
                 changeQuote();
 
-                // العودة للحالة الطبيعية بعد انتهاء الوقت
                 isBreak = false; 
 
-                const mins = parseInt(document.getElementById('minsInput').value) || 25;
-                timeLeft = mins * 60;
+                // 👇 والتعديل الثاني هنا: استبدل parseInt بـ parseFloat عشان لما يخلص ميرجعش لـ 25
+                const resetMins = parseFloat(document.getElementById('minsInput').value) || 25;
+                timeLeft = Math.floor(resetMins * 60);
                 updateTimerDisplay();
             }
             updateTimerDisplay();
-        }, 200); // تحديث سريع جداً كل 200 مللي ثانية لضمان الدقة المطلقة والسلاسة
+        }, 200); 
     } else {
         clearInterval(timer);
         isRunning = false;
         btn.innerText = trans.startBtnResume;
         
-        // حماية عند الإيقاف المؤقت
         if (!isBreak) {
             addPoints(); 
         }
