@@ -969,55 +969,64 @@ input[type="color"]::-moz-color-swatch {
 }
 
 /* ==========================================================================
-   🎯 الضبط الإمبراطوري: تكبير حقل المهام وفرد حقل اللون بالكامل (د. ملهم)
+   👑 الضبط الختامي بالـ CSS: مهمتين بالظبط وفرد اللون بالكامل (د. ملهم)
    ========================================================================== */
 
-/* 1. تكبير وتفخيم حقل "أضف مهمة جديدة" ليكون مفروداً ومميزاً */
-input[type="text"], .task-input, #taskInput {
+/* 1. إجبار حاوية المهام على عرض مهمتين فقط بالملي مع المغناطيس */
+#taskList, .tasks-container, ul {
+    display: flex !important;
+    flex-direction: column !important;
     width: 100% !important;
-    height: 52px !important;       /* نفس ارتفاع كبسولة المهام الفخمة */
-    padding: 0 20px !important;
-    font-size: 16px !important;    /* تكبير الخط عشان وضوح الموبايل */
-    font-weight: 600 !important;
-    border-radius: 25px !important; /* حواف دائرية مثالية */
-    box-sizing: border-box !important;
+    gap: 10px !important;
+    padding: 0 !important;
+    margin: 15px 0 0 0 !important;
+    height: 124px !important;     /* ارتفاع مهمتين بالظبط */
+    max-height: 124px !important; /* قفل الارتفاع لمنع ظهور الثالثة */
+    overflow-y: scroll !important;
+    scroll-snap-type: y mandatory !important;
+    scroll-behavior: smooth !important;
 }
 
-/* 2. إجبار اللون على ملء الفراغ والبوردر بالكامل بدون أي حواف داخلية غبية */
+/* 2. تصفير حقل اللون الخارجي تماماً ليتمدد بكامل العرض */
 input[type="color"] {
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
     appearance: none !important;
     
     width: 100% !important;
-    height: 52px !important;        /* نفس ارتفاع باقي الحقول المتناسقة */
+    height: 52px !important;       /* نفس ارتفاع الحقول الفخمة */
     background: transparent !important;
-    border: none !important;        /* إزالة البوردر الخارجي لتجنب الفراغات */
+    border: none !important;       /* إلغاء أي بوردر يعمل فراغ أسود */
     border-radius: 25px !important;
-    cursor: pointer !important;
-    padding: 0 !important;          /* تصفير الحشو تماماً */
+    padding: 0 !important;
     margin: 0 !important;
     overflow: hidden !important;
+    cursor: pointer !important;
 }
 
-/* 3. قهر متصفحات الموبايل (Chrome & Safari) وإجبار اللون على اللصق في الحواف */
+/* 3. قهر وحش الموبايل: مط اللون الداخلي ليلتصق بالحواف الدائرية مباشرة */
 input[type="color"]::-webkit-color-swatch-wrapper {
-    padding: 0 !important;          /* إزالة الفراغ الداخلي تماماً */
+    padding: 0 !important;
     margin: 0 !important;
     border-radius: 25px !important;
+    height: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 input[type="color"]::-webkit-color-swatch {
-    border: none !important;        /* إلغاء البوردر الداخلي للمتصفح */
+    border: none !important;
     border-radius: 25px !important;
     width: 100% !important;
-    height: 100% !important;        /* الفرد الكامل بعرض وارتفاع الكبسولة */
+    height: 100% !important;
+    box-sizing: border-box !important;
 }
 
-/* 4. الضبط لمتصفحات فايرفوكس */
+/* 4. الضبط الخاص بمتصفحات فايرفوكس */
 input[type="color"]::-moz-color-swatch {
     border: none !important;
     border-radius: 25px !important;
     width: 100% !important;
     height: 100% !important;
+    box-sizing: border-box !important;
 }
