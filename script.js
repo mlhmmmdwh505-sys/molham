@@ -140,6 +140,7 @@ if(document.getElementById('langSelect')) {
 }
 
 // --- 4. زر الحفظ الرئيسي ---
+// --- 4. زر الحفظ الرئيسي المطور (بدون رسائل alert منبثقة) ---
 document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
     e.preventDefault(); 
     
@@ -170,9 +171,25 @@ document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
         timeLeft = newMins * 60;
         updateTimerDisplay();
     }
-    alert(i18n[currentLang].alertSave);
-});
 
+    // ✨ الحركة السحرية البديلة للـ alert المزعج:
+    const saveBtn = document.getElementById('mainSaveBtn');
+    const originalText = saveBtn.innerText;
+    
+    // تحويل الزر للشكل الأخضر التأكيدي فوراً
+    saveBtn.innerText = currentLang === 'ar' ? "تم الحفظ بنجاح! ✔️" : "Saved Successfully! ✔️";
+    saveBtn.style.backgroundColor = "var(--success)" + " !important";
+    saveBtn.style.borderColor = "var(--success)" + " !important";
+    saveBtn.style.pointerEvents = "none"; // منع الضغط المتكرر أثناء التأكيد
+
+    // إعادة الزر لوضعه الطبيعي بعد ثانيتين بالظبط تلقائياً
+    setTimeout(() => {
+        saveBtn.innerText = originalText;
+        saveBtn.style.backgroundColor = "";
+        saveBtn.style.borderColor = "";
+        saveBtn.style.pointerEvents = "auto";
+    }, 2000);
+});
 // --- 5. نظام المؤقت ---
 function playAlarm() {
     try {
