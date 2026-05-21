@@ -5,6 +5,7 @@ let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 let currentLang = localStorage.getItem('userLang') || "ar"; 
+let temporaryLang = currentLang; // 🧲 متغير مؤقت لحفظ اللغة المختارة حتى يتم التأكيد
 
 const quotes = {
     ar: [
@@ -56,6 +57,8 @@ window.onload = () => {
     startGraduationCountdown();
     
     currentLang = localStorage.getItem('userLang') || "ar";
+    temporaryLang = currentLang; // مزامنة المتغير المؤقت عند الإقلاع
+    
     if(document.getElementById('langSelect')) {
         document.getElementById('langSelect').value = currentLang;
     }
@@ -97,7 +100,7 @@ function applyLanguage(lang) {
     currentLang = lang;
     document.documentElement.setAttribute('lang', lang);
     document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
-    localStorage.setItem('userLang', lang); // التأكد من حفظ اللغة المحددة
+    localStorage.setItem('userLang', lang); 
     
     const trans = i18n[lang];
     const savedName = localStorage.getItem('userName') || (lang === 'ar' ? "ملهم" : "Molham");
@@ -134,19 +137,18 @@ function applyLanguage(lang) {
     renderTasks(); 
 }
 
+// 🛠️ التعديل الجراحي هنا: عند تغيير القائمة نقوم بتحديث المتغير المؤقت فقط ولا نغير لغة الموقع
 if(document.getElementById('langSelect')) {
     document.getElementById('langSelect').addEventListener('change', function(e) {
-        applyLanguage(e.target.value);
+        temporaryLang = e.target.value; // احتفاظ بالاختيار سرًا بدون تطبيق فوري
     });
 }
 
 // --- 4. زر الحفظ الرئيسي المطور والمصلح ---
 document.getElementById('mainSaveBtn').addEventListener('click', function() {
-    // 1. تحديث وحفظ اللغة الفورية
-    const langSelect = document.getElementById('langSelect');
-    if (langSelect) {
-        currentLang = langSelect.value;
-    }
+    // 1. تثبيت وحفظ اللغة المعتمدة من المتغير المؤقت الآن
+    currentLang = temporaryLang;
+    localStorage.setItem('userLang', currentLang);
 
     // 2. جلب وحفظ الاسم فوراً
     const userNameInput = document.getElementById('userNameInput');
@@ -173,7 +175,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
         updateTimerDisplay();
     }
 
-    // 🚀 السحر الفوري: استدعاء دالة اللغة لتعيد حقن الاسم الجديد في الهيدر والترحيب فوراً من أول ضغطة
+    // 🚀 تطبيق التغييرات اللغوية والاسم فورا عند الضغط الحقيقي
     applyLanguage(currentLang);
     displayDate(); 
 
@@ -184,7 +186,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     saveBtn.innerText = currentLang === 'ar' ? "تم الحفظ بنجاح! ✔️" : "Saved Successfully! ✔️";
     saveBtn.style.setProperty('background-color', 'var(--success)', 'important');
     saveBtn.style.setProperty('border-color', 'var(--success)', 'important');
-    saveBtn.style.pointerEvents = "none"; // منع الضغط المتكرر أثناء التأكيد
+    saveBtn.style.pointerEvents = "none"; 
 
     // إعادة الزر لوضعه الطبيعي بعد ثانيتين
     setTimeout(() => {
@@ -283,6 +285,7 @@ function buyBreak(min) {
     }
 }
 
+// دالة حفظ النقاط
 function savePoints() {
     localStorage.setItem('userPoints', points);
     updatePointsDisplay();
