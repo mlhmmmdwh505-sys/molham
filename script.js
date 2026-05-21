@@ -332,129 +332,59 @@ window.deleteTask = function(index) {
 }
 
 function renderTasks() {
-    const taskList = document.getElementById('taskList');
-    if (!taskList) return;
-    
-    // 1. تنظيف القائمة
-    taskList.innerHTML = '';
-    
-    // 2. إجبار الكارد الخارجي الكبير نفسه (.todo-box) على التمدد بالعرض الكامل فوراً
-    const parentCard = taskList.closest('.todo-box') || taskList.parentElement;
-    if (parentCard) {
-        parentCard.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; min-width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; padding: 25px !important; overflow: hidden !important;";
-    }
-    
-function renderTasks() {
-    const taskList = document.getElementById('taskList');
+    var taskList = document.getElementById('taskList');
     if (!taskList) return;
     
     taskList.innerHTML = '';
     
-    // 1. ضبط حاوية المهام لتستوعب 3 مهام بكامل العرض
-    taskList.style.cssText = `
-        display: flex !important;
-        flex-direction: column !important;
-        width: 100% !important;
-        gap: 10px !important;
-        padding: 0 !important;
-        margin: 15px 0 0 0 !important;
-        text-align: right !important;
-        box-sizing: border-box !important;
-        height: 186px !important; 
-        max-height: 186px !important; 
-        overflow-y: scroll !important;
-        scroll-snap-type: y mandatory !important;
-        scroll-behavior: smooth !important;
-    `;
+    // 1. تشغيل الـ 3 مهام والمغناطيس بسلاسل نصية قياسية آمنة 100%
+    taskList.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important; padding: 0 !important; margin: 15px 0 0 0 !important; text-align: right !important; box-sizing: border-box !important; height: 186px !important; max-height: 186px !important; overflow-y: scroll !important; scroll-snap-type: y mandatory !important; scroll-behavior: smooth !important;";
 
-    // 2. تصفير وإجبار حقل اختيار اللون على ملء البوردر والفراغ بالكامل (علاج الموبايل الحاسم)
-    const colorInput = document.querySelector('input[type="color"]');
+    // 2. إجبار حقل اللون على فرد نفسه وملء البوردر بالكامل بدون فراغات
+    var colorInput = document.querySelector('input[type="color"]');
     if (colorInput) {
-        colorInput.style.cssText = `
-            -webkit-appearance: none !important;
-            -moz-appearance: none !important;
-            appearance: none !important;
-            width: 100% !important;
-            height: 52px !important;
-            background: transparent !important;
-            border: none !important;
-            border-radius: 25px !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            overflow: hidden !important;
-            cursor: pointer !important;
-        `;
+        colorInput.style.cssText = "-webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; width: 100% !important; height: 52px !important; background: transparent !important; border: none !important; border-radius: 25px !important; padding: 0 !important; margin: 0 !important; overflow: hidden !important; cursor: pointer !important;";
         
-        // حقن ستايل داخلي لجعل اللون يملأ الحواف بالكامل في سفاري وكروم على الموبايل
-        const colorStyleId = 'color-fix-style';
+        var colorStyleId = 'color-fix-style';
         if (!document.getElementById(colorStyleId)) {
-            const style = document.createElement('style');
+            var style = document.createElement('style');
             style.id = colorStyleId;
-            style.innerHTML = `
-                input[type="color"]::-webkit-color-swatch-wrapper { padding: 0 !important; margin: 0 !important; border-radius: 25px !important; }
-                input[type="color"]::-webkit-color-swatch { border: none !important; border-radius: 25px !important; width: 100% !important; height: 100% !important; }
-                input[type="color"]::-moz-color-swatch { border: none !important; border-radius: 25px !important; }
-            `;
+            style.innerHTML = "input[type='color']::-webkit-color-swatch-wrapper { padding: 0 !important; margin: 0 !important; border-radius: 25px !important; } input[type='color']::-webkit-color-swatch { border: none !important; border-radius: 25px !important; width: 100% !important; height: 100% !important; } input[type='color']::-moz-color-swatch { border: none !important; border-radius: 25px !important; }";
             document.head.appendChild(style);
         }
     }
 
-    // 3. تكبير حقل "أضف مهمة جديدة" ليكون فخماً ومفروداً
-    const textInput = document.querySelector('input[type="text"]') || document.getElementById('taskInput');
+    // 3. تكبير حقل "أضف مهمة جديدة" ليكون مفروداً وفخماً
+    var textInput = document.querySelector('input[type="text"]') || document.getElementById('taskInput');
     if (textInput) {
-        textInput.style.cssText = `
-            width: 100% !important;
-            height: 52px !important;
-            padding: 0 20px !important;
-            font-size: 16px !important;
-            font-weight: 600 !important;
-            border-radius: 25px !important;
-            box-sizing: border-box !important;
-        `;
+        textInput.style.cssText = "width: 100% !important; height: 52px !important; padding: 0 20px !important; font-size: 16px !important; font-weight: 600 !important; border-radius: 25px !important; box-sizing: border-box !important;";
     }
 
     // إخفاء شريط السكرول
     if (!document.getElementById('scroll-hide-style')) {
-        const style = document.createElement('style');
-        style.id = 'scroll-hide-style';
-        style.innerHTML = `#taskList::-webkit-scrollbar { width: 0px !important; background: transparent !important; }`;
-        document.head.appendChild(style);
+        var scrollStyle = document.createElement('style');
+        scrollStyle.id = 'scroll-hide-style';
+        scrollStyle.innerHTML = "#taskList::-webkit-scrollbar { width: 0px !important; background: transparent !important; }";
+        document.head.appendChild(scrollStyle);
     }
     
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
-    tasks.forEach((task, index) => {
-        const li = document.createElement('li');
+    tasks.forEach(function(task, index) {
+        var li = document.createElement('li');
         li.className = 'fixed-task-item'; 
+        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 20px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; flex-shrink: 0 !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
         
-        li.style.cssText = `
-            display: flex !important;
-            flex-direction: row !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            width: 100% !important;
-            box-sizing: border-box !important;
-            height: 52px !important; 
-            min-height: 52px !important; 
-            max-height: 52px !important; 
-            padding: 0 20px !important;
-            background: rgba(255, 255, 255, 0.04) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 12px !important;
-            flex-shrink: 0 !important;
-            scroll-snap-align: start !important;
-            scroll-snap-stop: always !important;
-        `;
+        // بناء المحتوى بأمان بدون تداخل علامات التنصيص
+        var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
+        var icon = task.done ? "✅" : "⭕";
         
-        li.innerHTML = `
-            <div style="display: flex !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important; direction: rtl !important;" onclick="toggleTask(${index})">
-                <span style="flex-shrink: 0 !important; font-size: 16px !important;">${task.done ? '✅' : '⭕'}</span>
-                <span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; text-align: right !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ${task.done ? 'text-decoration: line-through !important; opacity: 0.5 !important;' : ''}">
-                    ${task.text}
-                </span>
-            </div>
-            <button onclick="deleteTask(${index})" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; margin-right: 15px !important; color: #ff4444 !important;">❌</button>
-        `;
+        li.innerHTML = '<div style="display: flex !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important; direction: rtl !important;" onclick="toggleTask(' + index + ')">' +
+            '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
+            '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; text-align: right !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
+            '</div>' +
+            '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; margin-right: 15px !important; color: #ff4444 !important;">❌</button>';
+            
         taskList.appendChild(li);
     });
 }
