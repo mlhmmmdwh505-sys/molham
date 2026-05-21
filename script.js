@@ -92,11 +92,12 @@ window.onload = () => {
     }
 };
 
-// --- 3. دالة تطبيق اللغة ---
+// --- 3. دالة تطبيق اللغة وتحديث النصوص الشاشية ---
 function applyLanguage(lang) {
     currentLang = lang;
     document.documentElement.setAttribute('lang', lang);
     document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+    localStorage.setItem('userLang', lang); // التأكد من حفظ اللغة المحددة
     
     const trans = i18n[lang];
     const savedName = localStorage.getItem('userName') || (lang === 'ar' ? "ملهم" : "Molham");
@@ -139,74 +140,53 @@ if(document.getElementById('langSelect')) {
     });
 }
 
-// --- 4. زر الحفظ الرئيسي ---
-// --- 4. زر الحفظ الرئيسي المطور (بدون رسائل alert منبثقة) ---
-// 🎯 دالة حفظ وتأكيد الإعدادات من ضغطة واحدة فورية
+// --- 4. زر الحفظ الرئيسي المطور والمصلح ---
 document.getElementById('mainSaveBtn').addEventListener('click', function() {
-    // 1. جلب القيمة المكتوبة في حقل الاسم
-    const newName = document.getElementById('userNameInput').value.trim();
-    
-    // 2. إذا كان الحقل ليس فارغاً، يتم الحفظ والتحديث فوراً
-    if (newName !== "") {
-        // حفظ الاسم في الـ LocalStorage ليظل ثابتاً عند إعادة تحميل الصفحة
-        localStorage.setItem('userName', newName);
-        
-        // تحديث النص في واجهة المستخدم فوراً (العنوان والترحيب)
-        // قم بتغيير المعرفات (IDs) أدناه لتطابق المعرفات الموجودة لديك في الهيدر
-        const welcomeNameElement = document.getElementById('welcomeName'); 
-        const headerNameElement = document.getElementById('headerName');
-        
-        if (welcomeNameElement) {
-            welcomeNameElement.textContent = newName;
-        }
-        if (headerNameElement) {
-            headerNameElement.textContent = newName;
-        }
-        
-        // إذا كنت تستخدم دالة رئيسية لإعادة بناء الواجهة مثل (updateUI أو render) استدعيها هنا:
-        if (typeof updateUI === "function") {
-            updateUI();
-        }
+    // 1. تحديث وحفظ اللغة الفورية
+    const langSelect = document.getElementById('langSelect');
+    if (langSelect) {
+        currentLang = langSelect.value;
     }
 
-    // (هنا تترك باقي كود حفظ الدقائق واللون والتاريخ كما هو دون تغيير)
-    
-    // إشعار مرئي سريع للمستخدم بنجاح الحفظ
-});
-    applyLanguage(currentLang);
-    displayDate(); 
-
+    // 2. جلب وحفظ الاسم فوراً
     const userNameInput = document.getElementById('userNameInput');
     const newName = userNameInput.value.trim() || (currentLang === 'ar' ? "ملهم" : "Molham");
     localStorage.setItem('userName', newName);
 
+    // 3. جلب وحفظ الدقائق
     const minsInput = document.getElementById('minsInput');
     const newMins = parseInt(minsInput.value) || 25;
     localStorage.setItem('userMins', newMins); 
 
+    // 4. جلب وحفظ اللون المختار للثيم
     let newColor = document.getElementById('colorPicker').value || "#6366f1";
     document.documentElement.style.setProperty('--primary', newColor);
     localStorage.setItem('themeColor', newColor);
     
+    // 5. جلب وحفظ تاريخ التخرج
     graduationDate = document.getElementById('gradDateInput').value;
     localStorage.setItem('gradDate', graduationDate);
     
+    // 6. إذا كان المؤقت واقفاً، يتم تحديث زمن المؤقت فوراً طبقاً للدقائق الجديدة
     if (!isRunning) {
         timeLeft = newMins * 60;
         updateTimerDisplay();
     }
 
-    // ✨ الحركة السحرية البديلة للـ alert المزعج:
+    // 🚀 السحر الفوري: استدعاء دالة اللغة لتعيد حقن الاسم الجديد في الهيدر والترحيب فوراً من أول ضغطة
+    applyLanguage(currentLang);
+    displayDate(); 
+
+    // ✨ تحويل الزر للشكل الأخضر التأكيدي اللحظي
     const saveBtn = document.getElementById('mainSaveBtn');
-    const originalText = saveBtn.innerText;
+    const originalText = i18n[currentLang].saveBtn;
     
-    // تحويل الزر للشكل الأخضر التأكيدي فوراً
     saveBtn.innerText = currentLang === 'ar' ? "تم الحفظ بنجاح! ✔️" : "Saved Successfully! ✔️";
-    saveBtn.style.backgroundColor = "var(--success)" + " !important";
-    saveBtn.style.borderColor = "var(--success)" + " !important";
+    saveBtn.style.setProperty('background-color', 'var(--success)', 'important');
+    saveBtn.style.setProperty('border-color', 'var(--success)', 'important');
     saveBtn.style.pointerEvents = "none"; // منع الضغط المتكرر أثناء التأكيد
 
-    // إعادة الزر لوضعه الطبيعي بعد ثانيتين بالظبط تلقائياً
+    // إعادة الزر لوضعه الطبيعي بعد ثانيتين
     setTimeout(() => {
         saveBtn.innerText = originalText;
         saveBtn.style.backgroundColor = "";
@@ -214,6 +194,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
         saveBtn.style.pointerEvents = "auto";
     }, 2000);
 });
+
 // --- 5. نظام المؤقت ---
 function playAlarm() {
     try {
