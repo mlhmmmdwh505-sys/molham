@@ -362,8 +362,8 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     width: 100% !important;
     
     /* 📐 الارتفاع المضمون والمريح لاستيعاب مهمتين بالملي بدون أي خنق */
-    height: 120px !important;
-    max-height: 120px !important;
+    height: 124px !important;
+    max-height: 124px !important;
     
     overflow-y: auto !important; /* تفعيل السكرول داخلياً للمهمة الثالثة */
     overflow-x: hidden !important; 
@@ -419,6 +419,21 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     line-height: 52px !important; /* مطابقة الـ line-height مع ارتفاع الحبة للسنترة الكاملة */
+}
+#taskInput { 
+    flex: 1 !important; /* يخليه يفرش وياخد كل المساحة المتاحة بجانب الزر */
+    height: 46px !important; 
+    max-height: 46px !important; 
+    padding: 0 20px !important; 
+    font-size: 15px !important; 
+    border-radius: 50px !important; 
+    box-sizing: border-box !important;
+    background: rgba(255, 255, 255, 0.03) !important;
+    
+    /* 🎨 تفعيل البوردر الملون ديناميكياً */
+    border: 1.5px solid var(--main-color, #ff2a2a) !important; /* يقرأ اللون المختار تلقائياً، والـ #ff2a2a هو اللون الاحتياطي */
+    color: #fff !important;
+    transition: border-color 0.3s ease !important; /* نعومة أثناء تغيير اللون */
 }
 
 /* ==========================================================================
