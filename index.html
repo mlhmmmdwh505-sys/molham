@@ -99,5 +99,47 @@
     
     <audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
   <script src="script.js?v=10"></script>
+    <script>
+document.addEventListener("DOMContentLoaded", function() {
+    // 1. تحديد العناصر من الصفحة
+    var langSelect = document.getElementById('languageSelect');
+    var saveBtn = document.getElementById('saveSettingsBtn') || document.querySelector('.settings-box button') || document.querySelector('button[onclick*="save"]');
+
+    if (langSelect) {
+        // فك أي ارتباط أو حدث قديم بيغير اللغة تلقائياً بمجرد الاختيار
+        var clonedSelect = langSelect.cloneNode(true);
+        langSelect.parentNode.replaceChild(clonedSelect, langSelect);
+        langSelect = clonedSelect; 
+
+        // إنشاء متغير مؤقت لحفظ لغة الاختيار في ذاكرة المتصفح المؤقتة فقط
+        var tempLang = localStorage.getItem('selectedLanguage') || 'ar';
+        langSelect.value = tempLang;
+
+        // عند تغيير الاختيار، نحفظه في المتغير المؤقت بدون أي تأثير على الكروت أو الصفحة
+        langSelect.addEventListener('change', function(e) {
+            tempLang = e.target.value;
+        });
+
+        // 2. ربط زر التأكيد بشكل قاطع
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function(e) {
+                // منع أي دالة قديمة مسببة للمشاكل من العمل
+                e.preventDefault();
+                e.stopPropagation();
+
+                // الحفظ الرسمي للغة الجديدة الآن فقط عند الضغط
+                localStorage.setItem('selectedLanguage', tempLang);
+                
+                // تطبيق الاتجاه
+                document.documentElement.lang = tempLang;
+                document.documentElement.dir = tempLang === 'ar' ? 'rtl' : 'ltr';
+
+                // إعادة تحميل الصفحة نظيفة تماماً بالتعديل الجديد
+                location.reload();
+            });
+        }
+    }
+});
+</script>
 </body>
 </html>
