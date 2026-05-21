@@ -204,23 +204,33 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
 
 function playAlarm() {
     try {
-        const alarmAudio = document.getElementById('alarmSound');
+        // 🐧 إنشاء نظام صوتي نقي ومباشر من نواة المتصفح
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContext) return;
         
-        if (alarmAudio) {
-            alarmAudio.volume = 1.0; // أعلى درجة صوت
-            alarmAudio.currentTime = 0; // يبدأ من أول ثانية
-            alarmAudio.play();
-            
-            // ⏱️ كتم وإيقاف الصوت تماماً بعد 0.3 ثانية (300 مللي ثانية)
-            setTimeout(() => {
-                alarmAudio.pause();
-                alarmAudio.currentTime = 0; // تصفير العداد للمرة الجاية
-            }, 300); 
-        }
-    } catch (e) { 
-        console.log("خطأ في نظام الصوت:", e); 
+        const context = new AudioContext();
+        const oscillator = context.createOscillator();
+        const gainNode = context.createGain();
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(context.destination);
+        
+        // نوع الموجة وترددها (زنة إلكترونية خاطفة وقوية)
+        oscillator.type = 'sine'; 
+        oscillator.frequency.setValueAtTime(880, context.currentTime); // تردد 880 هرتز
+        
+        // قوة الصوت (أعلى درجة)
+        gainNode.gain.setValueAtTime(1.0, context.currentTime);
+        
+        // ⏱️ التشغيل والإيقاف الإجباري بعد 0.3 ثانية بالظبط (بدون أي رسائل)
+        oscillator.start();
+        oscillator.stop(context.currentTime + 0.3); 
+        
+    } catch (e) {
+        console.log("حماية المتصفح منعت الصوت تلقائياً.");
     }
 }
+
 
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
