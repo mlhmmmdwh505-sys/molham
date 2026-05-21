@@ -999,8 +999,8 @@ input[type="color"]::-moz-color-swatch {
     box-sizing: border-box !important;
     
     /* الارتفاع المحبوك بالملي لمهمتين فقط (52 + 10 + 52 = 114) */
-    height: 114px !important;     
-    max-height: 114px !important; 
+    height: 124px !important;     
+    max-height: 124px !important; 
     
     overflow-y: scroll !important;
     scroll-snap-type: y mandatory !important;
