@@ -38,7 +38,7 @@ const i18n = {
         resetBtn: "اعادة ضبط", taskPlaceholder: "أضف مهمة جديدة...",
         alertSave: "تم حفظ وتأكيد الإعدادات والاسم بنجاح! 🩺",
         alertBreak: "تم شراء استراحة بنجاح! ☕", alertNoPoints: "عذراً، النقاط غير كافية! 💪", alertResetPoints: "تصفير النقاط؟"
-    ],
+    ,
     en: {
         welcome: "Welcome,", mainTitle: "Dashboard of ",
         langLabel: "Lang", nameLabel: "Name", colorLabel: "Color", dateLabel: "Date", minsLabel: "Mins",
