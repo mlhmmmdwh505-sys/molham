@@ -985,35 +985,35 @@ input[type="color"]::-moz-color-swatch {
     scroll-snap-stop: always !important;
 }
 /* ==========================================================================
-   ⛔ القفل الفولاذي الموحد: منع انكماش المهام وعرض 2 فقط (د. ملهم)
+   🎯 القفل الجراحي النهائي: إظهار مهمتين كاملتين بالملي (د. ملهم)
    ========================================================================== */
 
-/* 1. تحديد حاوية القائمة ومسح أي مسافات زائدة */
 #taskList, .tasks-container, ul {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
-    gap: 10px !important; /* مسافة واضحة بين المهمتين */
+    gap: 10px !important; /* فجوة ثابتة ومنظمة بين المهمتين */
     padding: 0 !important;
     margin: 15px 0 0 0 !important;
+    text-align: right !important;
     box-sizing: border-box !important;
     
-    /* الارتفاع المحبوك بالملي لمهمتين فقط (52 + 10 + 52 = 114) */
-    height: 124px !important;     
-    max-height: 124px !important; 
+    /* 👑 الوزنة الذهبية: (52px مهمة 1) + (10px فجوة) + (52px مهمة 2) = 114px تماماً */
+    height: 114px !important;     
+    max-height: 114px !important; 
     
     overflow-y: scroll !important;
     scroll-snap-type: y mandatory !important;
     scroll-behavior: smooth !important;
 }
 
-/* 2. السحر الحقيقي: حماية المهمة من الانكماش وإجبارها على حجم فخم */
+/* ضبط العناصر الفردية لضمان الثبات الكامل ومنع أي قص */
 .fixed-task-item, #taskList li, li {
-    /* flex: 0 0 52px يعني ممنوع تنكمش وممنوع تتمدد، حجمك ثابت 52 بكسل غصب عن المتصفح */
-    flex: 0 0 52px !important; 
+    flex: 0 0 52px !important; /* منع الانكماش تماماً */
     height: 52px !important;
     min-height: 52px !important;
     max-height: 52px !important;
+    margin-bottom: 0 !important; /* تصفير المارجن القديم لمنع خنق المهمة الثانية */
     box-sizing: border-box !important;
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important;
