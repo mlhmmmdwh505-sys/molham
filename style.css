@@ -223,21 +223,22 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 }
 
 /* ==========================================================================
-   ⏱️ 7. منظومة بومودورو والعداد وتثبيت الأرقام
+   ⏱️ 7. منظومة بومودورو والعداد وتثبيت الأرقام (الخط القديم المريح)
    ========================================================================== */
 #pomoDisplay { font-size: 70px; font-weight: 800; color: var(--primary); margin-bottom: 15px; text-shadow: 0 0 25px rgba(99, 102, 241, 0.3); }
 .pomo-actions { display: flex; justify-content: center; gap: 15px; width: 100%; }
 .modern-timer { display: flex; justify-content: space-around; align-items: center; width: 100%; margin-top: 15px; }
-.unit text-align: center;
+.unit { text-align: center; }
 .unit span { font-size: 42px; font-weight: 800; color: var(--primary); display: block; }
 .unit label { font-size: 13px; color: var(--text-darker); font-weight: bold; margin-top: 4px; display: block; }
 
+/* 🔒 العودة للخط القديم وتثبيت الأرقام منعاً للرعشة */
 #years, #days, #hours, #pomoDisplay, .unit span {
-    font-family: 'Orbitron', sans-serif !important;
+    font-family: 'Cairo', sans-serif !important; /* رجعنا لخط كايرو القديم الفخم */
     direction: ltr !important;
     unicode-bidi: bidi-override !important;
     display: inline-block;
-    font-variant-numeric: tabular-nums;
+    font-variant-numeric: tabular-nums; /* ميزة تمنع رعشة وحركة الأرقام أثناء العد */
     text-align: center;
 }
 #pomoDisplay { min-width: 180px; }
