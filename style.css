@@ -1002,3 +1002,45 @@ input[type="color"]::-moz-color-swatch {
     scroll-snap-align: start !important;
     scroll-snap-stop: always !important;
 }
+
+/* =================================================== */
+/* كود تعديل لوحة الإعدادات للترتيب الأفقي الأصلي */
+/* =================================================== */
+
+/* الحاوية الكبرى للإعدادات: تحويلها لترتيب أفقي */
+.settings-panel {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important; /* للسماح بالالتفاف التلقائي على الشاشات الصغيرة */
+    gap: 15px !important;
+    align-items: flex-end !important;
+    justify-content: space-between !important;
+}
+
+/* المجموعات الداخلية (العنوان + المدخل الخاص به) أفقياً */
+.setting-group {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    flex: 1 1 calc(18% - 15px) !important; 
+    min-width: 140px !important;
+}
+
+/* ضبط مقاسات حقول الإدخال والقوائم */
+.settings-panel input, 
+.settings-panel select {
+    width: 100% !important;
+    height: 42px !important;
+    box-sizing: border-box !important;
+}
+
+/* إجبار زر تأكيد الإعدادات على النزول في سطر جديد بمفرده وتوسطه */
+button#mainSaveBtn {
+    display: block !important;
+    width: auto !important;
+    min-width: 160px !important;
+    height: 42px !important;
+    flex-basis: 100% !important; /* يأخذ السطر بالكامل ليجبر نفسه على النزول */
+    margin: 15px auto 0 auto !important; /* التوسط في المنتصف */
+    text-align: center !important;
+}
