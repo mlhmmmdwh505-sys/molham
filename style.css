@@ -383,6 +383,16 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     scroll-snap-type: y mandatory !important; /* تفعيل المغناطيس الإجباري */
     scroll-behavior: smooth !important;         
 }
+.btn-add { 
+    width: 52px !important; 
+    height: 46px !important; 
+    font-size: 20px !important; 
+    border-radius: 50px !important; 
+    flex-shrink: 0 !important; /* يمنع الزرار تماماً من الانضغاط أو التشوّه */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
 
 /* 📐 ضبط أبعاد المهمة الداخلية لتظهر كاملة وبدون أي قص */
 #taskList li {
@@ -416,6 +426,29 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 #taskList {
     -ms-overflow-style: none !important;  /* المتصفحات القديمة */
     scrollbar-width: none !important;  /* متصفح فايرفوكس */
+}
+.input-section {
+    display: flex !important;
+    flex-direction: row !important; /* إجبار العناصر على الاصطفاف جنباً إلى جنب */
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 10px !important; /* مسافة أمان أنيقة بين الحقل والزر */
+    height: 48px !important;
+    max-height: 48px !important;
+    flex-shrink: 0 !important;
+    margin-bottom: 5px !important;
+}
+
+/* ضبط حقل إدخال النص */
+#taskInput { 
+    flex: 1 !important; /* يخليه يفرش وياخد كل المساحة المتبقية */
+    height: 46px !important; 
+    max-height: 46px !important; 
+    padding: 0 20px !important; 
+    font-size: 15px !important; 
+    border-radius: 50px !important; 
+    box-sizing: border-box !important;
 }
 
 /* ==========================================================================
