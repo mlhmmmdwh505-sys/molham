@@ -362,8 +362,8 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     width: 100% !important;
     
     /* 📐 الارتفاع المضمون والمريح لاستيعاب مهمتين بالملي بدون أي خنق */
-    height: 124.88px !important;
-    max-height: 124.88px !important;
+    height: 124.75px !important;
+    max-height: 124.75px !important;
     
     overflow-y: auto !important; /* تفعيل السكرول داخلياً للمهمة الثالثة */
     overflow-x: hidden !important; 
