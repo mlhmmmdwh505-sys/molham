@@ -245,16 +245,16 @@ function playAlarm() {
         console.log("Audio bypass error:", e);
     }
 }
+
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     const trans = i18n[currentLang];
     
     if (!isRunning) {
-        // 👇 التعديل الجوهري هنا: استبدل parseInt بـ parseFloat في السطر ده
         let mins = parseFloat(document.getElementById('minsInput').value) || 25;
 
         if (timeLeft <= 0) {
-            timeLeft = Math.floor(mins * 60); // تحويل الدقائق لثوانٍ بدقة (0.1 دقيقة = 6 ثوانٍ)
+            timeLeft = Math.floor(mins * 60);
             updateTimerDisplay();
         }
 
@@ -277,12 +277,11 @@ function toggleTimer() {
                     addPoints(); 
                 }
                 
-                playAlarm(); // جرس التين تون شغال هنا غصب عن المتصفح 🔔
+                playAlarm(); 
                 changeQuote();
 
                 isBreak = false; 
 
-                // 👇 والتعديل الثاني هنا: استبدل parseInt بـ parseFloat عشان لما يخلص ميرجعش لـ 25
                 const resetMins = parseFloat(document.getElementById('minsInput').value) || 25;
                 timeLeft = Math.floor(resetMins * 60);
                 updateTimerDisplay();
