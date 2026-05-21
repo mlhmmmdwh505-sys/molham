@@ -251,8 +251,8 @@ function toggleTimer() {
     
     if (!isRunning) {
         if (timeLeft <= 0) {
-            const mins = parseInt(document.getElementById('minsInput').value) || 25;
-            timeLeft = mins * 60;
+          const resetMins = parseFloat(document.getElementById('minsInput').value) || 1;
+timeLeft = Math.floor(resetMins * 60);
             updateTimerDisplay();
         }
 
