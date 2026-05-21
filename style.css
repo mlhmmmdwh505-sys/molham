@@ -233,25 +233,61 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 }
 
 /* ==========================================================================
-   ⏱️ 7. منظومة بومودورو والعداد وتثبيت الأرقام بالخط القديم
+   ⏱️ 7. منظومة بومودورو والعداد وتثبيت الأرقام (نسخة التكبير العملاقة)
    ========================================================================== */
-#pomoDisplay { font-size: 70px; font-weight: 800; color: var(--primary); margin-bottom: 15px; text-shadow: 0 0 25px rgba(99, 102, 241, 0.3); }
-.pomo-actions { display: flex; justify-content: center; gap: 15px; width: 100%; }
+.focus-card {
+    padding: 35px 25px !important; /* زيادة حجم الكارد نفسه */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 20px !important;
+}
+
+/* 💥 تكبير أرقام مؤقت البومودورو بشكل عملاق */
+#pomoDisplay { 
+    font-size: 110px !important; /* رفعناها من 70 لـ 110 عشان تملأ الكارد */
+    font-weight: 800 !important; 
+    color: var(--primary) !important; 
+    margin-bottom: 5px !important; 
+    text-shadow: 0 0 35px rgba(99, 102, 241, 0.4); 
+    line-height: 1 !important;
+}
+
+/* ↔️ فرد وتكبير منطقة الأزرار لتصبح بكامل العرض */
+.pomo-actions { 
+    display: flex !important; 
+    justify-content: center !important; 
+    gap: 20px !important; 
+    width: 100% !important; 
+    max-width: 450px !important; /* زيادة المدى العرضي للأزرار */
+}
+
+/* 🕹️ تكبير أزرار (ابدأ المهمة) و (إعادة ضبط) وتضخيم الخط بداخلها */
+.pomo-actions button, 
+#startBtn, 
+#resetBtn {
+    flex: 1 !important; /* جعل الزرين متساويين ويفرشوا بالتوازي */
+    height: 56px !important; /* زيادة الارتفاع لسهولة الضغط */
+    font-size: 18px !important; /* تكبير كملة ابدأ المهمة واعادة ضبط */
+    font-weight: 800 !important; /* خط عريض جداً واضح */
+    border-radius: 50px !important;
+    transition: all 0.3s ease !important;
+}
+
 .modern-timer { display: flex; justify-content: space-around; align-items: center; width: 100%; margin-top: 15px; }
 .unit { text-align: center; }
 .unit span { font-size: 42px; font-weight: 800; color: var(--primary); display: block; }
 .unit label { font-size: 13px; color: var(--text-darker); font-weight: bold; margin-top: 4px; display: block; }
 
-#years, #days, #hours, #pomoDisplay, .unit span {
-    font-family: 'Cairo', sans-serif !important; /* العودة الكاملة للخط القديم المريح */
+#years, #days, #hours, .unit span {
+    font-family: 'Cairo', sans-serif !important; 
     direction: ltr !important;
     unicode-bidi: bidi-override !important;
     display: inline-block;
     font-variant-numeric: tabular-nums;
     text-align: center;
 }
-#pomoDisplay { min-width: 180px; }
-
 /* ==========================================================================
    🛍️ 9. متجر التميز الجمالي (تعديل الفرد الإجباري وملء مساحة الكارد)
    ========================================================================== */
