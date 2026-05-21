@@ -6,6 +6,9 @@ let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem(
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 let currentLang = localStorage.getItem('userLang') || "ar"; 
 
+// متغير مؤقت لمنع التغيير التلقائي للغة إلا بعد الضغط على زر التأكيد
+let selectedLanguageTemp = localStorage.getItem('userLang') || "ar";
+
 const quotes = {
     ar: [
         "الطب رسالة، وأنت قدها! 🩺",
@@ -59,10 +62,10 @@ const i18n = {
 window.onload = () => {
     updatePointsDisplay();
     startGraduationCountdown();
-    renderTasks();
     
     // جلب وتطبيق اللغة المحفوظة أولاً
     currentLang = localStorage.getItem('userLang') || "ar";
+    selectedLanguageTemp = currentLang; // مزامنة المتغير المؤقت
     document.getElementById('langSelect').value = currentLang;
     applyLanguage(currentLang);
     displayDate();
@@ -99,10 +102,9 @@ window.onload = () => {
     });
 };
 
-// --- 3. دالة تطبيق وترجمة اللغة ---
+// --- 3. دالة تطبيق وترجمة اللغة (معدلة لمنع التغيير الفوري التلقائي) ---
 function applyLanguage(lang) {
     currentLang = lang;
-    localStorage.setItem('userLang', lang);
     
     document.documentElement.setAttribute('lang', lang);
     document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
@@ -139,26 +141,32 @@ function applyLanguage(lang) {
     }
     
     changeQuote();
+    renderTasks(); // تحديث اتجاهات ومحاذاة التودو ليست فوراً عند تغيير اللغة
 }
 
-// --- 4. زر الحفظ الرئيسي والتأكيد ---
+// تعديل حدث القائمة المنسدلة ليحفظ الاختيار مؤقتاً فقط بدون أي تطبيق فوري على الصفحة
+document.getElementById('langSelect').addEventListener('change', function(e) {
+    selectedLanguageTemp = e.target.value;
+});
+
+// --- 4. زر الحفظ الرئيسي والتأكيد (معدل لاعتماد وحفظ اللغة هنا فقط) ---
 document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
     e.preventDefault(); 
     
-    const selectedLang = document.getElementById('langSelect').value;
-    currentLang = selectedLang;
-    localStorage.setItem('userLang', selectedLang);
-    applyLanguage(selectedLang);
+    // اعتماد اللغة المختارة رسمياً وحفظها عند الضغط على الزر فقط!
+    currentLang = selectedLanguageTemp;
+    localStorage.setItem('userLang', currentLang);
+    applyLanguage(currentLang);
     displayDate(); 
 
     const userNameInput = document.getElementById('userNameInput');
-    const newName = userNameInput.value.trim() || (selectedLang === 'ar' ? "ملهم" : "Molham");
+    const newName = userNameInput.value.trim() || (currentLang === 'ar' ? "ملهم" : "Molham");
     localStorage.setItem('userName', newName);
     
-    const trans = i18n[selectedLang];
+    const trans = i18n[currentLang];
     document.getElementById('welcomeWord').innerText = trans.welcome;
-    document.getElementById('userNameDisplay').innerText = selectedLang === 'ar' ? `دكتور ${newName}` : `Dr. ${newName}`;
-    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${selectedLang === 'ar' ? 'دكتور' : 'Dr.'} ${newName}</span> 🩺`;
+    document.getElementById('userNameDisplay').innerText = currentLang === 'ar' ? `دكتور ${newName}` : `Dr. ${newName}`;
+    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${currentLang === 'ar' ? 'دكتور' : 'Dr.'} ${newName}</span> 🩺`;
 
     const minsInput = document.getElementById('minsInput');
     const newMins = parseInt(minsInput.value) || 25;
@@ -176,6 +184,8 @@ document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
         timeLeft = newMins * 60;
         updateTimerDisplay();
     }
+    
+    alert(trans.alertSave);
 });
 
 // --- 5. نظام المنبه والمؤقت الذكي ---
@@ -305,7 +315,7 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
-// --- 8. نظام إدارة المهام (To-Do List) - 🎯 النسخة المحدثة لحل مشكلة اللاب توب بالكامل ---
+// --- 8. نظام إدارة المهام (To-Do List) - 🎯 النسخة المستقرة والهندسية بالكامل ---
 function addTask() {
     const input = document.getElementById('taskInput');
     const text = input.value.trim();
@@ -335,13 +345,11 @@ function renderTasks() {
     var taskList = document.getElementById('taskList');
     if (!taskList) return;
     
-    // 1. تصفير محتوى القائمة
     taskList.innerHTML = '';
     
-    // 2. القفل الحديدي للحاوية بارتفاع مهمتين كاملتين (114px)
+    // القفل الحديدي للحاوية بارتفاع مهمتين كاملتين (114px)
     taskList.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important; padding: 0 !important; margin: 15px 0 0 0 !important; box-sizing: border-box !important; height: 114px !important; max-height: 114px !important; overflow-y: scroll !important; scroll-snap-type: y mandatory !important; scroll-behavior: smooth !important;";
 
-    // 3. تأمين إخفاء السكرول بار المزعج
     if (!document.getElementById('scroll-hide-style')) {
         var scrollStyle = document.createElement('style');
         scrollStyle.id = 'scroll-hide-style';
@@ -351,33 +359,25 @@ function renderTasks() {
     
     var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
-    // معرفة لغة الموقع الحالية
-    var currentLang = document.documentElement.lang || 'ar';
-    var isAr = currentLang === 'ar';
-    
-    // 4. بناء المهام بربط برمجي مباشر ومقاوم لتقلبات اللغة
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
-        // اتجاه العنصر بالكامل يتبع اتجاه لغة الصفحة طبيعياً
-        var mainDirection = isAr ? "direction: rtl !important;" : "direction: ltr !important;";
-        var textAlignment = isAr ? "text-align: right !important;" : "text-align: left !important;";
-        
-        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; " + mainDirection + " scroll-snap-align: start !important; scroll-snap-stop: always !important;";
+        // التثبيت الهندسي المستقر: الهيكل دايماً صف (row) طبيعي مستقيم، والـ CSS الذكي (Logical Properties) يتولى الأطراف تلقائياً
+        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
         
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
-        // بناء الهيكل الداخلي: الحاوية الكبرى قابلة للضغط بالكامل لتفعيل الصح (toggleTask)
+        // الهيكل محمي تماماً ومربوط بالكامل بدالة الـ toggleTask لتغيير علامة الصح بنجاح عند الضغط
         li.innerHTML = 
-            /* حاوية الدائرة + النص (تتمدد لتملأ المساحة وتدعم الضغط بسلاسة) */
-            '<div onclick="toggleTask(' + index + ')" style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
+            /* حاوية الدائرة والنص (ملتصقين تماماً بمسافة موزونة) */
+            '<div onclick="toggleTask(' + index + ')" style="display: flex !important; flex-direction: row !important; align-items: center !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
                 '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
-                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + textAlignment + ' ' + strikeStyle + '">' + task.text + '</span>' +
+                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; margin-inline-start: 12px !important; text-align: start !important; ' + strikeStyle + '">' + task.text + '</span>' +
             '</div>' +
-            /* زر الحذف منفصل تماماً ومحمي في الطرف الآخر */
-            '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important; margin-right: ' + (isAr ? '15px' : '0') + ' !important; margin-left: ' + (!isAr ? '15px' : '0') + ' !important;">❌</button>';
+            /* زر الحذف ينفرد تماماً وبأمان في أقصى الطرف الآخر بفضل الـ justify-content */
+            '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important; margin-inline-start: 15px !important;">❌</button>';
             
         taskList.appendChild(li);
     });
