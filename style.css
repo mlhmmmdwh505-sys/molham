@@ -983,8 +983,8 @@ input[type="color"]::-moz-color-swatch {
     text-align: right !important;
     box-sizing: border-box !important;
     
-    height: 124px !important;     /* ارتفاع يتسع لـ 4 مهام كاملين على اللابتوب */
-    max-height: 124px !important;
+    height: 62px !important;     /* ارتفاع يتسع لـ 4 مهام كاملين على اللابتوب */
+    max-height: 62px !important;
     overflow-y: scroll !important;
     scroll-snap-type: y mandatory !important;
     scroll-behavior: smooth !important;
