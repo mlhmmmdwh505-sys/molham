@@ -204,44 +204,40 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
 
 function playAlarm() {
     try {
-        // 1. تشغيل مسار الخلفية الصامت لإجبار المتصفح يفضل صاحي وأنت بتلعب
         const bgTrack = document.getElementById('bgTrack');
         if (bgTrack) {
             bgTrack.src = "data:video/mp4;base64,AAAAHGZ0eXBtcDQyAAAAAG1wZD1tcDQyAG1vb3YAAABsbXZoZAAAAADXg4bS14OG0gAABeXgAAA+gAABAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
             bgTrack.play().catch(() => {});
         }
 
-        // 2. 🎵 توليد نغمة "تين تون" الموسيقية الهادية ذاتياً
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return;
         
         const context = new AudioContext();
         const now = context.currentTime;
         
-        // --- النغمة الأولى (تـيـن) ---
+        // نغمة تين
         const osc1 = context.createOscillator();
         const gain1 = context.createGain();
-        osc1.type = 'sine'; // موجة ناعمة جداً
-        osc1.frequency.setValueAtTime(523.25, now); // نغمة C5 الموسيقية الناعمة
-        gain1.gain.setValueAtTime(0.3, now); // مستوى صوت هادئ ومريح
-        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15); // خفتان تدريجي سريع
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(523.25, now); 
+        gain1.gain.setValueAtTime(0.3, now); 
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15); 
         osc1.connect(gain1);
         gain1.connect(context.destination);
         
-        // --- النغمة الثانية (تـون) ---
+        // نغمة تون
         const osc2 = context.createOscillator();
         const gain2 = context.createGain();
         osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(392.00, now + 0.15); // نغمة G4 متناسقة تبدأ بعد الأولى
+        osc2.frequency.setValueAtTime(392.00, now + 0.15); 
         gain2.gain.setValueAtTime(0.3, now + 0.15);
-        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3); // تنتهي بالظبط عند 0.3 ثانية
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3); 
         osc2.connect(gain2);
         gain2.connect(context.destination);
         
-        // تشغيل النغمتين ووقفهم في الإجمالي عند 0.3 ثانية
         osc1.start(now);
         osc1.stop(now + 0.15);
-        
         osc2.start(now + 0.15);
         osc2.stop(now + 0.3);
         
@@ -249,7 +245,6 @@ function playAlarm() {
         console.log("Audio bypass error:", e);
     }
 }
-
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     const trans = i18n[currentLang];
@@ -408,23 +403,6 @@ function startGraduationCountdown() {
 }
 
 // --- 8. إدارة المهام ---
-function addPoints() {
-    const minsInput = parseInt(document.getElementById('minsInput').value) || 25;
-    const totalSecondsSeconds = minsInput * 60;
-    
-    // حساب الثواني الحقيقية التي مرت بدقة
-    const secondsWorked = totalSecondsSeconds - timeLeft;
-    
-    // شرط الأمان: أن يكون اشتغل فعلياً أكتر من 20 ثانية ولم يكن العداد مشحوناً بالكامل
-    if (secondsWorked >= 20 && timeLeft < totalSecondsSeconds) {
-        const newPoints = Math.floor(secondsWorked / 20); 
-        points += newPoints;
-        savePoints();
-        
-        // تصفير مؤقت داخلي منعاً للتكرار الثغري
-        timeLeft = totalSecondsSeconds; 
-    }
-}
 
 window.toggleTask = function(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
