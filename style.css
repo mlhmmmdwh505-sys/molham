@@ -354,32 +354,43 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 /* ==========================================================================
    📝 قسم إدارة المهام الرئيسي - الشاشات الكبيرة (الكمبيوتر)
    ========================================================================== */
+/* ==========================================================================
+   📝 المنظومة المغناطيسية والعريضة للمهام - الكمبيوتر (Full Width Column)
+   ========================================================================== */
 #taskList {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr) !important; /* تقسيم السطر لعمودين بالتساوي */
-    gap: 12px !important; /* مسافة مريحة وموزونة بين المهمتين */
-    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important; /* ترتيب عمودي صارم تحت بعض زي المغناطيس */
+    width: 100% !important; /* تأخذ العرض الكامل للكارد الزجاجي المتاح */
     height: auto !important;
-    max-height: none !important; 
+    max-height: none !important;
     overflow: visible !important;
-    margin-top: 15px !important;
+    gap: 10px !important; /* مسافة مغناطيسية ثابتة وموحدة بين كل مهمة واللي تحتها */
+    margin-top: 20px !important;
     padding: 0 !important;
     list-style: none !important;
 }
 
 #taskList li {
-    width: 100% !important; /* لتأخذ المهمة حجم العمود المخصص لها بالظبط */
-    min-height: 50px !important; 
+    width: 100% !important; /* المهمة تفرد وتفرش بعرض الكارد بالكامل */
+    min-height: 52px !important;
     height: auto !important;
     box-sizing: border-box !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
     border-radius: 12px !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    padding: 10px 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    padding: 12px 20px !important; /* مسافة داخلية فخمة ومريحة للنصوص */
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: row !important; /* الأيقونة والنص في جهة، والـ X في الجهة المقابلة */
     justify-content: space-between !important;
     align-items: center !important;
+    transition: all 0.2s ease !important;
+}
+
+/* ضبط انسيابية النص داخل المهمة العريضة */
+#taskList li span {
+    white-space: normal !important;
+    word-break: break-word !important;
+    line-height: 1.4 !important;
 }
 .btn-add { 
     width: 52px !important; 
