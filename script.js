@@ -335,7 +335,7 @@ function renderTasks() {
     var taskList = document.getElementById('taskList');
     if (!taskList) return;
     
-    // 1. تصفير المحتوى بالكامل
+    // 1. تصفير محتوى القائمة
     taskList.innerHTML = '';
     
     // 2. القفل الحديدي للحاوية بارتفاع مهمتين كاملتين (114px)
@@ -351,32 +351,33 @@ function renderTasks() {
     
     var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
-    // معرفة لغة الموقع الحالية (عربي أو إنجليزي)
+    // معرفة لغة الموقع الحالية
     var currentLang = document.documentElement.lang || 'ar';
     var isAr = currentLang === 'ar';
     
-    // 4. بناء المهام بتوزيع هندسي ثابت ومضمون
+    // 4. بناء المهام بربط برمجي مباشر ومقاوم لتقلبات اللغة
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
-        // تثبيت البنية: الاتجاه دايماً طبيعي ومستقيم في اللغتين لمنع اللخبطة
+        // اتجاه العنصر بالكامل يتبع اتجاه لغة الصفحة طبيعياً
         var mainDirection = isAr ? "direction: rtl !important;" : "direction: ltr !important;";
+        var textAlignment = isAr ? "text-align: right !important;" : "text-align: left !important;";
         
         li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; " + mainDirection + " scroll-snap-align: start !important; scroll-snap-stop: always !important;";
         
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
-        // الترتيب ثابت هندسياً في الـ HTML للغتين: (الدائرة + النص) متلازمين في حاوية، وزر الـ ❌ في طرف لوحده تماماً
+        // بناء الهيكل الداخلي: الحاوية الكبرى قابلة للضغط بالكامل لتفعيل الصح (toggleTask)
         li.innerHTML = 
-            /* حاوية الدائرة والنص ملتصقين تماماً */
-            '<div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
+            /* حاوية الدائرة + النص (تتمدد لتملأ المساحة وتدعم الضغط بسلاسة) */
+            '<div onclick="toggleTask(' + index + ')" style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
                 '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
-                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
+                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + textAlignment + ' ' + strikeStyle + '">' + task.text + '</span>' +
             '</div>' +
-            /* زر الحذف يندفع تلقائياً وبأمان لأقصى الطرف الآخر بفضل الـ justify-content */
-            '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important;">❌</button>';
+            /* زر الحذف منفصل تماماً ومحمي في الطرف الآخر */
+            '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important; margin-right: ' + (isAr ? '15px' : '0') + ' !important; margin-left: ' + (!isAr ? '15px' : '0') + ' !important;">❌</button>';
             
         taskList.appendChild(li);
     });
