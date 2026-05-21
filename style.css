@@ -165,6 +165,16 @@ button:hover { background: var(--primary) !important; box-shadow: 0 0 15px var(-
     padding: 0 !important;
 }
 
+/* 🚫 إخفاء الأسهم الافتراضية تماماً من حقل أرقام الدقائق */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield !important; /* لمتصفح فايرفوكس */
+}
 /* ==========================================================================
    🎨 5. هندسة كبسولة اللون الاحترافية
    ========================================================================== */
