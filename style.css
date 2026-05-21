@@ -431,10 +431,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 /* 📐 ضبط أبعاد المهمة الداخلية لتظهر كاملة وبدون أي قص */
 
 
-/* إخفاء شريط التمرير (Scrollbar) تماماً لمظهر زجاجي ناعم ونظيف */
-#taskList::-webkit-scrollbar {
-    display: none !important;
-}
+
 #taskList {
     -ms-overflow-style: none !important;  /* المتصفحات القديمة */
     scrollbar-width: none !important;  /* متصفح فايرفوكس */
