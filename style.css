@@ -56,33 +56,45 @@ body {
 /* ==========================================================================
    🖼️ 2. الهيكل الزجاجي الرئيسي (المقاس الذهبي المحكم للاب توب)
    ========================================================================== */
+/* ==========================================================================
+   🖼️ 2. الهيكل الزجاجي الرئيسي (الإصدار الذهبي الموزون لارتفاع اللاب توب)
+   ========================================================================== */
 .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border-radius: 30px;
+    border-radius: 24px;
     
-    /* 🎯 الأبعاد المثالية: ملء الفراغ الجانبي بنسبة متناسقة والتحكم بالحد الأقصى */
-    width: 92vw !important; /* فرد اللوحة لملء الشاشة بنسبة مريحة جداً */
-    max-width: 1200px !important; /* قفل العرض الأقصى عشان العناصر ما تتباعدش بزيادة */
+    /* 🚀 قفل الأبعاد عرضاً وارتفاعاً لتلتصق داخل حدود الشاشة تماماً */
+    width: 94vw !important;
+    max-width: 1200px !important;
+    height: 92vh !important; /* إجبار اللوحة على عدم تخطي ارتفاع الشاشة */
+    max-height: 850px !important;
     
-    /* ضبط الهوامش الرأسية والارتفاع لمنع الـ Scroll العشوائي */
-    margin: 3vh auto !important;
-    padding: 25px 30px !important; /* حشو داخلي متناسق يلم العناصر بشكل فخم */
+    /* هوامش ذكية وحشو داخلي ملموم لمنع التمدد الخارجي */
+    margin: 4vh auto !important;
+    padding: 20px 30px !important; /* تقليل الحشو الرأسي ليوفر مساحة عمودية */
     
     border: 1px solid var(--glass-border);
     position: relative;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 20px;
-    overflow: visible !important;
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.5);
+    
+    /* تفعيل التوزيع المرن الذكي لضغط العناصر هندسياً داخل الشاشة */
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important; /* توزيع الفراغات بالعدل بين الأقسام */
+    gap: 15px !important;
+    overflow: hidden !important; /* منع أي خروج أو ظهور للـ Scroll الخارجي */
 }
 
-/* ضبط حجم كرت عنوان اللوحة الرئيسي */
+/* ضبط الهيدر ليكون ملموم ونظيف */
+header { 
+    text-align: center; 
+    margin-bottom: 0px !important; 
+    flex: 0 0 auto !important; 
+}
 header h1 { 
-    font-size: 30px !important; 
+    font-size: 26px !important; /* تصغير طفيف جداً للعنوان ليخدم المساحة الرأسية */
     font-weight: 850 !important; 
     background: linear-gradient(to bottom, #ffffff, #cbd5e1); 
     -webkit-background-clip: text; 
@@ -92,8 +104,6 @@ header h1 {
 .mini-score { position: absolute; top: 20px; right: 40px; background: var(--gold-glow); padding: 6px 18px; border-radius: 50px; border: 1px solid var(--gold-border); color: var(--gold); display: flex; align-items: center; gap: 12px; font-weight: bold; font-size: 18px; z-index: 10; }
 .reset-mini { background: none !important; border: none !important; color: var(--danger) !important; cursor: pointer; font-size: 14px; opacity: 0.6; padding: 0 !important; min-width: auto !important; transition: transform 0.2s ease, opacity 0.2s ease; }
 .reset-mini:hover { opacity: 1; transform: scale(1.2); }
-
-header { text-align: center; margin-bottom: 15px; flex: 0 0 auto; }
 
 /* ==========================================================================
    ⚙️ 3. شريط الإعدادات الذكي (Settings Bar Area)
@@ -216,8 +226,10 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     display: flex !important;
     flex-direction: row !important;
     justify-content: space-between !important;
-    gap: 25px !important;
-    align-items: flex-start !important;
+    gap: 20px !important; /* تقليل الفراغ بين العمودين لراحتهم الرأسية */
+    align-items: stretch !important;
+    flex: 1 !important; /* يخلي الجريد يملأ المساحة المتبقية بنعومة */
+    min-height: 0 !important; /* سحر لـ flex لمنع تمدد العناصر لأسفل */
 }
 
 .main-col, .side-col {
