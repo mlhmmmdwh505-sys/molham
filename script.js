@@ -141,14 +141,38 @@ if(document.getElementById('langSelect')) {
 
 // --- 4. زر الحفظ الرئيسي ---
 // --- 4. زر الحفظ الرئيسي المطور (بدون رسائل alert منبثقة) ---
-document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
-    e.preventDefault(); 
+// 🎯 دالة حفظ وتأكيد الإعدادات من ضغطة واحدة فورية
+document.getElementById('mainSaveBtn').addEventListener('click', function() {
+    // 1. جلب القيمة المكتوبة في حقل الاسم
+    const newName = document.getElementById('userNameInput').value.trim();
     
-    const langSelect = document.getElementById('langSelect');
-    if(langSelect) {
-        currentLang = langSelect.value;
-        localStorage.setItem('userLang', currentLang);
+    // 2. إذا كان الحقل ليس فارغاً، يتم الحفظ والتحديث فوراً
+    if (newName !== "") {
+        // حفظ الاسم في الـ LocalStorage ليظل ثابتاً عند إعادة تحميل الصفحة
+        localStorage.setItem('userName', newName);
+        
+        // تحديث النص في واجهة المستخدم فوراً (العنوان والترحيب)
+        // قم بتغيير المعرفات (IDs) أدناه لتطابق المعرفات الموجودة لديك في الهيدر
+        const welcomeNameElement = document.getElementById('welcomeName'); 
+        const headerNameElement = document.getElementById('headerName');
+        
+        if (welcomeNameElement) {
+            welcomeNameElement.textContent = newName;
+        }
+        if (headerNameElement) {
+            headerNameElement.textContent = newName;
+        }
+        
+        // إذا كنت تستخدم دالة رئيسية لإعادة بناء الواجهة مثل (updateUI أو render) استدعيها هنا:
+        if (typeof updateUI === "function") {
+            updateUI();
+        }
     }
+
+    // (هنا تترك باقي كود حفظ الدقائق واللون والتاريخ كما هو دون تغيير)
+    
+    // إشعار مرئي سريع للمستخدم بنجاح الحفظ
+});
     applyLanguage(currentLang);
     displayDate(); 
 
