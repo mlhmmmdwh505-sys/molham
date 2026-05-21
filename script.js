@@ -54,7 +54,7 @@ const i18n = {
 
 // --- 2. دالة تهيئة الصفحة ---
 window.onload = () => {
-    
+    let savedMins = parseFloat(localStorage.getItem('userMins')) || 25;
     updatePointsDisplay();
 
     points += 75; savePoints();
@@ -323,7 +323,7 @@ function resetTimer() {
     clearInterval(timer);
     isRunning = false;
     document.getElementById('startBtn').innerText = i18n[currentLang].startBtnJob;
-    const mins = document.getElementById('minsInput').value || 25;
+    const mins = parseFloat(document.getElementById('minsInput').value) || 25;
     timeLeft = mins * 60;
     updateTimerDisplay();
 }
