@@ -353,32 +353,32 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 /* ==========================================================================
    📝 منظومة المغناطيس الصارم والسكرول الموزون (مهمتين فقط بدون أي قص)
    ========================================================================== */
+/* ==========================================================================
+   🔒 منظومة التحديد الصارم (مهمتين فقط والباقي سكرول إجباري)
+   ========================================================================== */
 #taskList {
     display: flex !important;
-    flex-direction: column !important; /* رص عمودي مغناطيسي يجذب العناصر */
+    flex-direction: column !important; /* رص عمودي مغناطيسي */
     width: 100% !important;
     
-    /* 📐 زيادة الارتفاع الإجمالي ليكون مريحاً ومضموناً لمهمتين والمسافة بينهما */
-    height: 135px !important; 
-    max-height: 135px !important;
+    /* 📐 الحسبة الهندسية: (ارتفاع الحبة 50px * 2) + الفجوة بينهما 10px = 110px بالضبط */
+    height: 110px !important;
+    max-height: 110px !important;
     
-    overflow-y: auto !important; /* فتح السكرول العمودي فوراً للمهمة الثالثة */
-    overflow-x: hidden !important; /* منع أي حركة أفقية */
+    /* 🔥 إجبار المتصفح على قص أي مهمة زيادة وتفعيل السكرول */
+    overflow-y: scroll !important; /* جعل شريط السكرول نشط دائماً برؤية هندسية محكومة */
+    overflow-x: hidden !important; 
     
-    gap: 10px !important; /* المغناطيس الثابت بين المهام */
+    gap: 10px !important; /* مسافة المغناطيس */
     margin-top: 15px !important;
-    padding: 0 4px 0 0 !important; /* مسافة بسيطة لشريط السكرول */
+    padding: 0 !important; /* تصفير الحشو تماماً لمنع تسريب مهام إضافية */
     list-style: none !important;
     box-sizing: border-box !important;
-    
-    /* تحسين مظهر شريط السكرول لمتصفح فايرفوكس */
-    scrollbar-width: thin !important;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent !important;
 }
 
-/* 🎨 تخصيص شريط السكرول لـ Chrome و Safari */
+/* 🎨 تخصيص شريط السكرول ليكون نحيفاً جداً ومخفياً كأنه قطعة زجاجية */
 #taskList::-webkit-scrollbar {
-    width: 5px !important;
+    width: 4px !important;
 }
 #taskList::-webkit-scrollbar-track {
     background: transparent !important;
@@ -388,21 +388,22 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     border-radius: 10px !important;
 }
 
-/* تنسيق حبة المهمة العريضة (السر في منع القص هنا) */
+/* تنسيق حبة المهمة العريضة */
 #taskList li {
     width: 100% !important;
     
-    /* 📐 جعل الارتفاع مرناً لتتنفس الحبة وتستوعب الخط بدون أي قص نهائياً */
-    height: auto !important; 
-    min-height: 52px !important; 
+    /* 📐 تثبيت المقاس الصارم لمنع تمدد الحبات بره الـ 110px */
+    height: 50px !important; 
+    min-height: 50px !important; 
+    max-height: 50px !important;
     
-    flex-shrink: 0 !important; /* يمنع المتصفح من ضغط الحبة أثناء السكرول */
+    flex-shrink: 0 !important; /* منع المتصفح نهائياً من عصر الحبات */
     box-sizing: border-box !important;
     
     background: rgba(255, 255, 255, 0.04) !important;
     border-radius: 12px !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    padding: 10px 15px !important; /* حشو متناسق يمنع تلامس الحواف مع النص */
+    padding: 0 15px !important;
     
     display: flex !important;
     flex-direction: row !important;
@@ -410,14 +411,13 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     align-items: center !important;
 }
 
-/* ضبط النص ليكون مرناً وممتازاً داخل الحبة */
+/* ضبط النص في السنتر تماماً لتجنب القص */
 #taskList li span {
     font-size: 14px !important;
-    line-height: 1.4 !important; /* إعطاء مساحة رأسية مريحة جداً للخط العربي */
-    white-space: nowrap !important; /* سطر واحد أنيق */
+    white-space: nowrap !important;
     overflow: hidden !important;
-    text-overflow: ellipsis !important; /* نقط في نهاية النص لو طويل */
-    display: inline-block !important;
+    text-overflow: ellipsis !important;
+    line-height: 50px !important; /* مساواة خط النص بطول الحبة ليتوسطها عمودياً */
 }
 
 /* ➕ زر إضافة مهام جديدة */
@@ -432,7 +432,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     justify-content: center !important;
 }
 
-/* 🧱 قسم إدخال البيانات الموزون */
+/* 🧱 قسم إدخال البيانات */
 .input-section {
     display: flex !important;
     flex-direction: row !important;
@@ -456,7 +456,6 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     border-radius: 50px !important; 
     box-sizing: border-box !important;
 }
-
 /* ==========================================================================
    📱 11. التجاوب مع الشاشات والموبايل (تحت 1024px)
    ========================================================================== */
