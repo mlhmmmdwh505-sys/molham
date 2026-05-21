@@ -420,63 +420,6 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     text-overflow: ellipsis !important;
     line-height: 52px !important; /* مطابقة الـ line-height مع ارتفاع الحبة للسنترة الكاملة */
 }
-/* ==========================================================================
-   🧱 قسم إدخال البيانات (حل مشكلة البوردر الديناميكي 100%)
-   ========================================================================== */
-.input-section {
-    display: flex !important;
-    flex-direction: row !important; /* إجبار الحقل والزرار على نفس السطر */
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    gap: 12px !important; 
-    margin-bottom: 15px !important;
-    box-sizing: border-box !important;
-}
-
-/* ضبط حقل إدخال النص مع البوردر السحري */
-#taskInput { 
-    flex: 1 !important; 
-    height: 46px !important; 
-    max-height: 46px !important; 
-    padding: 0 20px !important; 
-    font-size: 15px !important; 
-    border-radius: 50px !important; 
-    box-sizing: border-box !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    color: #fff !important;
-    
-    /* 🛠️ إلغاء البوردر العادي عشان الجافا سكريبت ميتدخلش */
-    border: none !important; 
-    
-    /* 🎨 الخدعة: عمل بوردر وهمي يعكس اللون المختار حالياً تلقائياً */
-    box-shadow: 0 0 0 1.5px currentColor !important; 
-    
-    transition: all 0.3s ease !important;
-}
-
-/* ➕ زر إضافة مهام جديدة بنفس البوردر السحري */
-.btn-add { 
-    width: 52px !important; 
-    height: 46px !important; 
-    max-height: 46px !important;
-    font-size: 20px !important; 
-    border-radius: 50px !important; 
-    flex-shrink: 0 !important; 
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    background: rgba(255, 255, 255, 0.03) !important;
-    color: #fff !important;
-    
-    /* 🛠️ إلغاء البوردر العادي */
-    border: none !important; 
-    
-    /* 🎨 تفعيل نفس البوردر الوهمي للزرار */
-    box-shadow: 0 0 0 1.5px currentColor !important; 
-    
-    transition: all 0.3s ease !important;
-}
 
 /* ==========================================================================
    🧱 قسم إدخال البيانات (كتف في كتف + ربط اللون غصب عن المتصفح)
