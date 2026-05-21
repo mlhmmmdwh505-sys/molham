@@ -37,7 +37,7 @@ const i18n = {
         years: "سنة", days: "يوم", hours: "ساعة", storeTitle: "☕ متجر الطاقة 1د = 15ن",
         break5: "5 د = <small>75ن</small>", break10: "10 د = <small>150ن</small>", break15: "15 د = <small>225ن</small>",
         startBtnJob: "ابدأ المهمة 🚀", startBtnPause: "إيقاف مؤقت ⏸️", startBtnResume: "استئناف ▶️", startBtnBreak: "ابدأ الاستراحة ☕",
-        resetBtn: "إعادة ضبط 🔄", taskPlaceholder: "أضف مهمة جديدة...",
+        resetBtn: "إعادة ضبط 🔁", taskPlaceholder: "أضف مهمة جديدة...",
         alertSave: "تم حفظ وتأكيد الإعدادات والاسم بنجاح! 🩺",
         alertBreak: "تم شراء استراحة بنجاح! ☕", alertNoPoints: "عذراً، النقاط غير كافية! 💪", alertResetPoints: "تصفير النقاط؟"
     },
@@ -48,7 +48,7 @@ const i18n = {
         years: "Years", days: "Days", hours: "Hours", storeTitle: "☕ Energy Store 1m = 15p",
         break5: "5 Min = <small>75p</small>", break10: "10 Min = <small>150p</small>", break15: "15 Min = <small>225p</small>",
         startBtnJob: "Start Task 🚀", startBtnPause: "Pause ⏸️", startBtnResume: "Resume ▶️", startBtnBreak: "Start Break ☕",
-        resetBtn: "Reset 🔄", taskPlaceholder: "Add a new task...",
+        resetBtn: "Reset 🔁", taskPlaceholder: "Add a new task...",
         alertSave: "Settings and Name saved successfully! 🩺",
         alertBreak: "Break purchased successfully! ☕", alertNoPoints: "Sorry, not enough points! 💪", alertResetPoints: "Reset points?"
     }
