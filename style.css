@@ -363,30 +363,35 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 /* ==========================================================================
    📝 المنظومة المغناطيسية الذكية المحدثة (تثبيت مهمتين + سكرول ناعم)
    ========================================================================== */
+/* ==========================================================================
+   📝 منظومة المغناطيس الصارم والسكرول الموزون (مهمتين فقط بدون أي قص)
+   ========================================================================== */
 #taskList {
     display: flex !important;
-    flex-direction: column !important; /* رص عمودي مغناطيسي صارم */
-    width: 100% !important; /* العرض الكامل للكارد */
+    flex-direction: column !important; /* رص عمودي مغناطيسي يجذب العناصر */
+    width: 100% !important;
     
-    /* 📐 تحديد ارتفاع محكوم ومناسب تماماً لظهور مهمتين فقط */
-    height: 130px !important; 
-    max-height: 130px !important;
-    overflow-y: auto !important; /* تفعيل التمرير العمودي عند زيادة المهام عن 2 */
-    overflow-x: hidden !important; /* منع التمرير الأفقي المشوه */
+    /* 📐 الارتفاع الإجمالي لظهور مهمتين (50px + 50px) + الفجوة (10px) = 110px */
+    height: 112px !important; 
+    max-height: 112px !important;
     
-    gap: 10px !important; /* مسافة المغناطيس الثابتة بين كل مهمة وأختها */
-    margin-top: 20px !important;
-    padding: 0 5px 0 0 !important; /* مساحة أمان جانبية لشريط التمرير */
+    overflow-y: auto !important; /* فتح السكرول العمودي فوراً للمهمة الثالثة */
+    overflow-x: hidden !important; /* منع أي حركة أفقية */
+    
+    gap: 10px !important; /* المغناطيس الثابت بين المهام */
+    margin-top: 15px !important;
+    padding: 0 4px 0 0 !important; /* مسافة بسيطة لشريط السكرول ليتحرك بحرية */
     list-style: none !important;
+    box-sizing: border-box !important;
     
-    /* 🎛️ تنعيم شكل شريط السكرول ليناسب الثيم الزجاجي */
+    /* تحسين مظهر شريط السكرول لمتصفح فايرفوكس */
     scrollbar-width: thin !important;
     scrollbar-color: rgba(255, 255, 255, 0.2) transparent !important;
 }
 
-/* 🎨 تخصيص شريط السكرول لمتصفحات Chrome و Safari */
+/* 🎨 تخصيص شريط السكرول لـ Chrome و Safari (نحيف وشيك) */
 #taskList::-webkit-scrollbar {
-    width: 6px !important;
+    width: 5px !important;
 }
 #taskList::-webkit-scrollbar-track {
     background: transparent !important;
@@ -395,27 +400,35 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     background: rgba(255, 255, 255, 0.15) !important;
     border-radius: 10px !important;
 }
-#taskList::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.3) !important;
-}
 
-/* تنسيق حبة المهمة المرنة العريضة */
+/* تنسيق حبة المهمة العريضة (موزونة بالملي داخل الحاوية) */
 #taskList li {
-    width: 100% !important; /* تفرد بكامل العرض المتوفر */
-    min-height: 55px !important; /* حد أدنى ثابت ومريح للحبة */
-    height: auto !important; /* ترك الارتفاع يتنفس لمنع القص التراكمي */
-    flex-shrink: 0 !important; /* منع انضغاط الحبات عند السكرول */
+    width: 100% !important;
+    
+    /* 📐 تحديد ارتفاع ثابت وصارم لكل حبة لمنع تداخلها أو قصها */
+    height: 50px !important; 
+    min-height: 50px !important; 
+    
+    flex-shrink: 0 !important; /* يمنع المتصفح من ضغط الحبة أثناء السكرول */
     box-sizing: border-box !important;
     
     background: rgba(255, 255, 255, 0.04) !important;
     border-radius: 12px !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    padding: 10px 20px !important; /* حشو داخلي متناسق */
+    padding: 0 15px !important; /* حشو أفقي فقط للحفاظ على الارتفاع */
     
     display: flex !important;
     flex-direction: row !important;
     justify-content: space-between !important;
     align-items: center !important;
+}
+
+/* ضبط النص داخل المهمة ليكون في المنتصف رأسياً ولا يسبب قص */
+#taskList li span {
+    font-size: 14px !important;
+    white-space: nowrap !important; /* سطر واحد أنيق */
+    overflow: hidden !important;
+    text-overflow: ellipsis !important; /* نقط في نهاية النص لو كان طويل جداً */
 }
 .btn-add { 
     width: 52px !important; 
