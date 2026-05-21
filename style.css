@@ -803,8 +803,8 @@ ul::-webkit-scrollbar-thumb {
     gap: 10px !important;
     padding: 0 !important;
     margin: 20px 0 0 0 !important;
-    height: 134px !important;     /* ارتفاع مهمتين بالظبط */
-    max-height: 134px !important;
+    height: 124px !important;     /* ارتفاع مهمتين بالظبط */
+    max-height: 124px !important;
     overflow-y: scroll !important;
     scroll-snap-type: y mandatory !important;
     scroll-behavior: smooth !important;
