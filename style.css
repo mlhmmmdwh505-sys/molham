@@ -54,34 +54,47 @@ body {
 * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
 
 /* ==========================================================================
-   🖼️ 2. الهيكل الزجاجي الرئيسي (Glassmorphism Core Card)
+   🖼️ 2. الهيكل الزجاجي الرئيسي (نسخة الفرد الكامل لملء الشاشة الفخمة)
    ========================================================================== */
 .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border-radius: 40px;
-    width: 85vw !important;
-    max-width: 1250px !important;
-    margin: 4vh auto !important;
-    padding: 30px !important;
+    border-radius: 35px;
+    
+    /* 🚀 التعديل السحري: رفعنا العرض لـ 96% والحد الأقصى لـ 1500px لملء الفراغات تماماً */
+    width: 96vw !important;
+    max-width: 1500px !important; 
+    
+    /* ضبط الارتفاع ليتناسب عمودياً مع الشاشة بدون ترك هوامش عملاقة */
+    margin: 2vh auto !important;
+    padding: 35px 40px !important; /* زيادة الحشو الداخلي ليعطي اتساع */
+    
     border: 1px solid var(--glass-border);
     position: relative;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 20px;
+    gap: 25px;
     overflow: visible !important;
 }
 
+/* تكبير عنوان اللوحة الرئيسي ليتناسب مع الحجم الجديد */
+header h1 { 
+    font-size: 34px !important; 
+    font-weight: 850 !important; 
+    letter-spacing: 0.5px;
+    background: linear-gradient(to bottom, #ffffff, #cbd5e1); 
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+}
 .date-tag { position: absolute; top: 25px; left: 40px; font-size: 14px; color: var(--text-darker); font-weight: 500; }
 .mini-score { position: absolute; top: 20px; right: 40px; background: var(--gold-glow); padding: 6px 18px; border-radius: 50px; border: 1px solid var(--gold-border); color: var(--gold); display: flex; align-items: center; gap: 12px; font-weight: bold; font-size: 18px; z-index: 10; }
 .reset-mini { background: none !important; border: none !important; color: var(--danger) !important; cursor: pointer; font-size: 14px; opacity: 0.6; padding: 0 !important; min-width: auto !important; transition: transform 0.2s ease, opacity 0.2s ease; }
 .reset-mini:hover { opacity: 1; transform: scale(1.2); }
 
 header { text-align: center; margin-bottom: 15px; flex: 0 0 auto; }
-header h1 { font-size: 28px; font-weight: 800; background: linear-gradient(to bottom, #ffffff, #cbd5e1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
 /* ==========================================================================
    ⚙️ 3. شريط الإعدادات الذكي (Settings Bar Area)
