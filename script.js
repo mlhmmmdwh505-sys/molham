@@ -25,7 +25,6 @@ const quotes = {
     ]
 };
 
-// قاموس الترجمة الكامل المتوافق مع الـ HTML
 const i18n = {
     ar: {
         welcome: "مرحباً بك،",
@@ -55,12 +54,11 @@ const i18n = {
     }
 };
 
-// --- 2. دالة تهيئة الصفحة وتشغيلها عند الفتح ---
+// --- 2. دالة تهيئة الصفحة وتشغيلها عند الففتح ---
 window.onload = () => {
     updatePointsDisplay();
     startGraduationCountdown();
     
-    // جلب وتطبيق اللغة المحفوظة أولاً
     currentLang = localStorage.getItem('userLang') || "ar";
     if(document.getElementById('langSelect')) {
         document.getElementById('langSelect').value = currentLang;
@@ -68,7 +66,6 @@ window.onload = () => {
     applyLanguage(currentLang);
     displayDate();
     
-    // جلب وعرض الاسم المحفوظ
     const savedName = localStorage.getItem('userName') || (currentLang === 'ar' ? "ملهم" : "Molham");
     if(document.getElementById('userNameInput')) {
         document.getElementById('userNameInput').value = savedName;
@@ -79,13 +76,11 @@ window.onload = () => {
     document.getElementById('userNameDisplay').innerText = currentLang === 'ar' ? `دكتور ${savedName}` : `Dr. ${savedName}`;
     document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${currentLang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}</span> 🩺`;
     
-    // جلب وعرض الدقائق المحفوظة
     const savedMins = localStorage.getItem('userMins') || "25";
     if(document.getElementById('minsInput')) {
         document.getElementById('minsInput').value = savedMins;
     }
     
-    // جلب التاريخ واللون المحفوظين
     if(document.getElementById('gradDateInput')) {
         document.getElementById('gradDateInput').value = graduationDate;
     }
@@ -100,7 +95,6 @@ window.onload = () => {
     }
     document.documentElement.style.setProperty('--primary', savedColor);
     
-    // ضبط الوقت بناءً على الدقائق المحفوظة
     timeLeft = parseInt(savedMins) * 60;
     updateTimerDisplay();
     
@@ -153,7 +147,6 @@ function applyLanguage(lang) {
     renderTasks(); 
 }
 
-// مراقبة تغيير اللغة من القائمة فورا لتطبيقها بطريقتك المفضلة بدون مشاكل
 if(document.getElementById('langSelect')) {
     document.getElementById('langSelect').addEventListener('change', function(e) {
         applyLanguage(e.target.value);
@@ -372,20 +365,18 @@ function renderTasks() {
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
         
-        // الأبعاد والـ padding كما كانت في ملفك الأصلي المرن بالملي بدون أي تغيير
+        // الأبعاد والبادنج الأصليين لملفك بدون أي تغيير
         li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; padding: 12px 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 10px !important;";
         
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
-        // الهيكل الأصلي بالكامل: الضغط على الدائرة والنص شغال 100% لتفعيل علامة الصح
+        // الهيكل والخصائص الأصلية وترتيب الأوامر السليم للتنفيذ والاتجاهات
         li.innerHTML = 
-            /* حاوية الدائرة والنص (ملتصقين تماماً بـ margin-inline-start ذكي ليتناسب مع الاتجاهين تلقائياً) */
             '<div onclick="toggleTask(' + index + ')" style="display: flex !important; flex-direction: row !important; align-items: center !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
                 '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
                 '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; margin-inline-start: 12px !important; text-align: start !important; ' + strikeStyle + '">' + task.text + '</span>' +
             '</div>' +
-            /* زر الحذف يندفع طبيعياً وبدون مشاكل إلى الطرف المقابل */
             '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important; margin-inline-start: 15px !important;">❌</button>';
             
         taskList.appendChild(li);
