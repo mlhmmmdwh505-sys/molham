@@ -904,11 +904,10 @@ input[type="color"]::-moz-color-swatch {
 }
 
 /* ==========================================================================
-   📱 ثورة التصميم الذكي للموبايل: إنقاذ اللوحة من الانضغاط (د. ملهم)
+   📱 ثورة التصميم الذكي للموبايل واللابتوب الموحدة: مهمتين بس (د. ملهم)
    ========================================================================== */
 
 @media screen and (max-width: 768px) {
-    
     /* 1. تحرير الحاوية الزجاجية الكبرى على الموبايل */
     .glass-card, .container, .wrapper {
         width: 92vw !important;
@@ -918,10 +917,10 @@ input[type="color"]::-moz-color-swatch {
         height: auto !important;
     }
 
-    /* 2. تحويل توزيع الكروت من أفقي إلى رأسي (تحت بعض) ليعودوا لحجمهم الطبيعي */
+    /* 2. تحويل توزيع الكروت من أفقي إلى رأسي ليعودوا لحجمهم الطبيعي */
     .dashboard-grid, .main-layout {
         display: flex !important;
-        flex-direction: column !important; /* فك الخنقة الجانبية */
+        flex-direction: column !important;
         width: 100% !important;
         gap: 20px !important;
     }
@@ -938,62 +937,45 @@ input[type="color"]::-moz-color-swatch {
     .todo-box, .timer-box, .info-card, .store-card, .chart-box {
         width: 100% !important;
         min-width: 100% !important;
-        height: auto !important; /* السماح للكارت بالتمدد حسب محتواه */
+        height: auto !important;
         min-height: auto !important;
         max-height: none !important;
         padding: 20px 15px !important;
     }
 
-    /* 5. إعادة ضبط حاوية المهام لتستوعب 3 مهام بمظهر رائع */
-    #taskList, .tasks-container, ul {
-        width: 100% !important;
-        height: 134px !important; /* ارتفاع الـ 3 مهام اللي طلبته */
-        max-height: 134px !important;
-        margin-top: 15px !important;
-    }
-
-    /* 6. عناصر القائمة الفردية تفرد بكامل العرض الجديد */
-    .fixed-task-item, li {
-        width: 100% !important;
-        height: 52px !important;
-        min-height: 52px !important;
-        padding: 0 15px !important;
-    }
-
-    /* 7. إصلاح نصوص العداد الضخمة حتى لا تنكسر لسطرين */
+    /* 5. إصلاح نصوص العداد الضخمة حتى لا تنكسر لسطرين */
     .timer-box h1, #timerDisplay, .time-display {
-        font-size: 45px !important; /* تصغير نسبي للنص ليناسب الموبايل */
+        font-size: 45px !important;
         line-height: 1 !important;
         margin-bottom: 15px !important;
     }
 }
 
 /* ==========================================================================
-   🎯 القفل الجراحي الحاسم: إجبار اللابتوب والموبايل على مهمتين فقط (د. ملهم)
+   🎯 القفل الحديدي المشترك: فرض مهمتين فقط على (اللابتوب + الموبايل) 
    ========================================================================== */
 
-#taskList, .tasks-container, ul {
+#taskList, .tasks-container, #todoList, ul {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
-    /* تقليص الفجوة والارتفاع الإجمالي لمنع تسريب المهمة الثالثة */
-    gap: 8px !important; 
+    gap: 8px !important; /* فجوة محبوكة تمنع تسريب أي بكسل للمهمة الثالثة */
     padding: 0 !important;
     margin: 15px 0 0 0 !important;
     text-align: right !important;
     box-sizing: border-box !important;
     
-    /* الارتفاع المحبوك بالملي لمهمتين فقط */
-    height: 114px !important;     
-    max-height: 114px !important; 
+    /* 👑 الارتفاع السحري الحاسم والنهائي */
+    height: 112px !important;     
+    max-height: 112px !important; 
     
     overflow-y: scroll !important;
     scroll-snap-type: y mandatory !important;
     scroll-behavior: smooth !important;
 }
 
-/* ضبط العناصر الفردية للمهام لمنع انكماشها وإجبارها على ملء المساحة */
-.fixed-task-item, #taskList li {
+/* ضبط العناصر الفردية للمهام لمنع انكماشها وإجبارها على أخذ مساحتها كاملة */
+.fixed-task-item, #taskList li, li {
     flex-shrink: 0 !important;
     height: 52px !important;
     min-height: 52px !important;
