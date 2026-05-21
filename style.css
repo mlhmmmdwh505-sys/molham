@@ -351,24 +351,35 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 /* ==========================================================================
    📝 10. منظومة المهام الفخمة (إظهار المهمة كاملة مع الحفاظ على المغناطيس)
    ========================================================================== */
+/* ==========================================================================
+   📝 قسم إدارة المهام الرئيسي - الشاشات الكبيرة (الكمبيوتر)
+   ========================================================================== */
 #taskList {
-    list-style: none !important;
-    display: flex !important;
-    flex-direction: column !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* تقسيم السطر لعمودين بالتساوي */
+    gap: 12px !important; /* مسافة مريحة وموزونة بين المهمتين */
     width: 100% !important;
-    gap: 0px !important; /* إلغاء الفراغات لتجنب ترحيل المغناطيس */
+    height: auto !important;
+    max-height: none !important; 
+    overflow: visible !important;
+    margin-top: 15px !important;
     padding: 0 !important;
-    margin: 8px 0 0 0 !important;
-    text-align: right !important;
+    list-style: none !important;
+}
+
+#taskList li {
+    width: 100% !important; /* لتأخذ المهمة حجم العمود المخصص لها بالظبط */
+    min-height: 50px !important; 
+    height: auto !important;
     box-sizing: border-box !important;
-    
-    /* 🚀 رفع الارتفاع الإجمالي ليتناسب تماماً مع المهمة المفرودة */
-    height: 64px !important;     
-    max-height: 64px !important; 
-    
-    overflow-y: scroll !important;
-    scroll-snap-type: y mandatory !important; /* تفعيل المغناطيس الإجباري */
-    scroll-behavior: smooth !important;         
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 10px 15px !important;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
 }
 .btn-add { 
     width: 52px !important; 
@@ -382,29 +393,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 }
 
 /* 📐 ضبط أبعاد المهمة الداخلية لتظهر كاملة وبدون أي قص */
-#taskList li {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    
-    /* جعل الارتفاع مطابق تماماً للحوض الخارجي */
-    height: 64px !important;
-    min-height: 64px !important;
-    max-height: 64px !important;
-    
-    background: rgba(255, 255, 255, 0.04) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 16px !important;
-    padding: 0 20px !important; /* حشو جانبي مريح */
-    flex-shrink: 0 !important;
-    
-    /* نقطة الارتكاز للمغناطيس */
-    scroll-snap-align: start !important;
-    scroll-snap-stop: always !important; 
-}
+
 
 /* إخفاء شريط التمرير (Scrollbar) تماماً لمظهر زجاجي ناعم ونظيف */
 #taskList::-webkit-scrollbar {
