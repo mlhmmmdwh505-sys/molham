@@ -1,5 +1,4 @@
 // --- 1. المتغيرات والبيانات المحفوظة --- 
-// --- 1. المتغيرات والبيانات المحفوظة --- 
 let timer;
 let timeLeft;
 let isRunning = false;
@@ -27,6 +26,7 @@ const quotes = {
         "Nothing is impossible with hard work. 💪🏼"
     ]
 };
+
 const i18n = {
     ar: {
         welcome: "مرحباً بك،", mainTitle: "لوحة تحكم ",
@@ -54,11 +54,7 @@ const i18n = {
 
 // --- 2. دالة تهيئة الصفحة ---
 window.onload = () => {
-    let savedMins = parseFloat(localStorage.getItem('userMins')) || 25;
     updatePointsDisplay();
-
-    points += 75; savePoints();
-    
     startGraduationCountdown();
     
     currentLang = localStorage.getItem('userLang') || "ar";
@@ -75,6 +71,7 @@ window.onload = () => {
         document.getElementById('userNameInput').value = savedName;
     }
     
+    let savedMins = parseFloat(localStorage.getItem('userMins')) || 25;
     if(document.getElementById('minsInput')) {
         document.getElementById('minsInput').value = savedMins;
     }
@@ -157,7 +154,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     localStorage.setItem('userName', newName);
 
     const minsInput = document.getElementById('minsInput');
-    const newMins = parseFloat(minsInput.value) || 25; // ✔️ تعديل parseFloat
+    const newMins = parseFloat(minsInput.value) || 25;
     localStorage.setItem('userMins', newMins); 
 
     let newColor = document.getElementById('colorPicker').value || "#6366f1";
@@ -191,6 +188,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     }, 2000);
 });
 
+// --- 5. نظام المؤقت ---
 function playAlarm() {
     try {
         const bgTrack = document.getElementById('bgTrack');
@@ -205,6 +203,7 @@ function playAlarm() {
         const context = new AudioContext();
         const now = context.currentTime;
         
+        // نغمة تين
         const osc1 = context.createOscillator();
         const gain1 = context.createGain();
         osc1.type = 'sine';
@@ -214,6 +213,7 @@ function playAlarm() {
         osc1.connect(gain1);
         gain1.connect(context.destination);
         
+        // نغمة تون
         const osc2 = context.createOscillator();
         const gain2 = context.createGain();
         osc2.type = 'sine';
@@ -286,19 +286,6 @@ function toggleTimer() {
     }
 }
 
-function addPoints() {
-    const minsInput = parseFloat(document.getElementById('minsInput').value) || 25;
-    const totalSecondsSeconds = minsInput * 60;
-    const secondsWorked = totalSecondsSeconds - timeLeft;
-    
-    if (secondsWorked >= 20 && timeLeft < totalSecondsSeconds) {
-        const newPoints = Math.floor(secondsWorked / 20); 
-        points += newPoints;
-        savePoints();
-        timeLeft = totalSecondsSeconds; 
-    }
-}
-
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
@@ -314,21 +301,32 @@ function updateTimerDisplay() {
     document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
+// --- 6. متجر الطاقة والنقاط ---
+function addPoints() {
+    const minsInput = parseFloat(document.getElementById('minsInput').value) || 25;
+    const totalSeconds = minsInput * 60;
+    const secondsWorked = totalSeconds - timeLeft;
+    
+    // يمنح نقطة لكل 20 ثانية عمل حقيقية انقضت
+    if (secondsWorked >= 20 && timeLeft < totalSeconds) {
+        const newPoints = Math.floor(secondsWorked / 20); 
+        points += newPoints;
+        savePoints();
+        timeLeft = totalSeconds; 
+    }
+}
+
 function buyBreak(min) {
     const cost = min * 15; 
     const trans = i18n[currentLang];
-    
     if (points >= cost) {
         points -= cost;
         savePoints();
-        
         clearInterval(timer);
         isRunning = false;
-        isBreak = true; 
-        
+        isBreak = true;
         timeLeft = min * 60;
         updateTimerDisplay();
-        
         document.getElementById('startBtn').innerText = trans.startBtnBreak;
         alert(trans.alertBreak);
     } else {
@@ -354,6 +352,7 @@ function resetPoints() {
     }
 }
 
+// --- 7. العد التنازلي ---
 function changeQuote() {
     const qElem = document.getElementById('motivationQuote');
     const currentQuotes = quotes[currentLang];
@@ -379,16 +378,16 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
+// --- 8. إدارة المهام ---
 function addTask() {
-    const taskInput = document.getElementById('taskInput');
-    if (!taskInput) return;
-    const text = taskInput.value.trim();
+    const input = document.getElementById('taskInput');
+    if (!input) return;
+    const text = input.value.trim();
     if (text === '') return;
-
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks.push({ text: text, done: false });
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
-    taskInput.value = '';
+    input.value = '';
     renderTasks();
 }
 
@@ -429,3 +428,4 @@ function renderTasks() {
             
         taskList.appendChild(li);
     });
+}
