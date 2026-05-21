@@ -967,3 +967,57 @@ input[type="color"]::-moz-color-swatch {
         margin-bottom: 15px !important;
     }
 }
+
+/* ==========================================================================
+   🎯 الضبط الإمبراطوري: تكبير حقل المهام وفرد حقل اللون بالكامل (د. ملهم)
+   ========================================================================== */
+
+/* 1. تكبير وتفخيم حقل "أضف مهمة جديدة" ليكون مفروداً ومميزاً */
+input[type="text"], .task-input, #taskInput {
+    width: 100% !important;
+    height: 52px !important;       /* نفس ارتفاع كبسولة المهام الفخمة */
+    padding: 0 20px !important;
+    font-size: 16px !important;    /* تكبير الخط عشان وضوح الموبايل */
+    font-weight: 600 !important;
+    border-radius: 25px !important; /* حواف دائرية مثالية */
+    box-sizing: border-box !important;
+}
+
+/* 2. إجبار اللون على ملء الفراغ والبوردر بالكامل بدون أي حواف داخلية غبية */
+input[type="color"] {
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+    
+    width: 100% !important;
+    height: 52px !important;        /* نفس ارتفاع باقي الحقول المتناسقة */
+    background: transparent !important;
+    border: none !important;        /* إزالة البوردر الخارجي لتجنب الفراغات */
+    border-radius: 25px !important;
+    cursor: pointer !important;
+    padding: 0 !important;          /* تصفير الحشو تماماً */
+    margin: 0 !important;
+    overflow: hidden !important;
+}
+
+/* 3. قهر متصفحات الموبايل (Chrome & Safari) وإجبار اللون على اللصق في الحواف */
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0 !important;          /* إزالة الفراغ الداخلي تماماً */
+    margin: 0 !important;
+    border-radius: 25px !important;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none !important;        /* إلغاء البوردر الداخلي للمتصفح */
+    border-radius: 25px !important;
+    width: 100% !important;
+    height: 100% !important;        /* الفرد الكامل بعرض وارتفاع الكبسولة */
+}
+
+/* 4. الضبط لمتصفحات فايرفوكس */
+input[type="color"]::-moz-color-swatch {
+    border: none !important;
+    border-radius: 25px !important;
+    width: 100% !important;
+    height: 100% !important;
+}
