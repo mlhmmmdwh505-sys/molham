@@ -25,15 +25,12 @@ const quotes = {
     ]
 };
 
-// قاموس الترجمة الكامل المتوافق مع الـ HTML
 const i18n = {
     ar: {
-        welcome: "مرحباً بك،",
-        mainTitle: "لوحة تحكم ",
+        welcome: "مرحباً بك،", mainTitle: "لوحة تحكم ",
         langLabel: "اللغة", nameLabel: "الاسم", colorLabel: "اللون", dateLabel: "التاريخ", minsLabel: "الدقائق",
         saveBtn: "تأكيد الإعدادات", countdownTitle: "⏳ حلم التخرج",
-        years: "سنة", days: "يوم", hours: "ساعة",
-        storeTitle: "☕ متجر الطاقة 1د = 15ن",
+        years: "سنة", days: "يوم", hours: "ساعة", storeTitle: "☕ متجر الطاقة 1د = 15ن",
         break5: "5 د = <small>75ن</small>", break10: "10 د = <small>150ن</small>", break15: "15 د = <small>225ن</small>",
         startBtnJob: "ابدأ المهمة", startBtnPause: "إيقاف مؤقت", startBtnResume: "استئناف", startBtnBreak: "ابدأ الاستراحة ☕",
         resetBtn: "اعادة ضبط", taskPlaceholder: "أضف مهمة جديدة...",
@@ -41,12 +38,10 @@ const i18n = {
         alertBreak: "تم شراء استراحة بنجاح! ☕", alertNoPoints: "عذراً، النقاط غير كافية! 💪", alertResetPoints: "تصفير النقاط؟"
     },
     en: {
-        welcome: "Welcome,",
-        mainTitle: "Dashboard of ",
+        welcome: "Welcome,", mainTitle: "Dashboard of ",
         langLabel: "Lang", nameLabel: "Name", colorLabel: "Color", dateLabel: "Date", minsLabel: "Mins",
         saveBtn: "Confirm Settings", countdownTitle: "⏳ Graduation Dream",
-        years: "Years", days: "Days", hours: "Hours",
-        storeTitle: "☕ Energy Store 1m = 15p",
+        years: "Years", days: "Days", hours: "Hours", storeTitle: "☕ Energy Store 1m = 15p",
         break5: "5 Min = <small>75p</small>", break10: "10 Min = <small>150p</small>", break15: "15 Min = <small>225p</small>",
         startBtnJob: "Start Task", startBtnPause: "Pause", startBtnResume: "Resume", startBtnBreak: "Start Break ☕",
         resetBtn: "Reset", taskPlaceholder: "Add a new task...",
@@ -55,7 +50,7 @@ const i18n = {
     }
 };
 
-// --- 2. دالة تهيئة الصفحة وتشغيلها عند الفتح ---
+// --- 2. دالة تهيئة الصفحة ---
 window.onload = () => {
     updatePointsDisplay();
     startGraduationCountdown();
@@ -72,11 +67,6 @@ window.onload = () => {
         document.getElementById('userNameInput').value = savedName;
     }
     
-    const trans = i18n[currentLang];
-    document.getElementById('welcomeWord').innerText = trans.welcome;
-    document.getElementById('userNameDisplay').innerText = currentLang === 'ar' ? `دكتور ${savedName}` : `Dr. ${savedName}`;
-    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${currentLang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}</span> 🩺`;
-    
     const savedMins = localStorage.getItem('userMins') || "25";
     if(document.getElementById('minsInput')) {
         document.getElementById('minsInput').value = savedMins;
@@ -86,11 +76,7 @@ window.onload = () => {
         document.getElementById('gradDateInput').value = graduationDate;
     }
     
-    let savedColor = localStorage.getItem('themeColor');
-    if (!savedColor || savedColor === "#000000" || savedColor === "transparent") {
-        savedColor = "#6366f1"; 
-        localStorage.setItem('themeColor', savedColor);
-    }
+    let savedColor = localStorage.getItem('themeColor') || "#6366f1";
     if(document.getElementById('colorPicker')) {
         document.getElementById('colorPicker').value = savedColor;
     }
@@ -106,10 +92,9 @@ window.onload = () => {
     }
 };
 
-// --- 3. دالة تطبيق وترجمة اللغة ---
+// --- 3. دالة تطبيق اللغة ---
 function applyLanguage(lang) {
     currentLang = lang;
-    
     document.documentElement.setAttribute('lang', lang);
     document.documentElement.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
     
@@ -117,8 +102,8 @@ function applyLanguage(lang) {
     const savedName = localStorage.getItem('userName') || (lang === 'ar' ? "ملهم" : "Molham");
     
     document.getElementById('welcomeWord').innerText = trans.welcome;
-    document.getElementById('mainTitleName').innerText = `${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}`;
     document.getElementById('userNameDisplay').innerText = `${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}`;
+    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}</span> 🩺`;
     
     document.getElementById('langLabel').innerText = trans.langLabel;
     document.getElementById('nameLabel').innerText = trans.nameLabel;
@@ -154,7 +139,7 @@ if(document.getElementById('langSelect')) {
     });
 }
 
-// --- 4. زر الحفظ الرئيسي والتأكيد ---
+// --- 4. زر الحفظ الرئيسي ---
 document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
     e.preventDefault(); 
     
@@ -169,18 +154,12 @@ document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
     const userNameInput = document.getElementById('userNameInput');
     const newName = userNameInput.value.trim() || (currentLang === 'ar' ? "ملهم" : "Molham");
     localStorage.setItem('userName', newName);
-    
-    const trans = i18n[currentLang];
-    document.getElementById('welcomeWord').innerText = trans.welcome;
-    document.getElementById('userNameDisplay').innerText = currentLang === 'ar' ? `دكتور ${newName}` : `Dr. ${newName}`;
-    document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${currentLang === 'ar' ? 'دكتور' : 'Dr.'} ${newName}</span> 🩺`;
 
     const minsInput = document.getElementById('minsInput');
     const newMins = parseInt(minsInput.value) || 25;
     localStorage.setItem('userMins', newMins); 
 
-    let newColor = document.getElementById('colorPicker').value;
-    if (!newColor || newColor === "#000000") { newColor = "#6366f1"; } 
+    let newColor = document.getElementById('colorPicker').value || "#6366f1";
     document.documentElement.style.setProperty('--primary', newColor);
     localStorage.setItem('themeColor', newColor);
     
@@ -191,10 +170,10 @@ document.getElementById('mainSaveBtn').addEventListener('click', (e) => {
         timeLeft = newMins * 60;
         updateTimerDisplay();
     }
-    alert(trans.alertSave);
+    alert(i18n[currentLang].alertSave);
 });
 
-// --- 5. نظام المنبه والمؤقت الذكي ---
+// --- 5. نظام المؤقت ---
 function playAlarm() {
     try {
         const context = new (window.AudioContext || window.webkitAudioContext)();
@@ -247,19 +226,18 @@ function resetTimer() {
     clearInterval(timer);
     isRunning = false;
     document.getElementById('startBtn').innerText = i18n[currentLang].startBtnJob;
-    
     const mins = document.getElementById('minsInput').value || 25;
     timeLeft = mins * 60;
     updateTimerDisplay();
 }
 
-// --- 6. نظام النقاط ومتجر الطاقة ---
 function updateTimerDisplay() {
     const m = Math.floor(timeLeft / 60);
     const s = timeLeft % 60;
     document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
+// --- 6. متجر الطاقة والنقاط ---
 function addPoints() {
     const minsWorked = parseInt(document.getElementById('minsInput').value) || 25;
     points += (minsWorked * 3);  
@@ -283,15 +261,6 @@ function buyBreak(min) {
     }
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const item5 = document.getElementById('itemBreak5');
-    const item10 = document.getElementById('itemBreak10');
-    const item15 = document.getElementById('itemBreak15');
-    if(item5) item5.parentElement.onclick = () => buyBreak(5);
-    if(item10) item10.parentElement.onclick = () => buyBreak(10);
-    if(item15) item15.parentElement.onclick = () => buyBreak(15);
-});
-
 function savePoints() {
     localStorage.setItem('userPoints', points);
     updatePointsDisplay();
@@ -304,7 +273,7 @@ function resetPoints() {
     }
 }
 
-// --- 7. الدوال المساعدة والعد التنازلي ---
+// --- 7. العد التنازلي ---
 function changeQuote() {
     const qElem = document.getElementById('motivationQuote');
     const currentQuotes = quotes[currentLang];
@@ -330,7 +299,7 @@ function startGraduationCountdown() {
     }, 1000);
 }
 
-// --- 8. نظام إدارة المهام (To-Do List) ---
+// --- 8. إدارة المهام ---
 function addTask() {
     const input = document.getElementById('taskInput');
     const text = input.value.trim();
@@ -367,15 +336,10 @@ function renderTasks() {
     
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
-        
-        // كود الستايل الأصلي والكامل بتاعك بدون أي أبعاد مفروضة أو إضافات
-        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; padding: 12px 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 10px !important;";
-        
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
         li.innerHTML = 
-            /* الهيكل الأصلي والكامل للمهام لتعود للعمل بكفاءة تامة */
             '<div onclick="toggleTask(' + index + ')" style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
                 '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
                 '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + textAlignment + ' ' + strikeStyle + '">' + task.text + '</span>' +
