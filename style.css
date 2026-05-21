@@ -354,82 +354,46 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
    📝 منظومة المغناطيس الصارم والسكرول الموزون (مهمتين فقط بدون أي قص)
    ========================================================================== */
 /* ==========================================================================
-   🔒 منظومة التحديد الصارم (مهمتين فقط والباقي سكرول إجباري)
-   ========================================================================== */
-/* ==========================================================================
-   🔒 منظومة التحديد الصارم + المغناطيس الجاذب (Scroll Snap)
+   📝 المنظومة الطبيعية - مهام عريضة متتالية تلقائياً (بدون سكرول)
    ========================================================================== */
 #taskList {
     display: flex !important;
-    flex-direction: column !important; /* رص عمودي */
-    width: 100% !important;
-    
-    /* 📐 الحسبة الهندسية لظهور مهمتين بالظبط */
-    height: 110px !important;
-    max-height: 110px !important;
-    
-    overflow-y: scroll !important; /* السكرول إجباري */
-    overflow-x: hidden !important; 
-    
-    gap: 10px !important; 
+    flex-direction: column !important; /* ترتيب عمودي مغناطيسي طبيعي */
+    width: 100% !important; /* العرض الكامل للكارد */
+    height: auto !important; /* ترك الارتفاع حر تماماً لمنع القص */
+    max-height: none !important; /* إلغاء أي قيود قديمة */
+    overflow: visible !important; /* منع ظهور أي شريط تمرير مشوه */
+    gap: 10px !important; /* مسافة المغناطيس الثابتة بين المهام */
     margin-top: 15px !important;
-    padding: 0 !important; 
+    padding: 0 !important;
     list-style: none !important;
     box-sizing: border-box !important;
-
-    /* 🧲 تشغيل خاصية المغناطيس على الحاوية الكبيرة */
-    scroll-snap-type: y mandatory !important; /* إجبار السكرول العمودي على الانجذاب للمحاذاة */
-    scroll-behavior: smooth !important; /* جعل الحركة ناعمة وانسيابية */
-    
-    /* إخفاء وتنعيم شريط السكرول */
-    scrollbar-width: thin !important;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent !important;
 }
 
-/* 🎨 تخصيص شريط السكرول لـ Chrome و Safari */
-#taskList::-webkit-scrollbar {
-    width: 4px !important;
-}
-#taskList::-webkit-scrollbar-track {
-    background: transparent !important;
-}
-#taskList::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15) !important;
-    border-radius: 10px !important;
-}
-
-/* تنسيق حبة المهمة العريضة */
+/* تنسيق حبة المهمة العريضة المريحة */
 #taskList li {
     width: 100% !important;
-    
-    height: 50px !important; 
+    height: auto !important; /* ترك الحبة تتنفس حسب الخط */
     min-height: 50px !important; 
-    max-height: 50px !important;
-    
-    flex-shrink: 0 !important; 
     box-sizing: border-box !important;
     
     background: rgba(255, 255, 255, 0.04) !important;
     border-radius: 12px !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    padding: 0 15px !important;
+    padding: 10px 15px !important; /* حشو داخلي متناسق */
     
     display: flex !important;
     flex-direction: row !important;
     justify-content: space-between !important;
     align-items: center !important;
-
-    /* 🧲 قطب المغناطيس داخل الحبة */
-    scroll-snap-align: start !important; /* الحبة تنجذب وتلصق من أول حافتها فوراً */
 }
 
-/* ضبط النص في السنتر */
+/* ضبط النص */
 #taskList li span {
     font-size: 14px !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    line-height: 50px !important; 
+    line-height: 1.4 !important;
+    white-space: normal !important; /* السماح بالنزول لسطر جديد لو النص طويل جداً منعاً للقص */
+    word-break: break-word !important;
 }
 
 /* ➕ زر إضافة مهام جديدة */
