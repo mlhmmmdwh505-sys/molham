@@ -131,6 +131,16 @@ input[type="text"], input[type="number"], input[type="date"], select {
     width: 100% !important;
 }
 
+/* 🚫 إخفاء الأسهم الافتراضية تماماً من حقل أرقام الدقائق */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0 !important;
+}
+input[type="number"] {
+    -moz-appearance: textfield !important;
+}
+
 select { text-align-last: center !important; padding-right: 20px !important; appearance: none; -webkit-appearance: none; }
 select option { background-color: #0f172a !important; color: var(--text-main) !important; font-family: 'Cairo', sans-serif; }
 input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
@@ -165,16 +175,6 @@ button:hover { background: var(--primary) !important; box-shadow: 0 0 15px var(-
     padding: 0 !important;
 }
 
-/* 🚫 إخفاء الأسهم الافتراضية تماماً من حقل أرقام الدقائق */
-input[type="number"]::-webkit-inner-spin-button,
-input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none !important;
-    margin: 0 !important;
-}
-
-input[type="number"] {
-    -moz-appearance: textfield !important; /* لمتصفح فايرفوكس */
-}
 /* ==========================================================================
    🎨 5. هندسة كبسولة اللون الاحترافية
    ========================================================================== */
@@ -233,7 +233,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 }
 
 /* ==========================================================================
-   ⏱️ 7. منظومة بومودورو والعداد وتثبيت الأرقام (الخط القديم المريح)
+   ⏱️ 7. منظومة بومودورو والعداد وتثبيت الأرقام بالخط القديم
    ========================================================================== */
 #pomoDisplay { font-size: 70px; font-weight: 800; color: var(--primary); margin-bottom: 15px; text-shadow: 0 0 25px rgba(99, 102, 241, 0.3); }
 .pomo-actions { display: flex; justify-content: center; gap: 15px; width: 100%; }
@@ -242,28 +242,25 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 .unit span { font-size: 42px; font-weight: 800; color: var(--primary); display: block; }
 .unit label { font-size: 13px; color: var(--text-darker); font-weight: bold; margin-top: 4px; display: block; }
 
-/* 🔒 العودة للخط القديم وتثبيت الأرقام منعاً للرعشة */
 #years, #days, #hours, #pomoDisplay, .unit span {
-    font-family: 'Cairo', sans-serif !important; /* رجعنا لخط كايرو القديم الفخم */
+    font-family: 'Cairo', sans-serif !important; /* العودة الكاملة للخط القديم المريح */
     direction: ltr !important;
     unicode-bidi: bidi-override !important;
     display: inline-block;
-    font-variant-numeric: tabular-nums; /* ميزة تمنع رعشة وحركة الأرقام أثناء العد */
+    font-variant-numeric: tabular-nums;
     text-align: center;
 }
 #pomoDisplay { min-width: 180px; }
 
 /* ==========================================================================
-   🛍️ 9. متجر التميز الجمالي (فرد وتكبير الكروت لملء المساحة بالكامل)
+   🛍️ 9. متجر التميز الجمالي (تعديل الفرد الإجباري وملء مساحة الكارد)
    ========================================================================== */
-/* 🛠️ استبدل كود المتجر القديم بهذا التعديل الجديد بالظبط */
 .store-card {
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
     align-items: center !important;
     width: 100% !important;
-    height: 100% !important;
 }
 
 .store-grid { 
@@ -271,14 +268,14 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     direction: rtl !important;
     gap: 15px !important; 
     margin-top: 20px !important; 
-    width: 100% !important; /* بيخلي الكروت تفرش بكامل العرض */
+    width: 100% !important; /* إجبار الشبكة على الفرش بكامل العرض */
     height: auto !important;
 }
 
 .item { 
-    flex: 1 !important; /* بيوزع الكروت بالتساوي عشان تملأ الفراغات */
+    flex: 1 !important; /* توزيع متساوي تماماً يخلي الكروت تفرش وتملأ الفراغات */
     background: var(--success-bg) !important; 
-    padding: 25px 15px !important; /* تكبير الحشو الداخلي عشان يملأ الكارد */
+    padding: 25px 15px !important; /* زيادة الحشو الداخلي ليعطي فخامة وحجم أكبر */
     border-radius: 20px !important; 
     cursor: pointer !important; 
     border: 1px solid transparent !important; 
@@ -288,12 +285,12 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     justify-content: center !important; 
     align-items: center !important; 
     gap: 10px !important; 
-    font-size: 18px !important; /* تكبير الخط الافتراضي */
+    font-size: 18px !important; /* تكبير خط العناوين داخل الكروت */
     font-weight: bold !important;
 }
 
 .item small {
-    font-size: 15px !important; /* تكبير رقم النقاط (ن) بالأسفل */
+    font-size: 15px !important; /* تكبير خط النقاط (ن) بالأسفل ليصبح واضحاً */
     color: var(--success) !important;
     font-weight: 800 !important;
 }
@@ -303,10 +300,11 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     background: var(--success-hover) !important; 
     transform: scale(1.03) !important; 
 }
+
 /* ==========================================================================
    📝 10. منظومة المهام الفخمة وقفل المهمتين مغناطيسياً منعاً للدهس
    ========================================================================== */
-.todo-box {
+.tasks-card {
     display: flex !important;
     flex-direction: column !important;
     width: 100% !important;
@@ -330,7 +328,6 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 #taskInput { flex: 1 !important; height: 52px !important; max-height: 52px !important; padding: 0 25px !important; font-size: 16px !important; border-radius: 50px !important; }
 .btn-add { width: 60px !important; height: 52px !important; font-size: 24px !important; border-radius: 50px !important; flex-shrink: 0 !important; }
 
-/* 🧲 حاوية السكرول لمهمتين فقط (د. ملهم) */
 #taskList {
     list-style: none !important;
     display: flex !important;
@@ -381,7 +378,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     
     .dashboard-grid { flex-direction: column !important; gap: 20px !important; }
     .main-col, .side-col { width: 100% !important; max-width: 100% !important; }
-    .todo-box, .info-card { height: auto !important; min-height: auto !important; }
+    .tasks-card, .info-card { height: auto !important; min-height: auto !important; }
     .store-grid { flex-direction: column !important; }
     #taskList { height: 114px !important; max-height: 114px !important; overflow-y: scroll !important; }
 }
