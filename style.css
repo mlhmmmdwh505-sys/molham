@@ -254,12 +254,54 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 #pomoDisplay { min-width: 180px; }
 
 /* ==========================================================================
-   🛍️ 9. متجر التميز الجمالي
+   🛍️ 9. متجر التميز الجمالي (فرد وتكبير الكروت لملء المساحة بالكامل)
    ========================================================================== */
-.store-grid { display: flex; gap: 15px; margin-top: 15px; width: 100%; }
-.item { flex: 1; background: var(--success-bg); padding: 18px 12px; border-radius: 20px; cursor: pointer; border: 1px solid transparent; transition: border-color 0.3s, background 0.3s, transform 0.2s; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 6px; }
-.item:hover { border-color: var(--success); background: var(--success-hover); transform: scale(1.03); }
+.store-card {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    height: 100% !important;
+}
 
+.store-grid { 
+    display: flex !important; 
+    direction: rtl !important;
+    gap: 15px !important; 
+    margin-top: 20px !important; 
+    width: 100% !important; /* إجبار الشبكة على الفرش بكامل العرض */
+    height: auto !important;
+}
+
+.item { 
+    flex: 1 !important; /* توزيع متساوي تماماً يخلي الكروت تفرش وتملأ الفراغات */
+    background: var(--success-bg) !important; 
+    padding: 25px 15px !important; /* زيادة الحشو الداخلي ليعطي فخامة وحجم أكبر */
+    border-radius: 20px !important; 
+    cursor: pointer !important; 
+    border: 1px solid transparent !important; 
+    transition: border-color 0.3s, background 0.3s, transform 0.2s !important; 
+    display: flex !important; 
+    flex-direction: column !important; 
+    justify-content: center !important; 
+    align-items: center !important; 
+    gap: 10px !important; 
+    font-size: 18px !important; /* تكبير خط العناوين داخل الكروت */
+    font-weight: bold !important;
+}
+
+.item small {
+    font-size: 15px !important; /* تكبير خط النقاط (ن) بالأسفل ليصبح واضحاً */
+    color: var(--success) !important;
+    font-weight: 800 !important;
+}
+
+.item:hover { 
+    border-color: var(--success) !important; 
+    background: var(--success-hover) !important; 
+    transform: scale(1.03) !important; 
+}
 /* ==========================================================================
    📝 10. منظومة المهام الفخمة وقفل المهمتين مغناطيسياً منعاً للدهس
    ========================================================================== */
