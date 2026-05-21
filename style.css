@@ -456,3 +456,97 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     .store-grid { flex-direction: column !important; }
     #taskList { height: 114px !important; max-height: 114px !important; overflow-y: scroll !important; }
 }
+
+/* ==========================================================================
+   📱 11. منظومة الموازنة الذكية المخصصة لأجهزة الآيباد (iPad Tablet Optimization)
+   ========================================================================== */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    
+    /* 🖼️ ضبط أبعاد اللوحة الزجاجية الكبرى لتناسب الآيباد */
+    .glass-card {
+        width: 95vw !important;
+        height: auto !important; /* السماح بالمرونة الرأسية الطفيفة على التابلت */
+        max-height: 94vh !important;
+        margin: 2vh auto !important;
+        padding: 15px 20px !important; /* تقليل الحشو لتوفر مساحة */
+        gap: 12px !important;
+    }
+
+    /* 👑 تصغير عنوان اللوحة الرئيسي */
+    header h1 {
+        font-size: 22px !important;
+        margin-bottom: 2px !important;
+    }
+
+    /* ⏱️ تصغير عداد البومودورو والأزرار التابعة له */
+    #pomoDisplay {
+        font-size: 65px !important; /* حجم خط ملموم ومستقر جوه الكارد تماماً */
+        margin-bottom: 0px !important;
+    }
+
+    .pomo-actions {
+        max-width: 290px !important; /* لم الأزرار أفقياً */
+        gap: 10px !important;
+    }
+
+    .pomo-actions button, #startBtn, #resetBtn {
+        height: 42px !important; /* أزرار أنعم وأصغر */
+        font-size: 14px !important;
+    }
+
+    /* 📝 كارد إضافة المهام والمغناطيس */
+    .tasks-card {
+        padding: 15px !important;
+        gap: 8px !important;
+    }
+
+    .input-section {
+        height: 42px !important;
+        max-height: 42px !important;
+        gap: 8px !important;
+    }
+
+    #taskInput {
+        height: 40px !important;
+        max-height: 40px !important;
+        font-size: 14px !important;
+    }
+
+    .btn-add {
+        width: 44px !important;
+        height: 40px !important;
+        font-size: 18px !important;
+    }
+
+    /* حوض المغناطيس للمهمة الواحدة */
+    #taskList {
+        height: 56px !important;
+        max-height: 56px !important;
+    }
+
+    #taskList li {
+        height: 56px !important;
+        min-height: 56px !important;
+        max-height: 56px !important;
+        padding: 0 15px !important;
+        border-radius: 12px !important;
+        font-size: 14px !important;
+    }
+
+    /* 🏆 كروت التخرج ومتجر الطاقة للآيباد */
+    .dashboard-grid {
+        gap: 12px !important;
+    }
+
+    .stats-display {
+        gap: 10px !important;
+    }
+
+    .stat-item .stat-value {
+        font-size: 24px !important; /* تصغير طفيف لأرقام حلم التخرج */
+    }
+
+    .energy-item {
+        padding: 10px !important; /* لم عناصر المتجر */
+    }
+}
