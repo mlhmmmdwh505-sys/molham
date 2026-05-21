@@ -218,6 +218,13 @@ function toggleTimer() {
     const trans = i18n[currentLang];
     
     if (!isRunning) {
+        // 🔒 تكة الحماية: لو المؤقت كان مخلص (واقف عند 0)، نعيد شحنه بالوقت المطلوب قبل ما يبدأ يحسب نقاط
+        if (timeLeft <= 0) {
+            const mins = parseInt(document.getElementById('minsInput').value) || 25;
+            timeLeft = mins * 60;
+            updateTimerDisplay();
+        }
+
         isRunning = true;
         btn.innerText = trans.startBtnPause;
         
@@ -233,19 +240,45 @@ function toggleTimer() {
                 clearInterval(timer);
                 isRunning = false;
                 btn.innerText = trans.startBtnJob;
+                
+                // الحساب العادل ونهاية الوقت
+                addPoints(); 
                 playAlarm();
-                addPoints();
                 changeQuote();
+
+                // 🔒 إعادة شحن المؤقت فوراً بعد انتهاء الجلسة عشان الدوسة الجاية تبدأ بنظافة
+                const mins = parseInt(document.getElementById('minsInput').value) || 25;
+                timeLeft = mins * 60;
+                updateTimerDisplay();
             }
             updateTimerDisplay();
         }, 1000);
     } else {
+        // إذا ضغط إيقاف مؤقت، نحسب له نقاطه على الشغل اللي أنجزه حتى تلك اللحظة
         clearInterval(timer);
         isRunning = false;
         btn.innerText = trans.startBtnResume;
+        addPoints(); 
     }
 }
 
+function addPoints() {
+    const minsInput = parseInt(document.getElementById('minsInput').value) || 25;
+    const totalSecondsSeconds = minsInput * 60;
+    
+    // حساب الثواني اللي انقضت بالفعل
+    const secondsWorked = totalSecondsSeconds - timeLeft;
+    
+    // شرط حماة الثغرة: لازم يكون اشتغل أكتر من 20 ثانية حقيقية، وميكونش المؤقت لسه مشحون بالكامل
+    if (secondsWorked >= 20 && timeLeft < totalSecondsSeconds) {
+        const newPoints = Math.floor(secondsWorked / 20); 
+        points += newPoints;
+        savePoints();
+        
+        // 🔒 تصفير الثواني المحسوبة داخلياً عن طريق جعل timeLeft مساوياً للوقت الكلي منعاً للتكرار
+        timeLeft = totalSecondsSeconds; 
+    }
+}
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
@@ -261,22 +294,7 @@ function updateTimerDisplay() {
     document.getElementById('pomoDisplay').innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
 }
 
-// --- 6. متجر الطاقة والنقاط ---
-function addPoints() {
-    // 1. جلب إجمالي الدقائق المحددة وتحويلها لثوانٍ لمعرفة الوقت الأصلي للجلسة
-    const minsInput = parseInt(document.getElementById('minsInput').value) || 25;
-    const totalSecondsSeconds = minsInput * 60;
-    
-    // 2. حساب عدد الثواني الفردية التي ذاكرتها بالفعل (الوقت الأصلي ناقص الوقت المتبقي)
-    const secondsWorked = totalSecondsSeconds - timeLeft;
-    
-    // 3. الحسبة السحرية: كل 20 ثانية تعادل 1 نقطة بالظبط
-    if (secondsWorked > 0) {
-        const newPoints = Math.floor(secondsWorked / 20); // Math.floor لمنع الكسور العشري في النقاط
-        points += newPoints;
-        savePoints();
-    }
-}
+
 
 function buyBreak(min) {
     const cost = min * 15; 
