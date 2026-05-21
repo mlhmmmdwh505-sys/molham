@@ -335,32 +335,13 @@ function renderTasks() {
     var taskList = document.getElementById('taskList');
     if (!taskList) return;
     
+    // 1. تصفير المحتوى
     taskList.innerHTML = '';
     
-    // 1. تشغيل الـ 3 مهام والمغناطيس بسلاسل نصية قياسية آمنة 100%
-    taskList.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important; padding: 0 !important; margin: 15px 0 0 0 !important; text-align: right !important; box-sizing: border-box !important; height: 186px !important; max-height: 186px !important; overflow-y: scroll !important; scroll-snap-type: y mandatory !important; scroll-behavior: smooth !important;";
+    // 2. القفل الحديدي: إجبار حاوية المهام على ارتفاع مهمتين فقط بالملي (112px)
+    taskList.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; gap: 8px !important; padding: 0 !important; margin: 15px 0 0 0 !important; text-align: right !important; box-sizing: border-box !important; height: 112px !important; max-height: 112px !important; overflow-y: scroll !important; scroll-snap-type: y mandatory !important; scroll-behavior: smooth !important;";
 
-    // 2. إجبار حقل اللون على فرد نفسه وملء البوردر بالكامل بدون فراغات
-    var colorInput = document.querySelector('input[type="color"]');
-    if (colorInput) {
-        colorInput.style.cssText = "-webkit-appearance: none !important; -moz-appearance: none !important; appearance: none !important; width: 100% !important; height: 52px !important; background: transparent !important; border: none !important; border-radius: 25px !important; padding: 0 !important; margin: 0 !important; overflow: hidden !important; cursor: pointer !important;";
-        
-        var colorStyleId = 'color-fix-style';
-        if (!document.getElementById(colorStyleId)) {
-            var style = document.createElement('style');
-            style.id = colorStyleId;
-            style.innerHTML = "input[type='color']::-webkit-color-swatch-wrapper { padding: 0 !important; margin: 0 !important; border-radius: 25px !important; } input[type='color']::-webkit-color-swatch { border: none !important; border-radius: 25px !important; width: 100% !important; height: 100% !important; } input[type='color']::-moz-color-swatch { border: none !important; border-radius: 25px !important; }";
-            document.head.appendChild(style);
-        }
-    }
-
-    // 3. تكبير حقل "أضف مهمة جديدة" ليكون مفروداً وفخماً
-    var textInput = document.querySelector('input[type="text"]') || document.getElementById('taskInput');
-    if (textInput) {
-        textInput.style.cssText = "width: 100% !important; height: 52px !important; padding: 0 20px !important; font-size: 16px !important; font-weight: 600 !important; border-radius: 25px !important; box-sizing: border-box !important;";
-    }
-
-    // إخفاء شريط السكرول
+    // 3. إخفاء شريط السكرول المزعج برمجياً
     if (!document.getElementById('scroll-hide-style')) {
         var scrollStyle = document.createElement('style');
         scrollStyle.id = 'scroll-hide-style';
@@ -368,14 +349,17 @@ function renderTasks() {
         document.head.appendChild(scrollStyle);
     }
     
+    // 4. سحب المهام من الـ LocalStorage
     var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
+    // 5. بناء المهام وإجبار كل مهمة على أخذ ارتفاع 52px كاملة بدون أي انكماش
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
         li.className = 'fixed-task-item'; 
-        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 20px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; flex-shrink: 0 !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
         
-        // بناء المحتوى بأمان بدون تداخل علامات التنصيص
+        // منع المتصفح تماماً من تصغير حجم المهمة (flex: 0 0 52px) لتقص المهمة الثالثة فوراً
+        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 20px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
+        
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
