@@ -536,13 +536,6 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     transition: all 0.3s ease !important;
 }
 
-/* تأثير الهوفر الملون */
-.btn-add:hover {
-    background: currentColor !important;
-    background-color: currentColor !important;
-    color: #000 !important; /* يخلي الزائد تظهر بالأسود وسط اللون النشط */
-    cursor: pointer;
-}
 /* ==========================================================================
    📱 11. التجاوب مع الشاشات والموبايل (تحت 1024px)
    ========================================================================== */
