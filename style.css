@@ -969,10 +969,10 @@ input[type="color"]::-moz-color-swatch {
 }
 
 /* ==========================================================================
-   💻 التوزيع الذكي: مهام مفتوحة للابتوب ومحكومة للموبايل (د. ملهم)
+   👑 تثبيت العرض: مهمتين فقط بالظبط على اللاب توب والموبايل (د. ملهم)
    ========================================================================== */
 
-/* 1. الوضع الافتراضي (لابتوب والكمبيوتر): يعرض 3 إلى 4 مهام مستريحين */
+/* إجبار القائمة على مقاس مهمتين فقط في كل الشاشات ومنع ظهور الثالثة */
 #taskList, .tasks-container, ul {
     display: flex !important;
     flex-direction: column !important;
@@ -983,22 +983,14 @@ input[type="color"]::-moz-color-swatch {
     text-align: right !important;
     box-sizing: border-box !important;
     
-    height: 62px !important;     /* ارتفاع يتسع لـ 4 مهام كاملين على اللابتوب */
-    max-height: 62px !important;
+    height: 124px !important;     /* الارتفاع السحري المقاس لمهمتين بالظبط */
+    max-height: 124px !important; /* قفل الارتفاع بإحكام لمنع تمدد الكارت */
     overflow-y: scroll !important;
     scroll-snap-type: y mandatory !important;
     scroll-behavior: smooth !important;
 }
 
-/* 2. وضع الموبايل: أول ما الشاشة تصغر عن 768 بكسل، يقلب مهمتين بس */
-@media screen and (max-width: 768px) {
-    #taskList, .tasks-container, ul {
-        height: 124px !important;     /* كبس الارتفاع لمهمتين بس في التليفون */
-        max-height: 124px !important;
-    }
-}
-
-/* 3. تثبيت كود فرد اللون ومنع الفراغات السوداء (شغال لابتوب وموبايل) */
+/* 🎨 الحفاظ على كود فرد اللون بالكامل ومنع الفراغات الجانبية */
 input[type="color"] {
     -webkit-appearance: none !important;
     -moz-appearance: none !important;
