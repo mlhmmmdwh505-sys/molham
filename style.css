@@ -550,3 +550,123 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
         padding: 10px !important; /* لم عناصر المتجر */
     }
 }
+
+/* ==========================================================================
+   📱 12. منظومة التوسط والموازنة الشاملة للهواتف (Mobile Optimization)
+   ========================================================================== */
+@media only screen and (max-width: 767px) {
+
+    /* 1️⃣ تظبيط اللوحة الزجاجية الرئيسية لتتوسط الشاشة تماماً */
+    .glass-card {
+        width: 92vw !important;
+        max-width: 480px !important;
+        margin: 15px auto !important;
+        padding: 15px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important; /* وسطنة كل المحتويات */
+        justify-content: center !important;
+        gap: 15px !important;
+    }
+
+    /* 2️⃣ وسطنة قسم الإعدادات وجعل المدخلات متوازية ومحاذية للسنتر */
+    /* إذا كانت الإعدادات مرصوصة عمودياً في الموبايل */
+    .settings-grid, .settings-section {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100% !important;
+        gap: 12px !important;
+    }
+
+    /* جعل حقول الإدخال (الاسم، اللغة، اللون، إلخ) متوازية وموسطنة */
+    .settings-grid input, 
+    .settings-grid select,
+    #userNameInput, #langSelect, #minsInput, #gradDateInput, #colorPicker {
+        width: 85% !important; /* حجم متناسق غير مفرط جانبياً */
+        max-width: 320px !important;
+        height: 42px !important;
+        text-align: center !important; /* وسطنة النصوص بداخل الحقول */
+        margin: 0 auto !important;
+        display: block !important;
+    }
+
+    /* موازنة وتوسطن زر "تأكيد الإعدادات" */
+    #mainSaveBtn {
+        width: 85% !important;
+        max-width: 320px !important;
+        margin: 10px auto 0 auto !important;
+        display: block !important;
+        text-align: center !important;
+    }
+
+    /* 3️⃣ موازنة ووسطنة العداد (البومودورو) وأزراره */
+    #pomoDisplay {
+        font-size: 55px !important; /* حجم خط مثالي للهاتف */
+        text-align: center !important;
+        width: 100% !important;
+    }
+
+    .pomo-actions {
+        display: flex !important;
+        flex-direction: row !important; /* الحفاظ على الأزرار بجانب بعضها */
+        justify-content: center !important;
+        align-items: center !important;
+        width: 100% !important;
+        gap: 10px !important;
+    }
+
+    .pomo-actions button, #startBtn, #resetBtn {
+        flex: 1 !important;
+        max-width: 140px !important;
+        height: 42px !important;
+        font-size: 14px !important;
+    }
+
+    /* 4️⃣ إصلاح مظهر "أضف مهمة جديدة" ليتوازى أفقياً (نفس الصورة المكسورة) */
+    .input-section {
+        display: flex !important;
+        flex-direction: row !important; /* إجبار الحقل والزر يكونوا جنب بعض مش تحت بعض */
+        align-items: center !important;
+        justify-content: center !important;
+        width: 90% !important;
+        max-width: 340px !important;
+        margin: 0 auto !important;
+        gap: 8px !important;
+    }
+
+    #taskInput {
+        flex-grow: 1 !important; /* يجعل الحقل يأخذ المساحة المتاحة بالتوازي */
+        height: 42px !important;
+        margin: 0 !important;
+        text-align: center !important; /* وسطنة كلمة "أضف مهمة جديدة..." */
+    }
+
+    .btn-add {
+        width: 45px !important;
+        height: 42px !important;
+        flex-shrink: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    /* 5️⃣ حوض المهام المضافة (List Items) */
+    #taskList {
+        width: 90% !important;
+        max-width: 340px !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    #taskList li {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 10px 12px !important;
+    }
+}
