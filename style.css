@@ -947,8 +947,8 @@ input[type="color"]::-moz-color-swatch {
     /* 5. إعادة ضبط حاوية المهام لتستوعب 3 مهام بمظهر رائع */
     #taskList, .tasks-container, ul {
         width: 100% !important;
-        height: 186px !important; /* ارتفاع الـ 3 مهام اللي طلبته */
-        max-height: 186px !important;
+        height: 134px !important; /* ارتفاع الـ 3 مهام اللي طلبته */
+        max-height: 134px !important;
         margin-top: 15px !important;
     }
 
