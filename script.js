@@ -1,12 +1,13 @@
 // --- 1. المتغيرات والبيانات المحفوظة --- 
+// --- 1. المتغيرات والبيانات المحفوظة --- 
 let timer;
 let timeLeft;
 let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 let currentLang = localStorage.getItem('userLang') || "ar"; 
-let temporaryLang = currentLang; // 🧲 متغير مؤقت لحفظ اللغة المختارة حتى يتم التأكيد
-let isBreak = false; // 🔒 راية أمان لمعرفة هل الوقت الحالي للمذاكرة أم للاستراحة
+let temporaryLang = currentLang; 
+let isBreak = false; 
 
 const quotes = {
     ar: [
@@ -26,7 +27,6 @@ const quotes = {
         "Nothing is impossible with hard work. 💪🏼"
     ]
 };
-
 const i18n = {
     ar: {
         welcome: "مرحباً بك،", mainTitle: "لوحة تحكم ",
