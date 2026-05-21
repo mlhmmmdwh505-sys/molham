@@ -249,41 +249,39 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
    ⏱️ 7. منظومة بومودورو والعداد وتثبيت الأرقام (نسخة التكبير العملاقة)
    ========================================================================== */
 .focus-card {
-    padding: 35px 25px !important; /* زيادة حجم الكارد نفسه */
+    padding: 25px 20px !important; /* تقليل الحشو الداخلي للكارد طفيفاً */
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     align-items: center !important;
-    gap: 20px !important;
+    gap: 15px !important;
 }
-
 /* 💥 تكبير أرقام مؤقت البومودورو بشكل عملاق */
 #pomoDisplay { 
-    font-size: 110px !important; /* رفعناها من 70 لـ 110 عشان تملأ الكارد */
+    font-size: 80px !important; /* نزلت من الحجم الضخم لـ 78px لتكون متناسقة بالملي */
     font-weight: 800 !important; 
     color: var(--primary) !important; 
-    margin-bottom: 5px !important; 
-    text-shadow: 0 0 35px rgba(99, 102, 241, 0.4); 
+    margin-bottom: 2px !important; 
+    text-shadow: 0 0 25px rgba(99, 102, 241, 0.35); 
     line-height: 1 !important;
 }
-
 /* ↔️ فرد وتكبير منطقة الأزرار لتصبح بكامل العرض */
 .pomo-actions { 
     display: flex !important; 
     justify-content: center !important; 
-    gap: 20px !important; 
+    gap: 15px !important; 
     width: 100% !important; 
-    max-width: 450px !important; /* زيادة المدى العرضي للأزرار */
+    max-width: 380px !important; /* تقليل العرض الأقصى للأزرار عشان ما تفرشش بزيادة */
 }
 
 /* 🕹️ تكبير أزرار (ابدأ المهمة) و (إعادة ضبط) وتضخيم الخط بداخلها */
 .pomo-actions button, 
 #startBtn, 
 #resetBtn {
-    flex: 1 !important; /* جعل الزرين متساويين ويفرشوا بالتوازي */
-    height: 56px !important; /* زيادة الارتفاع لسهولة الضغط */
-    font-size: 18px !important; /* تكبير كملة ابدأ المهمة واعادة ضبط */
-    font-weight: 800 !important; /* خط عريض جداً واضح */
+    flex: 1 !important; 
+    height: 48px !important; /* تقليل الارتفاع من 56 لـ 48 بكسل لمظهر أنعم */
+    font-size: 16px !important; /* خط ملموم وواضح */
+    font-weight: 750 !important; 
     border-radius: 50px !important;
     transition: all 0.3s ease !important;
 }
