@@ -354,48 +354,48 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
    📝 منظومة المغناطيس الصارم والسكرول الموزون (مهمتين فقط بدون أي قص)
    ========================================================================== */
 /* ==========================================================================
-   🔒 منظومة الـ 2 مهمة فقط + المغناطيس الصارم (Scroll Snap) + إخفاء الشريط
+   🔒 منظومة الـ 2 مهمة فقط + المغناطيس الصارم (Scroll Snap)
    ========================================================================== */
 #taskList {
     display: flex !important;
-    flex-direction: column !important; /* رص عمودي مغناطيسي */
+    flex-direction: column !important; /* رص عمودي مغناطيسي صارم */
     width: 100% !important;
     
-    /* 📐 الحسبة الهندسية: طول المهمتين بالفجوة = 110px بالظبط */
-    height: 110px !important;
-    max-height: 110px !important;
+    /* 📐 الارتفاع المضمون والمريح لاستيعاب مهمتين بالملي بدون أي خنق */
+    height: 120px !important;
+    max-height: 120px !important;
     
-    overflow-y: auto !important; /* تفعيل السكرول داخلياً */
+    overflow-y: auto !important; /* تفعيل السكرول داخلياً للمهمة الثالثة */
     overflow-x: hidden !important; 
     gap: 10px !important; 
     margin-top: 15px !important;
-    padding: 0 !important; 
+    padding: 2px 0 !important; /* مساحة أمان ميكروسكوبية لمنع قص الحواف الرأسية */
     list-style: none !important;
     box-sizing: border-box !important;
 
-    /* 🧲 تشغيل خاصية المغناطيس على الحاوية الكبيرة */
-    scroll-snap-type: y mandatory !important; /* إجبار السكرول على الانجذاب للمحاذاة */
-    scroll-behavior: smooth !important; /* حركة ناعمة وانسيابية */
+    /* 🧲 تفعيل المغناطيس الحقيقي أثناء السكرول */
+    scroll-snap-type: y mandatory !important;
+    scroll-behavior: smooth !important;
 
-    /* 🧼 إخفاء شريط السكرول لمتصفح فايرفوكس والـ IE */
+    /* 🧼 إخفاء شريط السكرول تماماً للنظافة البصرية */
     -ms-overflow-style: none !important;  
     scrollbar-width: none !important;  
 }
 
-/* 🧼 إخفاء شريط السكرول تماماً لمتصفحات Chrome و Safari (الأسهم والشريط الرمادي) */
+/* 🧼 إخفاء شريط السكرول لمتصفحات Chrome و Safari */
 #taskList::-webkit-scrollbar {
     display: none !important; 
     width: 0 !important;
     height: 0 !important;
 }
 
-/* تنسيق حبة المهمة العريضة الثابتة */
+/* تنسيق حبة المهمة (مرن عمودياً لمنع القص وثابت هيدروليكياً للمغناطيس) */
 #taskList li {
     width: 100% !important;
-    height: 50px !important; 
-    min-height: 50px !important; 
-    max-height: 50px !important;
-    flex-shrink: 0 !important; /* ممنوع تعصر الحبات */
+    height: 52px !important; 
+    min-height: 52px !important; 
+    max-height: 52px !important;
+    flex-shrink: 0 !important; /* يمنع المتصفح من عصر الحبة */
     box-sizing: border-box !important;
     
     background: rgba(255, 255, 255, 0.04) !important;
@@ -406,19 +406,60 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     display: flex !important;
     flex-direction: row !important;
     justify-content: space-between !important;
-    align-items: center !important;
+    align-items: center !important; /* سنترة المحتوى داخلياً */
 
-    /* 🧲 قطب المغناطيس داخل كل حبة */
-    scroll-snap-align: start !important; /* الحبة تنجذب وتلتصق من أول حافتها فوراً */
+    /* 🧲 قطب المغناطيس: الحبة تنجذب وتثبت مكعباً في مكانه فوراً */
+    scroll-snap-align: start !important;
 }
 
-/* ضبط النص في المنتصف وبسطر واحد */
+/* ضبط النص ليتوسط الحبة تماماً وبدون أي قص */
 #taskList li span {
     font-size: 14px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
-    line-height: 50px !important; 
+    line-height: 52px !important; /* مطابقة الـ line-height مع ارتفاع الحبة للسنترة الكاملة */
+}
+
+/* ==========================================================================
+   🧱 قسم إدخال البيانات (إجبار العناصر على سطر واحد كتف في كتف)
+   ========================================================================== */
+.input-section {
+    display: flex !important;
+    flex-direction: row !important; /* إجبار الحقل والزرار على نفس السطر */
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 10px !important; /* مسافة ثابتة وأنيقة بين الحقل والزر */
+    margin-bottom: 15px !important;
+    box-sizing: border-box !important;
+}
+
+/* ضبط حقل إدخال النص */
+#taskInput { 
+    flex: 1 !important; /* يخليه يفرش وياخد كل المساحة المتاحة بجانب الزر */
+    height: 46px !important; 
+    max-height: 46px !important; 
+    padding: 0 20px !important; 
+    font-size: 15px !important; 
+    border-radius: 50px !important; 
+    box-sizing: border-box !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #fff !important;
+}
+
+/* ➕ زر إضافة مهام جديدة */
+.btn-add { 
+    width: 52px !important; 
+    height: 46px !important; 
+    max-height: 46px !important;
+    font-size: 20px !important; 
+    border-radius: 50px !important; 
+    flex-shrink: 0 !important; /* ممنوع ينزل تحت أو ينضغط */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 /* ==========================================================================
    📱 11. التجاوب مع الشاشات والموبايل (تحت 1024px)
