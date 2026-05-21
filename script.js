@@ -157,7 +157,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     localStorage.setItem('userName', newName);
 
     const minsInput = document.getElementById('minsInput');
-    const newMins = parseFloat(minsInput.value) || 25;
+    const newMins = parseFloat(minsInput.value) || 25; // ✔️ تعديل parseFloat
     localStorage.setItem('userMins', newMins); 
 
     let newColor = document.getElementById('colorPicker').value || "#6366f1";
