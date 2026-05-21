@@ -53,6 +53,7 @@ const i18n = {
 
 // --- 2. دالة تهيئة الصفحة ---
 window.onload = () => {
+    
     points += 75; savePoints();
     
     updatePointsDisplay();
