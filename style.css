@@ -54,37 +54,36 @@ body {
 * { scrollbar-width: none !important; -ms-overflow-style: none !important; }
 
 /* ==========================================================================
-   🖼️ 2. الهيكل الزجاجي الرئيسي (نسخة الفرد الكامل لملء الشاشة الفخمة)
+   🖼️ 2. الهيكل الزجاجي الرئيسي (المقاس الذهبي المحكم للاب توب)
    ========================================================================== */
 .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(25px);
     -webkit-backdrop-filter: blur(25px);
-    border-radius: 35px;
+    border-radius: 30px;
     
-    /* 🚀 التعديل السحري: رفعنا العرض لـ 96% والحد الأقصى لـ 1500px لملء الفراغات تماماً */
-    width: 96vw !important;
-    max-width: 1500px !important; 
+    /* 🎯 الأبعاد المثالية: ملء الفراغ الجانبي بنسبة متناسقة والتحكم بالحد الأقصى */
+    width: 92vw !important; /* فرد اللوحة لملء الشاشة بنسبة مريحة جداً */
+    max-width: 1200px !important; /* قفل العرض الأقصى عشان العناصر ما تتباعدش بزيادة */
     
-    /* ضبط الارتفاع ليتناسب عمودياً مع الشاشة بدون ترك هوامش عملاقة */
-    margin: 2vh auto !important;
-    padding: 35px 40px !important; /* زيادة الحشو الداخلي ليعطي اتساع */
+    /* ضبط الهوامش الرأسية والارتفاع لمنع الـ Scroll العشوائي */
+    margin: 3vh auto !important;
+    padding: 25px 30px !important; /* حشو داخلي متناسق يلم العناصر بشكل فخم */
     
     border: 1px solid var(--glass-border);
     position: relative;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
-    gap: 25px;
+    gap: 20px;
     overflow: visible !important;
 }
 
-/* تكبير عنوان اللوحة الرئيسي ليتناسب مع الحجم الجديد */
+/* ضبط حجم كرت عنوان اللوحة الرئيسي */
 header h1 { 
-    font-size: 34px !important; 
+    font-size: 30px !important; 
     font-weight: 850 !important; 
-    letter-spacing: 0.5px;
     background: linear-gradient(to bottom, #ffffff, #cbd5e1); 
     -webkit-background-clip: text; 
     -webkit-text-fill-color: transparent; 
