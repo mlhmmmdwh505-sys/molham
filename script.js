@@ -205,15 +205,18 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
 // --- 5. نظام المؤقت ---
 function playAlarm() {
     try {
-        // 🔔 رابط صوت مباشر وموثوق ومفتوح المصدر ومضمون على جيت هاب
-        const alarmAudio = new Audio("https://raw.githubusercontent.com/rafaelreis-hotmart/Audio-Samples/master/assets/warning.mp3");
+        // استدعاء العنصر الثابت المخزن في الـ HTML
+        const alarmAudio = document.getElementById('alarmSound');
         
-        alarmAudio.volume = 1.0; // أعلى درجة صوت
-        
-        // تشغيل الصوت فوراً
-        alarmAudio.play().catch(e => {
-            console.log("المتصفح يطلب تفاعل أولاً: اضغط في أي مكان على الشاشة لتفعيل الصوت تلقائياً.");
-        });
+        if (alarmAudio) {
+            alarmAudio.volume = 1.0; // أعلى درجة صوت
+            alarmAudio.currentTime = 0; // إعادة الصوت من البداية في كل مرة
+            
+            // تشغيل غصب عن قيود الخلفية
+            alarmAudio.play().catch(e => {
+                console.log("المتصفح حظر التكرار التلقائي في الخلفية.");
+            });
+        }
     } catch (e) { 
         console.log("خطأ في نظام الصوت:", e); 
     }
