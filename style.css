@@ -365,8 +365,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     height: 110px !important;
     max-height: 110px !important;
     
-    overflow-y: scroll !important; /* السكرول إجباري */
-    overflow-x: hidden !important; 
+    overflow: visible !important; /* السكرول إجباري */ 
     
     gap: 10px !important; 
     margin-top: 15px !important;
