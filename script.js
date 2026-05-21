@@ -338,10 +338,10 @@ function renderTasks() {
     // 1. تصفير المحتوى
     taskList.innerHTML = '';
     
-    // 2. القفل الحديدي الموزون: إجبار الحاوية على ارتفاع مهمتين كاملتين منورين (114px)
+    // 2. القفل الحديدي للحاوية بارتفاع مهمتين منورين كاملين
     taskList.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; gap: 10px !important; padding: 0 !important; margin: 15px 0 0 0 !important; box-sizing: border-box !important; height: 114px !important; max-height: 114px !important; overflow-y: scroll !important; scroll-snap-type: y mandatory !important; scroll-behavior: smooth !important;";
 
-    // 3. تأمين إخفاء السكرول بار برمجياً
+    // 3. تأمين إخفاء سكرول بار المتصفح المزعج
     if (!document.getElementById('scroll-hide-style')) {
         var scrollStyle = document.createElement('style');
         scrollStyle.id = 'scroll-hide-style';
@@ -351,24 +351,40 @@ function renderTasks() {
     
     var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     
-    // 4. بناء المهام بتوزيع مرن ذكي (مستحيل يتكوموا جنب بعض)
+    // معرفة لغة الموقع الحالية لتنسيق محاذاة النص الداخلي
+    var currentLang = document.documentElement.lang || 'ar';
+    var isAr = currentLang === 'ar';
+    
+    // 4. بناء المهام بتوزيع هندسي يضمن بقاء الـ ❌ منفردة في الطرف
     tasks.forEach(function(task, index) {
         var li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
-        // إجبار المهمة على الارتفاع الكامل وتصفير المارجن السفلي لمنع خنق المهمة الثانية
-        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
+        // تثبيت الاتجاه ltr لكل المهمة لتأمين بقاء الأجزاء في أطرافها الثابتة
+        li.style.cssText = "display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; width: 100% !important; box-sizing: border-box !important; flex: 0 0 52px !important; height: 52px !important; min-height: 52px !important; max-height: 52px !important; padding: 0 15px !important; background: rgba(255, 255, 255, 0.04) !important; border: 1px solid rgba(255, 255, 255, 0.1) !important; border-radius: 12px !important; margin-bottom: 0px !important; direction: ltr !important; scroll-snap-align: start !important; scroll-snap-stop: always !important;";
         
         var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
         var icon = task.done ? "✅" : "⭕";
         
-        // استخدام هندسة التوزيع الداخلي المرن ليفصل النص عن علامة الـ ❌ تلقائياً حسب لغة الموقع
-        li.innerHTML = '<div style="display: flex !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;" onclick="toggleTask(' + index + ')">' +
-            '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
-            '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
-            '</div>' +
-            '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important;">❌</button>';
-            
+        // تحديد ترتيب العناصر الداخلية برمجياً بناءً على لغة واجهة المستخدم لتظهر بفخامة
+        var taskContent = '';
+        if (isAr) {
+            // عربي: النص والأيقونة في اليمين، والـ ❌ منفرة في أقصى اليسار
+            taskContent = '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important;">❌</button>' +
+                '<div style="display: flex !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important; justify-content: flex-end !important; direction: rtl !important;">' +
+                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; text-align: right !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
+                '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
+                '</div>';
+        } else {
+            // إنجليزي: الأيقونة والنص في اليسار، والـ ❌ منفردة في أقصى اليمين
+            taskContent = '<div style="display: flex !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important; justify-content: flex-start !important; direction: ltr !important;">' +
+                '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
+                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; text-align: left !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + strikeStyle + '">' + task.text + '</span>' +
+                '</div>' +
+                '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important;">❌</button>';
+        }
+        
+        li.innerHTML = taskContent;
         taskList.appendChild(li);
     });
 }
