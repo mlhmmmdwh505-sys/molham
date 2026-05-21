@@ -204,27 +204,45 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
 
 // --- 5. نظام المؤقت ---
 function playAlarm() {
+    // 1. محاولة تشغيل الصوت الرقمي
     try {
-        // صوت منبه رقمي قصير ونظيف ومباشر
         const alarmAudio = new Audio("https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav");
-        
-        alarmAudio.volume = 1.0; // أعلى درجة صوت
-        
-        // إجبار المتصفح على التشغيل
-        let playPromise = alarmAudio.play();
-        
-        if (playPromise !== undefined) {
-            playPromise.catch(error => {
-                console.log("حظر التصفح التلقائي نشط: ", error);
-                // حل بديل: إظهار الرعب للمتصفح كـ تذكير بصري لو الصوت اتحظر
-                alert("⏰ انتهى الوقت الحين! (تم حظر الصوت من المتصفح)");
-            });
-        }
-    } catch (e) { 
-        console.log("خطأ في النظام الصوتي:", e); 
+        alarmAudio.volume = 1.0;
+        alarmAudio.play().catch(e => { console.log("Linux browser blocked direct audio."); });
+    } catch (e) { }
+
+    // 2. 🐧 خدعة الـ Audio Context الخفيفة لعمل زنة (Beep) إلكترونية غصب عن المتصفح في لينكس
+    try {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = context.createOscillator();
+        const gain = context.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(880, context.currentTime); // تردد نغمة التنبيه
+        gain.gain.setValueAtTime(0.5, context.currentTime);
+        osc.connect(gain);
+        gain.connect(context.destination);
+        osc.start();
+        osc.stop(context.currentTime + 0.5); // تصفر لمدة نصف ثانية وتفصل
+    } catch(e) { }
+
+    // 3. إرسال الإشعار الرسمي لـ Desktop Environment بتاعتك (GNOME / KDE)
+    if ("Notification" in window && Notification.permission === "granted") {
+        new Notification("⏰ انتهى الوقت يا دكتور!", {
+            body: "عاش يا بطل ملهم، ارفع راسك وخذ بريك الحين! 🩺",
+            icon: "https://cdn-icons-png.flaticon.com/512/1827/1827312.png"
+        });
+        alert("⏰ انتهى الوقت الحين! 💪🩺");
+    } else if ("Notification" in window && Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                new Notification("⏰ انتهى الوقت يا دكتور! 🩺");
+            }
+            alert("⏰ انتهى الوقت الحين! 💪🩺");
+        });
+    } else {
+        alert("⏰ انتهى الوقت الحين! 💪🩺");
     }
 }
-
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
     const trans = i18n[currentLang];
