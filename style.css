@@ -691,3 +691,11 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
         margin-bottom: 0 !important; /* الاعتماد على gap للحاوية */
     }
 }
+/* تكبير الرقم المكتوب جوة خانة الدقائق فقط */
+#minsInput {
+    font-size: 2rem !important; /* تكبير حجم الرقم */
+    font-weight: 700 !important; /* جعل الرقم عريض وواضح */
+    text-align: center !important; /* توسيط الرقم جوة الخانة لشكل أشيك */
+    padding: 5px !important; /* إضافة مساحة مريحة حول الرقم */
+}
+
