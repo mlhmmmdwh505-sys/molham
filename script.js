@@ -5,8 +5,7 @@ let isRunning = false;
 let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 let currentLang = localStorage.getItem('userLang') || "ar"; 
-let temporaryLang = currentLang; 
-let isBreak = false; 
+let temporaryLang = currentLang;  
 let isPaused = false; // متغير جديد برا الدالة عشان يعرف لو كنا عاملين إيقاف مؤقت
 
 
@@ -235,14 +234,25 @@ function playAlarm() {
     }
 }
 
+// تأكد أن المتغيرات دي متعرّفة في أول الملف برة أي دالة
+let timer = null;
+let timeLeft = parseFloat(document.getElementById('work-duration')?.value || 25) * 60;
+let isBreak = false;
+
 function toggleTimer() {
     const button = document.getElementById('start-btn');
+    const workInput = document.getElementById('work-duration');
+    
+    // لو الـ timeLeft مش متعرّف أو قيمته صفر، خده من الخانة فوراً
+    if (!timeLeft || timeLeft <= 0) {
+        timeLeft = parseFloat(workInput.value || 25) * 60;
+    }
     
     if (timer === null) {
         // بداية التشغيل أو الاستئناف
         button.innerText = isBreak ? "إيقاف مؤقت للراحة ☕" : "إيقاف مؤقت للمهمة ⏸️";
         
-        // ضبط وقت النهاية الجديد بناءً على الثواني المتبقية الحالية بالظبط
+        // حساب وقت النهاية الحقيقي بدقة سويسري
         const endTime = Date.now() + (timeLeft * 1000);
         
         timer = setInterval(() => {
@@ -259,9 +269,9 @@ function toggleTimer() {
                     showNewQuote();
                 }
                 
-                // إعادة ضبط بعد الانتهاء
+                // إعادة ضبط السيستم تلقائياً بعد الانتهاء
                 isBreak = false;
-                timeLeft = parseFloat(document.getElementById('work-duration').value || 25) * 60;
+                timeLeft = parseFloat(workInput.value || 25) * 60;
                 updateDisplay();
                 button.innerText = "ابدأ المهمة 🚀";
             } else {
@@ -270,14 +280,13 @@ function toggleTimer() {
         }, 1000);
         
     } else {
-        // هنا الضغط على "إيقاف مؤقت"
+        // حالة الإيقاف المؤقت
         clearInterval(timer);
         timer = null;
         
-        // بنحفظ الـ timeLeft الحالي زي ما هو بدون تغيير
         button.innerText = isBreak ? "استئناف الراحة ☕" : "استئناف المهمة ▶️";
         
-        // لو مش في وقت راحة، احسب له نقاطه على الشغل اللي أنجزه لحد ثانية الإيقاف
+        // إضافة نقاط جزئية لو عمل إيقاف مؤقت أثناء المذاكرة
         if (!isBreak) {
             addPoints(); 
         }
