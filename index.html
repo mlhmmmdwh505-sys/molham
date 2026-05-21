@@ -28,32 +28,37 @@
             <p class="welcome-msg"><span id="welcomeWord">مرحباً بك،</span> <span id="userNameDisplay">دكتور ملهم</span> ✨</p>
             <p id="motivationQuote" style="color: var(--primary); font-style: italic; margin-top: 10px; min-height: 24px; font-weight: bold;"></p>
             
-            <div class="settings-bar card">
-                <div class="setting-item">
-                    <label id="langLabel">اللغة</label>
-                   <select id="languageSelect" class="form-control">
-    <option value="ar">العربية</option>
-    <option value="en">English</option>
-</select>
-                </div>
-                <div class="setting-item">
-                    <label id="nameLabel">الاسم</label>
-                    <input type="text" id="userNameInput" placeholder="اكتب اسمك هنا...">
-                </div>
-                <div class="setting-item">
-                    <label id="colorLabel">اللون</label>
-                    <input type="color" id="colorPicker" value="#6366f1">
-                </div>
-                <div class="setting-item">
-                    <label id="dateLabel">التاريخ</label>
-                    <input type="date" id="gradDateInput">
-                </div>
-                <div class="setting-item">
-                    <label id="minsLabel">الدقائق</label>
-                    <input type="number" id="minsInput" value="25" class="num-input">
-                </div>
-                <button class="btn-save" id="mainSaveBtn">تأكيد الإعدادات</button>
-            </div>
+           <div class="settings-box">
+    <div class="form-group">
+        <label id="langLabel">اللغة</label>
+        <select id="langSelect" class="form-control">
+            <option value="ar">العربية</option>
+            <option value="en">English</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label id="nameLabel">الاسم</label>
+        <input type="text" id="userNameInput" class="form-control" placeholder="د. ملهم">
+    </div>
+
+    <div class="form-group">
+        <label id="minsLabel">الدقائق</label>
+        <input type="number" id="minsInput" class="form-control" min="1" max="120" value="25">
+    </div>
+
+    <div class="form-group">
+        <label id="colorLabel">اللون</label>
+        <input type="color" id="colorPicker" class="form-control">
+    </div>
+
+    <div class="form-group">
+        <label id="dateLabel">التاريخ</label>
+        <input type="date" id="gradDateInput" class="form-control">
+    </div>
+
+    <button id="mainSaveBtn" class="btn btn-primary">تأكيد الإعدادات</button>
+</div>
         </header>
 
         <div class="dashboard-grid">
