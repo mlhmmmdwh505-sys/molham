@@ -211,29 +211,44 @@ function playAlarm() {
             bgTrack.play().catch(() => {});
         }
 
-        // 2. ⚡ توليد الزنة الإلكترونية الخاطفة (0.3 ثانية) ذاتياً غصب عن المتصفح
+        // 2. 🎵 توليد نغمة "تين تون" الموسيقية الهادية ذاتياً
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         if (!AudioContext) return;
         
         const context = new AudioContext();
-        const oscillator = context.createOscillator();
-        const gainNode = context.createGain();
+        const now = context.currentTime;
         
-        oscillator.connect(gainNode);
-        gainNode.connect(context.destination);
+        // --- النغمة الأولى (تـيـن) ---
+        const osc1 = context.createOscillator();
+        const gain1 = context.createGain();
+        osc1.type = 'sine'; // موجة ناعمة جداً
+        osc1.frequency.setValueAtTime(523.25, now); // نغمة C5 الموسيقية الناعمة
+        gain1.gain.setValueAtTime(0.3, now); // مستوى صوت هادئ ومريح
+        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15); // خفتان تدريجي سريع
+        osc1.connect(gain1);
+        gain1.connect(context.destination);
         
-        oscillator.type = 'sine'; 
-        oscillator.frequency.setValueAtTime(880, context.currentTime); // تردد التنبيه
-        gainNode.gain.setValueAtTime(1.0, context.currentTime); // أعلى صوت
+        // --- النغمة الثانية (تـون) ---
+        const osc2 = context.createOscillator();
+        const gain2 = context.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(392.00, now + 0.15); // نغمة G4 متناسقة تبدأ بعد الأولى
+        gain2.gain.setValueAtTime(0.3, now + 0.15);
+        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3); // تنتهي بالظبط عند 0.3 ثانية
+        osc2.connect(gain2);
+        gain2.connect(context.destination);
         
-        oscillator.start();
-        oscillator.stop(context.currentTime + 0.3); // يقف بعد 0.3 ثانية بالظبط
+        // تشغيل النغمتين ووقفهم في الإجمالي عند 0.3 ثانية
+        osc1.start(now);
+        osc1.stop(now + 0.15);
+        
+        osc2.start(now + 0.15);
+        osc2.stop(now + 0.3);
         
     } catch (e) {
-        console.log("Audio block bypass error:", e);
+        console.log("Audio bypass error:", e);
     }
 }
-
 
 function toggleTimer() {
     const btn = document.getElementById('startBtn');
