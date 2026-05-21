@@ -429,4 +429,3 @@ function renderTasks() {
             
         taskList.appendChild(li);
     });
-}
