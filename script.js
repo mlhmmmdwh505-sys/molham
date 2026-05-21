@@ -344,25 +344,76 @@ function renderTasks() {
         parentCard.style.cssText = "display: flex !important; flex-direction: column !important; width: 100% !important; min-width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; padding: 25px !important; overflow: hidden !important;";
     }
     
-    // 3. ضبط حاوية المهام (الـ ul) لتظهر بعرض كامل وتتسع لمهمتين بالظبط مع مغناطيس ناعم
+function renderTasks() {
+    const taskList = document.getElementById('taskList');
+    if (!taskList) return;
+    
+    taskList.innerHTML = '';
+    
+    // 1. ضبط حاوية المهام لتستوعب 3 مهام بكامل العرض
     taskList.style.cssText = `
         display: flex !important;
         flex-direction: column !important;
         width: 100% !important;
-        min-width: 100% !important;
         gap: 10px !important;
         padding: 0 !important;
         margin: 15px 0 0 0 !important;
         text-align: right !important;
         box-sizing: border-box !important;
-        height: 133px !important;
-        max-height: 133px !important;
+        height: 186px !important; 
+        max-height: 186px !important; 
         overflow-y: scroll !important;
         scroll-snap-type: y mandatory !important;
         scroll-behavior: smooth !important;
     `;
 
-    // حقن ستايل مخفي لإخفاء شريط السكرول المزعج
+    // 2. تصفير وإجبار حقل اختيار اللون على ملء البوردر والفراغ بالكامل (علاج الموبايل الحاسم)
+    const colorInput = document.querySelector('input[type="color"]');
+    if (colorInput) {
+        colorInput.style.cssText = `
+            -webkit-appearance: none !important;
+            -moz-appearance: none !important;
+            appearance: none !important;
+            width: 100% !important;
+            height: 52px !important;
+            background: transparent !important;
+            border: none !important;
+            border-radius: 25px !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            overflow: hidden !important;
+            cursor: pointer !important;
+        `;
+        
+        // حقن ستايل داخلي لجعل اللون يملأ الحواف بالكامل في سفاري وكروم على الموبايل
+        const colorStyleId = 'color-fix-style';
+        if (!document.getElementById(colorStyleId)) {
+            const style = document.createElement('style');
+            style.id = colorStyleId;
+            style.innerHTML = `
+                input[type="color"]::-webkit-color-swatch-wrapper { padding: 0 !important; margin: 0 !important; border-radius: 25px !important; }
+                input[type="color"]::-webkit-color-swatch { border: none !important; border-radius: 25px !important; width: 100% !important; height: 100% !important; }
+                input[type="color"]::-moz-color-swatch { border: none !important; border-radius: 25px !important; }
+            `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // 3. تكبير حقل "أضف مهمة جديدة" ليكون فخماً ومفروداً
+    const textInput = document.querySelector('input[type="text"]') || document.getElementById('taskInput');
+    if (textInput) {
+        textInput.style.cssText = `
+            width: 100% !important;
+            height: 52px !important;
+            padding: 0 20px !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            border-radius: 25px !important;
+            box-sizing: border-box !important;
+        `;
+    }
+
+    // إخفاء شريط السكرول
     if (!document.getElementById('scroll-hide-style')) {
         const style = document.createElement('style');
         style.id = 'scroll-hide-style';
@@ -376,22 +427,20 @@ function renderTasks() {
         const li = document.createElement('li');
         li.className = 'fixed-task-item'; 
         
-        // 4. كبسولة المهمة الفردية: مفرودة تماماً وواخدة العرض كله ومجهّزة للمغناطيس
         li.style.cssText = `
             display: flex !important;
             flex-direction: row !important;
             align-items: center !important;
             justify-content: space-between !important;
             width: 100% !important;
-            min-width: 100% !important;
             box-sizing: border-box !important;
-            height: 52px !important;
-            min-height: 52px !important;
-            max-height: 52px !important;
+            height: 52px !important; 
+            min-height: 52px !important; 
+            max-height: 52px !important; 
             padding: 0 20px !important;
             background: rgba(255, 255, 255, 0.04) !important;
             border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 15px !important;
+            border-radius: 12px !important;
             flex-shrink: 0 !important;
             scroll-snap-align: start !important;
             scroll-snap-stop: always !important;
