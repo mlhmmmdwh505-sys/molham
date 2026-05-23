@@ -401,8 +401,6 @@ function playAlarm() {
 
         // 🔔 تشغيل النغمة الأصلية 3 مرات متتالية عشان تلفت انتباهك تماماً
         triggerOriginalTintun(now);        // المرة الأولى فوراً
-        triggerOriginalTintun(now + 0.7);  // المرة الثانية بعد فاصل مريح
-        triggerOriginalTintun(now + 1.4);  // المرة الثالثة للتأكيد النهائي
         
     } catch (e) {
         console.log("Audio bypass error:", e);
