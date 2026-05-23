@@ -368,38 +368,46 @@ function playAlarm() {
         if (!AudioContext) return;
         
         const context = new AudioContext();
+        
+        // دالة داخلية لتشغيل نغمة تين تون الأصلية بدقة
+        function triggerOriginalTintun(startTime) {
+            // 🔔 نغمة "تين" (C5)
+            const osc1 = context.createOscillator();
+            const gain1 = context.createGain();
+            osc1.type = 'sine'; // الموجة الناعمة الأصلية
+            osc1.frequency.setValueAtTime(523.25, startTime); 
+            gain1.gain.setValueAtTime(1.0, startTime); // أعلى درجة صوت 📢
+            gain1.gain.exponentialRampToValueAtTime(0.001, startTime + 0.2); 
+            osc1.connect(gain1);
+            gain1.connect(context.destination);
+            
+            // 🔔 نغمة "تون" (E5) بعد 150 مللي ثانية
+            const osc2 = context.createOscillator();
+            const gain2 = context.createGain();
+            osc2.type = 'sine'; // الموجة الناعمة الأصلية
+            osc2.frequency.setValueAtTime(659.25, startTime + 0.15); 
+            gain2.gain.setValueAtTime(1.0, startTime + 0.15); // أعلى درجة صوت 📢
+            gain2.gain.exponentialRampToValueAtTime(0.001, startTime + 0.4); 
+            osc2.connect(gain2);
+            gain2.connect(context.destination);
+            
+            osc1.start(startTime);
+            osc1.stop(startTime + 0.2);
+            osc2.start(startTime + 0.15);
+            osc2.stop(startTime + 0.4);
+        }
+
         const now = context.currentTime;
-        
-        // نغمة تين
-        const osc1 = context.createOscillator();
-        const gain1 = context.createGain();
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(523.25, now); 
-        gain1.gain.setValueAtTime(0.3, now); 
-        gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.15); 
-        osc1.connect(gain1);
-        gain1.connect(context.destination);
-        
-        // نغمة تون
-        const osc2 = context.createOscillator();
-        const gain2 = context.createGain();
-        osc2.type = 'sine';
-        osc2.frequency.setValueAtTime(659.25, now + 0.15); 
-        gain2.gain.setValueAtTime(0.3, now + 0.15);
-        gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.3); 
-        osc2.connect(gain2);
-        gain2.connect(context.destination);
-        
-        osc1.start(now);
-        osc1.stop(now + 0.15);
-        osc2.start(now + 0.15);
-        osc2.stop(now + 0.3);
+
+        // 🔔 تشغيل النغمة الأصلية 3 مرات متتالية عشان تلفت انتباهك تماماً
+        triggerOriginalTintun(now);        // المرة الأولى فوراً
+        triggerOriginalTintun(now + 0.7);  // المرة الثانية بعد فاصل مريح
+        triggerOriginalTintun(now + 1.4);  // المرة الثالثة للتأكيد النهائي
         
     } catch (e) {
         console.log("Audio bypass error:", e);
     }
 }
-
 // ==========================================
 // 8️⃣ العداد التنازلي للتخرج والاقتباسات
 // ==========================================
