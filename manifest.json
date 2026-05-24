@@ -3,14 +3,11 @@
   "short_name": "الجراح",
   "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#020617",
-  "theme_color": "#6366f1",
+  "background_color": "#0f172a",
+  "theme_color": "#10b981",
   "icons": [
-    {
-      "src": "favicon.png?v=8",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+  { "src": "icon.png",
+   "sizes": "512x512",
+   "type": "image/png" }
   ]
 }
