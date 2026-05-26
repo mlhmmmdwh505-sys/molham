@@ -7,10 +7,20 @@
   "theme_color": "#6366f1",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/2232/2232688.png",
-      "sizes": "512x512",
-      "type": "image/png",
+      "src": "gnome-books.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
+    },
+    {
+      "src": "gnome-books.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "gnome-books.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
     }
   ]
 }
