@@ -1,14 +1,32 @@
-const CACHE_NAME = 'surgeon-dashboard-v2'; // قمنا بتغيير الإصدار هنا لإجبار المتصفح على التحديث
+const CACHE_NAME = 'surgeon-dashboard-v3';
 
+// الأصول والملفات المطلوبة للتخزين حتى يعمل الموقع بدون إنترنت
+const ASSETS_TO_CACHE = [
+  './',
+  './index.html',
+  './style.css?v=7',
+  './script.js',
+  './manifest.json?v=8',
+  './gnome-books.svg',
+  './gnome-books.png',
+  'https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap',
+  'https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&display=swap'
+];
+
+// 1. مرحلة التثبيت: حفظ جميع الملفات المهمة في الـ Cache
 self.addEventListener('install', (e) => {
   console.log('Service Worker: Installed');
-  // إجبار الـ Service Worker الجديد على التفعيل فوراً بدون انتظار إغلاق المتصفح
-  self.skipWaiting();
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Service Worker: Caching Files');
+      return cache.addAll(ASSETS_TO_CACHE);
+    }).then(() => self.skipWaiting())
+  );
 });
 
+// 2. مرحلة التفعيل: مسح الكاش القديم
 self.addEventListener('activate', (e) => {
   console.log('Service Worker: Activated');
-  // حذف أي كاش قديم مخزن في المتصفح يمنع ظهور الأيقونة الجديدة
   e.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
@@ -19,11 +37,18 @@ self.addEventListener('activate', (e) => {
           }
         })
       );
-    }).then(() => self.clients.claim()) // جعل التحديث يطبق فوراً على كل التبويبات المفتوحة
+    }).then(() => self.clients.claim())
   );
 });
 
+// 3. مرحلة جلب البيانات: محاولة جلبها من الكاش أولاً، وإذا لم تتوفر يجلبها من الشبكة
 self.addEventListener('fetch', (e) => {
-  // هذا الكود يضمن استمرار عمل التطبيق كـ PWA مع السماح بجلب الملفات الجديدة مباشرة
-  e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
+  e.respondWith(
+    caches.match(e.request).then((cachedResponse) => {
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+      return fetch(e.request);
+    })
+  );
 });
