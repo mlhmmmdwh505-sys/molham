@@ -496,3 +496,112 @@ if ('serviceWorker' in navigator) {
       .catch(err => console.log('Service Worker Registration Failed: ', err));
   });
 }
+
+// ==========================================
+// 🔑 إدارة حسابات المستخدمين والبيانات
+// ==========================================
+
+let currentUser = JSON.parse(localStorage.getItem('currentUser')) || null;
+
+// تحميل بيانات المستخدم الحالية عند فتح الموقع
+document.addEventListener('DOMContentLoaded', () => {
+    if (currentUser) {
+        updateUIForLoggedInUser(currentUser.name);
+        loadUserData(currentUser.email);
+    }
+});
+
+// فتح وإغلاق النافذة
+function openAuthModal() {
+    document.getElementById('authModal').style.display = 'flex';
+}
+
+function closeAuthModal() {
+    document.getElementById('authModal').style.display = 'none';
+}
+
+// التعامل مع تسجبل الدخول / إنشاء الحساب
+function handleAuth(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('authName').value.trim();
+    const email = document.getElementById('authEmail').value.trim().toLowerCase();
+    const password = document.getElementById('authPassword').value;
+
+    if (!name || !email || !password) return;
+
+    // حفظ المستخدم الحالي
+    currentUser = { name, email };
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+    // إنشاء قاعدة بيانات خاصة بملف هذا الإيميل إذا لم تكن موجودة
+    let userDatabase = JSON.parse(localStorage.getItem(`userData_${email}`)) || {
+        points: points || 0,
+        tasks: tasks || [],
+        gradDate: graduationDate || "2027-12-31"
+    };
+
+    // دمج وتحديث البيانات المحلية
+    localStorage.setItem(`userData_${email}`, JSON.stringify(userDatabase));
+
+    // تحديث الواجهة
+    updateUIForLoggedInUser(name);
+    loadUserData(email);
+    closeAuthModal();
+}
+
+// تحديث اسم المستخدم في الواجهة
+function updateUIForLoggedInUser(userName) {
+    const nameElement = document.getElementById('displayUserName');
+    const authBtn = document.getElementById('authBtn');
+
+    if (nameElement) {
+        nameElement.innerText = `د. ${userName}`;
+    }
+    if (authBtn) {
+        authBtn.innerText = "خروج";
+        authBtn.onclick = logoutUser;
+    }
+}
+
+// تحميل بيانات المستخدم الخاص بالإيميل
+function loadUserData(email) {
+    const savedData = localStorage.getItem(`userData_${email}`);
+    if (savedData) {
+        const data = JSON.parse(savedData);
+        
+        // استرجاع النقاط والمهام المخصصة لهذا الإيميل
+        if (data.points !== undefined) {
+            points = data.points;
+            localStorage.setItem('userPoints', points);
+            if (document.getElementById('userPoints')) {
+                document.getElementById('userPoints').innerText = points;
+            }
+        }
+        
+        if (data.tasks) {
+            tasks = data.tasks;
+            localStorage.setItem('userTasks', JSON.stringify(tasks));
+            if (typeof renderTasks === 'function') renderTasks();
+        }
+    }
+}
+
+// حفظ أي تعديل أو تقدم على إيميل المستخدم الحالي
+function saveCurrentUserData() {
+    if (currentUser && currentUser.email) {
+        const dataToSave = {
+            points: points,
+            tasks: tasks,
+            gradDate: graduationDate
+        };
+        localStorage.setItem(`userData_${currentUser.email}`, JSON.stringify(dataToSave));
+    }
+}
+
+// تسجيل الخروج
+function logoutUser() {
+    localStorage.removeItem('currentUser');
+    currentUser = null;
+    location.reload(); // إعادة تحميل الصفحة للعودة للوضع الافتراضي
+}
