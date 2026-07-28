@@ -103,6 +103,31 @@
             </main>
         </div>
     </div>
+    <div id="authModal" class="modal-overlay" style="display: none;">
+    <div class="modal-content glass-card">
+        <span class="close-btn" onclick="closeAuthModal()">&times;</span>
+        <h2 id="modalTitle">تسجيل الدخول</h2>
+        
+        <form id="authForm" onsubmit="handleAuth(event)">
+            <div class="input-group">
+                <label>الاسم:</label>
+                <input type="text" id="authName" placeholder="أدخل اسمك الكريِم" required>
+            </div>
+            
+            <div class="input-group">
+                <label>البريد الإلكتروني:</label>
+                <input type="email" id="authEmail" placeholder="example@mail.com" required>
+            </div>
+            
+            <div class="input-group">
+                <label>كلمة المرور:</label>
+                <input type="password" id="authPassword" placeholder="••••••••" required>
+            </div>
+
+            <button type="submit" class="btn-main" style="width: 100%; margin-top: 15px;">حفظ وتأكيد</button>
+        </form>
+    </div>
+</div>
     
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
     <script src="script.js?v=11"></script>
