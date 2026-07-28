@@ -551,18 +551,13 @@ function handleAuth(e) {
 }
 
 // تحديث اسم المستخدم في الواجهة
-// تحديث اسم المستخدم في الواجهة وعنوان الصفحة
+// تحديث اسم المستخدم في عنوان الصفحة وزر الخروج
 function updateUIForLoggedInUser(userName) {
-    // 1. تحديث عنوان الصفحة (اللي بيظهر في المكان اللي في الصورة)
+    // 1. تحديث عنوان الصفحة (الذي يظهر في أعلى المتصفح)
     document.title = `Surgeon Dashboard D.${userName.toUpperCase()} ❤️`;
 
-    // 2. تحديث الاسم جوا الموقع والزرار
-    const nameElement = document.getElementById('displayUserName');
+    // 2. تحديث الزر ليصبح "خروج"
     const authBtn = document.getElementById('authBtn');
-
-    if (nameElement) {
-        nameElement.innerText = `د. ${userName}`;
-    }
     if (authBtn) {
         authBtn.innerText = "خروج";
         authBtn.onclick = logoutUser;
