@@ -551,7 +551,12 @@ function handleAuth(e) {
 }
 
 // تحديث اسم المستخدم في الواجهة
+// تحديث اسم المستخدم في الواجهة وعنوان الصفحة
 function updateUIForLoggedInUser(userName) {
+    // 1. تحديث عنوان الصفحة (اللي بيظهر في المكان اللي في الصورة)
+    document.title = `Surgeon Dashboard D.${userName.toUpperCase()} ❤️`;
+
+    // 2. تحديث الاسم جوا الموقع والزرار
     const nameElement = document.getElementById('displayUserName');
     const authBtn = document.getElementById('authBtn');
 
