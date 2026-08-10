@@ -117,8 +117,11 @@ async function loadCloudState(user) {
         await writeCloudState();
     }
 
+    // The visible dashboard name always follows the Google account that signed in.
+    if (user.displayName) localStorage.setItem('userName', user.displayName);
     localStorage.setItem('molhamCloudUserId', user.uid);
     refreshDashboardFromStorage();
+    await writeCloudState();
 }
 
 async function signInWithGoogle() {
