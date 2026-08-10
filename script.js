@@ -13,12 +13,12 @@ let totalSecondsWorked = 0; // لحساب ثواني العمل الفعلية �
 // Copy this object from Firebase Console > Project settings > Your apps > Web app.
 // Firebase config is public by design; the Firestore security rules protect each user's data.
 const FIREBASE_CONFIG = {
-    apiKey: 'PASTE_YOUR_API_KEY',
-    authDomain: 'PASTE_YOUR_PROJECT.firebaseapp.com',
-    projectId: 'PASTE_YOUR_PROJECT_ID',
-    storageBucket: 'PASTE_YOUR_PROJECT.firebasestorage.app',
-    messagingSenderId: 'PASTE_YOUR_SENDER_ID',
-    appId: 'PASTE_YOUR_APP_ID'
+    apiKey: 'AIzaSyD8BD5gyVpgMEaDuFU9Wn68BVUN-ChQbjw',
+    authDomain: 'molham-dash-bord.firebaseapp.com',
+    projectId: 'molham-dash-bord',
+    storageBucket: 'molham-dash-bord.firebasestorage.app',
+    messagingSenderId: '527443679426',
+    appId: '1:527443679426:web:a5b4de91a9507f8845c35b'
 };
 const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'themeColor', 'surgeonTasks'];
 let cloudUser = null;

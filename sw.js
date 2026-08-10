@@ -1,11 +1,11 @@
-const CACHE_NAME = 'surgeon-dashboard-v3';
+const CACHE_NAME = 'surgeon-dashboard-v4';
 
 // الأصول والملفات المطلوبة للتخزين حتى يعمل الموقع بدون إنترنت
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css?v=7',
-  './script.js',
+  './style.css?v=8',
+  './script.js?v=14',
   './manifest.json?v=8',
   './gnome-books.svg',
   './gnome-books.png',
