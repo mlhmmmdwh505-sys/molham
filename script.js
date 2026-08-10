@@ -10,6 +10,162 @@ let currentLang = localStorage.getItem('userLang') || "ar";
 let temporaryLang = currentLang;  
 let totalSecondsWorked = 0; // لحساب ثواني العمل الفعلية بدقة فائقة من أجل النقاط
 
+// Copy this object from Firebase Console > Project settings > Your apps > Web app.
+// Firebase config is public by design; the Firestore security rules protect each user's data.
+const FIREBASE_CONFIG = {
+    apiKey: 'PASTE_YOUR_API_KEY',
+    authDomain: 'PASTE_YOUR_PROJECT.firebaseapp.com',
+    projectId: 'PASTE_YOUR_PROJECT_ID',
+    storageBucket: 'PASTE_YOUR_PROJECT.firebasestorage.app',
+    messagingSenderId: 'PASTE_YOUR_SENDER_ID',
+    appId: 'PASTE_YOUR_APP_ID'
+};
+const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'themeColor', 'surgeonTasks'];
+let cloudUser = null;
+let cloudSaveTimer = null;
+
+function isFirebaseConfigured() {
+    return !FIREBASE_CONFIG.apiKey.startsWith('PASTE_YOUR') && !FIREBASE_CONFIG.projectId.startsWith('PASTE_YOUR');
+}
+
+function showLoginError(message) {
+    const errorBox = document.getElementById('googleLoginError');
+    if (!errorBox) return;
+    errorBox.textContent = message;
+    errorBox.hidden = false;
+}
+
+function setSignedInView(user) {
+    const loginScreen = document.getElementById('loginScreen');
+    const accountControl = document.getElementById('accountControl');
+    const accountName = document.getElementById('accountName');
+    const accountAvatar = document.getElementById('accountAvatar');
+
+    if (loginScreen) loginScreen.classList.toggle('is-hidden', Boolean(user));
+    if (accountControl) accountControl.hidden = !user;
+    if (!user) return;
+
+    if (accountName) accountName.textContent = user.name || user.displayName || user.email;
+    if (accountAvatar) {
+        accountAvatar.src = user.picture || user.photoURL || 'gnome-books.png';
+        accountAvatar.alt = `Account photo for ${user.name || user.displayName || 'user'}`;
+    }
+}
+
+function getCloudState() {
+    return CLOUD_STATE_KEYS.reduce((state, key) => {
+        const value = localStorage.getItem(key);
+        if (value !== null) state[key] = value;
+        return state;
+    }, {});
+}
+
+function refreshDashboardFromStorage() {
+    points = parseInt(localStorage.getItem('userPoints')) || 0;
+    graduationDate = localStorage.getItem('gradDate') || '2027-12-31';
+    currentLang = localStorage.getItem('userLang') || 'ar';
+    temporaryLang = currentLang;
+
+    const savedName = localStorage.getItem('userName') || (currentLang === 'ar' ? 'ملهم' : 'Molham');
+    const savedMins = parseFloat(localStorage.getItem('userMins')) || 25;
+    const savedColor = localStorage.getItem('themeColor') || '#6366f1';
+    document.documentElement.style.setProperty('--primary', savedColor);
+
+    if (document.getElementById('langSelect')) document.getElementById('langSelect').value = currentLang;
+    if (document.getElementById('userNameInput')) document.getElementById('userNameInput').value = savedName;
+    if (document.getElementById('minsInput')) document.getElementById('minsInput').value = savedMins;
+    if (document.getElementById('gradDateInput')) document.getElementById('gradDateInput').value = graduationDate;
+    if (document.getElementById('colorPicker')) document.getElementById('colorPicker').value = savedColor;
+
+    timeLeft = Math.floor(savedMins * 60);
+    updatePointsDisplay();
+    updateTimerDisplay();
+    applyLanguage(currentLang);
+    displayDate();
+}
+
+async function writeCloudState() {
+    if (!cloudUser || !isFirebaseConfigured()) return;
+    await firebase.firestore().collection('users').doc(cloudUser.uid).set({
+        state: getCloudState(),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+}
+
+function queueCloudSave() {
+    if (!cloudUser) return;
+    clearTimeout(cloudSaveTimer);
+    cloudSaveTimer = setTimeout(() => {
+        writeCloudState().catch(() => showLoginError('تعذر حفظ التغييرات على السحابة. تحقق من الاتصال.'));
+    }, 500);
+}
+
+function clearLocalUserState() {
+    CLOUD_STATE_KEYS.forEach(key => localStorage.removeItem(key));
+}
+
+async function loadCloudState(user) {
+    const doc = await firebase.firestore().collection('users').doc(user.uid).get();
+    const previousUserId = localStorage.getItem('molhamCloudUserId');
+
+    if (doc.exists && doc.data().state) {
+        Object.entries(doc.data().state).forEach(([key, value]) => localStorage.setItem(key, value));
+    } else {
+        // Do not copy another account's local data to a new user.
+        if (previousUserId && previousUserId !== user.uid) clearLocalUserState();
+        if (!localStorage.getItem('userName') && user.displayName) localStorage.setItem('userName', user.displayName);
+        await writeCloudState();
+    }
+
+    localStorage.setItem('molhamCloudUserId', user.uid);
+    refreshDashboardFromStorage();
+}
+
+async function signInWithGoogle() {
+    if (!isFirebaseConfigured() || !window.firebase) {
+        showLoginError('أضف إعدادات Firebase في ملف script.js لتفعيل تسجيل الدخول والحفظ بين الأجهزة.');
+        return;
+    }
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        await firebase.auth().signInWithPopup(provider);
+    } catch (error) {
+        showLoginError('تعذر إكمال تسجيل الدخول. أعد المحاولة من فضلك.');
+    }
+}
+
+function initializeCloud() {
+    document.getElementById('googleLoginButton')?.addEventListener('click', signInWithGoogle);
+    document.getElementById('logoutButton')?.addEventListener('click', signOut);
+
+    if (!isFirebaseConfigured()) {
+        showLoginError('أضف إعدادات Firebase في ملف script.js لتفعيل تسجيل الدخول والحفظ بين الأجهزة.');
+        return;
+    }
+
+    if (!window.firebase) {
+        showLoginError('تعذر تحميل خدمة الحفظ. تحقق من اتصال الإنترنت ثم أعد المحاولة.');
+        return;
+    }
+
+    firebase.initializeApp(FIREBASE_CONFIG);
+    firebase.auth().onAuthStateChanged(async user => {
+        cloudUser = user;
+        setSignedInView(user);
+        if (user) {
+            try {
+                await loadCloudState(user);
+            } catch (error) {
+                showLoginError('تم تسجيل الدخول، لكن تعذر تحميل بياناتك السحابية.');
+            }
+        }
+    });
+}
+
+function signOut() {
+    if (window.firebase && firebase.auth) firebase.auth().signOut();
+}
+
 const quotes = {
     ar: [
         "الطب رسالة، وأنت قدها! 🩺",
@@ -186,6 +342,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
 
     applyLanguage(currentLang);
     displayDate(); 
+    queueCloudSave();
 
     const saveBtn = document.getElementById('mainSaveBtn');
     const originalText = i18n[currentLang].saveBtn;
@@ -338,6 +495,7 @@ function buyBreak(min) {
 function savePoints() {
     localStorage.setItem('userPoints', points);
     updatePointsDisplay();
+    queueCloudSave();
 }
 
 function updatePointsDisplay() { 
@@ -447,6 +605,7 @@ function addTask() {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks.push({ text: text, done: false });
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
+    queueCloudSave();
     input.value = '';
     renderTasks();
 }
@@ -455,6 +614,7 @@ window.toggleTask = function(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks[index].done = !tasks[index].done;
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
+    queueCloudSave();
     renderTasks();
 }
 
@@ -462,6 +622,7 @@ window.deleteTask = function(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks.splice(index, 1);
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
+    queueCloudSave();
     renderTasks();
 }
 
@@ -497,3 +658,6 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+window.addEventListener('load', () => {
+    initializeCloud();
+});
