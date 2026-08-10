@@ -39,6 +39,7 @@ function setSignedInView(user) {
     const loginScreen = document.getElementById('loginScreen');
     const accountControl = document.getElementById('accountControl');
     const accountName = document.getElementById('accountName');
+    const accountEmail = document.getElementById('accountEmail');
     const accountAvatar = document.getElementById('accountAvatar');
 
     if (loginScreen) loginScreen.classList.toggle('is-hidden', Boolean(user));
@@ -46,6 +47,7 @@ function setSignedInView(user) {
     if (!user) return;
 
     if (accountName) accountName.textContent = user.name || user.displayName || user.email;
+    if (accountEmail) accountEmail.textContent = user.email || '';
     if (accountAvatar) {
         accountAvatar.src = user.picture || user.photoURL || 'gnome-books.png';
         accountAvatar.alt = `Account photo for ${user.name || user.displayName || 'user'}`;
@@ -140,6 +142,7 @@ async function signInWithGoogle() {
 function initializeCloud() {
     document.getElementById('googleLoginButton')?.addEventListener('click', signInWithGoogle);
     document.getElementById('logoutButton')?.addEventListener('click', signOut);
+    initializeAccountMenu();
 
     if (!isFirebaseConfigured()) {
         showLoginError('أضف إعدادات Firebase في ملف script.js لتفعيل تسجيل الدخول والحفظ بين الأجهزة.');
@@ -161,6 +164,33 @@ function initializeCloud() {
             } catch (error) {
                 showLoginError('تم تسجيل الدخول، لكن تعذر تحميل بياناتك السحابية.');
             }
+        }
+    });
+}
+
+function initializeAccountMenu() {
+    const trigger = document.getElementById('accountMenuButton');
+    const menu = document.getElementById('accountMenu');
+    const control = document.getElementById('accountControl');
+    if (!trigger || !menu || !control) return;
+
+    trigger.addEventListener('click', () => {
+        const shouldOpen = menu.hidden;
+        menu.hidden = !shouldOpen;
+        trigger.setAttribute('aria-expanded', String(shouldOpen));
+    });
+
+    document.addEventListener('click', event => {
+        if (!control.contains(event.target)) {
+            menu.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            menu.hidden = true;
+            trigger.setAttribute('aria-expanded', 'false');
         }
     });
 }

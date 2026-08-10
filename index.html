@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <link rel="stylesheet" href="style.css?v=13">
+    <link rel="stylesheet" href="style.css?v=14">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=9">
     <link rel="canonical" href="https://molham-dash-borad.com/">
@@ -41,9 +41,15 @@
         </div>
 
         <div id="accountControl" class="account-control" hidden>
-            <img id="accountAvatar" class="account-avatar" alt="صورة الحساب">
-            <span id="accountName"></span>
-            <button type="button" id="logoutButton" class="logout-button">تسجيل الخروج</button>
+            <button type="button" id="accountMenuButton" class="account-trigger" aria-label="بيانات الحساب" aria-expanded="false">
+                <img id="accountAvatar" class="account-avatar" alt="صورة الحساب">
+            </button>
+            <div id="accountMenu" class="account-menu" hidden>
+                <span class="account-menu-label">الحساب</span>
+                <strong id="accountName"></strong>
+                <span id="accountEmail" class="account-email"></span>
+                <button type="button" id="logoutButton" class="logout-button">تسجيل الخروج</button>
+            </div>
         </div>
 
         <div class="date-tag" id="dateDisplay"></div>
@@ -136,6 +142,6 @@
         </div>
     </div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script src="script.js?v=17"></script>
+    <script src="script.js?v=18"></script>
 </body>
 </html>
