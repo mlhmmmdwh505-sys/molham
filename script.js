@@ -23,6 +23,7 @@ const FIREBASE_CONFIG = {
 const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'surgeonTasks'];
 let cloudUser = null;
 let cloudSaveTimer = null;
+let cloudUnsubscribe = null;
 
 function isFirebaseConfigured() {
     return !FIREBASE_CONFIG.apiKey.startsWith('PASTE_YOUR') && !FIREBASE_CONFIG.projectId.startsWith('PASTE_YOUR');
@@ -107,14 +108,16 @@ function clearLocalUserState() {
 }
 
 async function loadCloudState(user) {
-    const doc = await firebase.firestore().collection('users').doc(user.uid).get();
     const previousUserId = localStorage.getItem('molhamCloudUserId');
+    // Never allow values left by a different account to appear in this account.
+    if (previousUserId && previousUserId !== user.uid) clearLocalUserState();
+
+    const doc = await firebase.firestore().collection('users').doc(user.uid).get();
 
     if (doc.exists && doc.data().state) {
+        clearLocalUserState();
         Object.entries(doc.data().state).forEach(([key, value]) => localStorage.setItem(key, value));
     } else {
-        // Do not copy another account's local data to a new user.
-        if (previousUserId && previousUserId !== user.uid) clearLocalUserState();
         if (!localStorage.getItem('userName') && user.displayName) localStorage.setItem('userName', user.displayName);
         await writeCloudState();
     }
@@ -124,6 +127,22 @@ async function loadCloudState(user) {
     localStorage.setItem('molhamCloudUserId', user.uid);
     refreshDashboardFromStorage();
     await writeCloudState();
+}
+
+function watchCloudState(user) {
+    if (cloudUnsubscribe) cloudUnsubscribe();
+    cloudUnsubscribe = firebase.firestore().collection('users').doc(user.uid).onSnapshot(snapshot => {
+        // Ignore the immediate local echo. The server copy is what keeps other devices in sync.
+        if (!snapshot.exists || !snapshot.data().state || snapshot.metadata.hasPendingWrites) return;
+
+        clearLocalUserState();
+        Object.entries(snapshot.data().state).forEach(([key, value]) => localStorage.setItem(key, value));
+        localStorage.setItem('molhamCloudUserId', user.uid);
+        if (user.displayName) localStorage.setItem('userName', user.displayName);
+        refreshDashboardFromStorage();
+    }, error => {
+        console.warn('Cloud sync listener error:', error);
+    });
 }
 
 async function signInWithGoogle() {
@@ -161,9 +180,13 @@ function initializeCloud() {
         if (user) {
             try {
                 await loadCloudState(user);
+                watchCloudState(user);
             } catch (error) {
                 showLoginError('تم تسجيل الدخول، لكن تعذر تحميل بياناتك السحابية.');
             }
+        } else if (cloudUnsubscribe) {
+            cloudUnsubscribe();
+            cloudUnsubscribe = null;
         }
     });
 }
@@ -196,6 +219,13 @@ function initializeAccountMenu() {
 }
 
 function signOut() {
+    clearTimeout(cloudSaveTimer);
+    if (cloudUnsubscribe) {
+        cloudUnsubscribe();
+        cloudUnsubscribe = null;
+    }
+    clearLocalUserState();
+    localStorage.removeItem('molhamCloudUserId');
     if (window.firebase && firebase.auth) firebase.auth().signOut();
 }
 
@@ -295,7 +325,7 @@ window.onload = () => {
 // ==========================================
 function getRoleOptions(lang) {
     return lang === 'ar'
-        ? { medStudent: 'طالب طب', doctor: 'طبيب', student: 'طالب', professional: 'موظف', ambitious: 'شخص طموح' }
+        ? { medStudent: 'طالب الطب', doctor: 'الطبيب', student: 'الطالب', professional: 'الموظف', ambitious: 'الشخص الطموح' }
         : { medStudent: 'Medical student', doctor: 'Doctor', student: 'Student', professional: 'Professional', ambitious: 'Ambitious person' };
 }
 
