@@ -20,7 +20,7 @@ const FIREBASE_CONFIG = {
     messagingSenderId: '527443679426',
     appId: '1:527443679426:web:a5b4de91a9507f8845c35b'
 };
-const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'themeColor', 'surgeonTasks', 'studyPlan', 'quickNote', 'studyDays', 'focusLog'];
+const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'surgeonTasks'];
 let cloudUser = null;
 let cloudSaveTimer = null;
 
@@ -82,7 +82,6 @@ function refreshDashboardFromStorage() {
     updateTimerDisplay();
     applyLanguage(currentLang);
     displayDate();
-    window.dispatchEvent(new Event('molhamCloudStateLoaded'));
 }
 
 async function writeCloudState() {
@@ -192,7 +191,7 @@ const quotes = {
 const i18n = {
     ar: {
         welcome: "مرحباً بك،", mainTitle: "لوحة تحكم ",
-        langLabel: "اللغة", nameLabel: "الاسم", colorLabel: "اللون", dateLabel: "التاريخ", minsLabel: "الدقائق",
+        langLabel: "اللغة", nameLabel: "الاسم", roleLabel: "الدور", colorLabel: "اللون", dateLabel: "التاريخ", minsLabel: "الدقائق", customizeLabel: "⚙️ تخصيص لوحتك", smartLabel: "اقتراح ذكي",
         saveBtn: "تأكيد الإعدادات", countdownTitle: "⏳ حلم التخرج",
         years: "سنة", days: "يوم", hours: "ساعة", storeTitle: "☕ متجر الطاقة 1د = 15ن",
         break5: "5 د = <small>75ن</small>", break10: "10 د = <small>150ن</small>", break15: "15 د = <small>225ن</small>",
@@ -203,7 +202,7 @@ const i18n = {
     },
     en: {
         welcome: "Welcome,", mainTitle: "Dashboard of ",
-        langLabel: "Lang", nameLabel: "Name", colorLabel: "Color", dateLabel: "Date", minsLabel: "Mins",
+        langLabel: "Lang", nameLabel: "Name", roleLabel: "Role", colorLabel: "Color", dateLabel: "Date", minsLabel: "Mins", customizeLabel: "⚙️ Customize dashboard", smartLabel: "Smart suggestion",
         saveBtn: "Confirm Settings", countdownTitle: "⏳ Graduation Dream",
         years: "Years", days: "Days", hours: "Hours", storeTitle: "☕ Energy Store 1m = 15p",
         break5: "5 Min = <small>75p</small>", break10: "10 Min = <small>150p</small>", break15: "15 Min = <small>225p</small>",
@@ -264,6 +263,40 @@ window.onload = () => {
 // ==========================================
 // 3️⃣ دالة تطبيق اللغة وتحديث النصوص الشاشية
 // ==========================================
+function getRoleOptions(lang) {
+    return lang === 'ar'
+        ? { medStudent: 'طالب طب', doctor: 'طبيب', student: 'طالب', professional: 'موظف', ambitious: 'شخص طموح' }
+        : { medStudent: 'Medical student', doctor: 'Doctor', student: 'Student', professional: 'Professional', ambitious: 'Ambitious person' };
+}
+
+function getRoleName(lang) {
+    const role = localStorage.getItem('userRole') || 'medStudent';
+    return getRoleOptions(lang)[role] || getRoleOptions(lang).medStudent;
+}
+
+function updateRoleSelect(lang) {
+    const select = document.getElementById('roleSelect');
+    if (!select) return;
+    const selectedRole = localStorage.getItem('userRole') || 'medStudent';
+    select.innerHTML = Object.entries(getRoleOptions(lang)).map(([value, label]) => `<option value="${value}">${label}</option>`).join('');
+    select.value = selectedRole;
+}
+
+function updateSmartSuggestion() {
+    const suggestion = document.getElementById('smartSuggestion');
+    if (!suggestion) return;
+    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    const pending = tasks.filter(task => !task.done);
+    const role = getRoleName(currentLang);
+    if (timer !== null) {
+        suggestion.textContent = currentLang === 'ar' ? `أحسنت يا ${role}، ركّز الآن ولا تفتح مهمة جديدة.` : `Great work, ${role}. Stay focused; no new tasks now.`;
+    } else if (pending.length) {
+        suggestion.textContent = currentLang === 'ar' ? `لديك ${pending.length} مهام متبقية. ابدأ بـ: ${pending[0].text}` : `${pending.length} tasks remain. Start with: ${pending[0].text}`;
+    } else {
+        suggestion.textContent = currentLang === 'ar' ? `لا توجد مهام معلّقة. اختر خطوة صغيرة تناسب دورك كـ ${role}.` : `No pending tasks. Choose one small step for your role as ${role}.`;
+    }
+}
+
 function applyLanguage(lang) {
     currentLang = lang;
     document.documentElement.setAttribute('lang', lang);
@@ -274,14 +307,18 @@ function applyLanguage(lang) {
     const savedName = localStorage.getItem('userName') || (lang === 'ar' ? "ملهم" : "Molham");
     
     if(document.getElementById('welcomeWord')) document.getElementById('welcomeWord').innerText = trans.welcome;
-    if(document.getElementById('userNameDisplay')) document.getElementById('userNameDisplay').innerText = `${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}`;
-    if(document.getElementById('mainTitle')) document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${lang === 'ar' ? 'دكتور' : 'Dr.'} ${savedName}</span> 🩺`;
+    if(document.getElementById('userNameDisplay')) document.getElementById('userNameDisplay').innerText = `${getRoleName(lang)} ${savedName}`;
+    if(document.getElementById('mainTitle')) document.getElementById('mainTitle').innerHTML = trans.mainTitle + `<span id="mainTitleName">${getRoleName(lang)} ${savedName}</span> 🩺`;
     
     if(document.getElementById('langLabel')) document.getElementById('langLabel').innerText = trans.langLabel;
     if(document.getElementById('nameLabel')) document.getElementById('nameLabel').innerText = trans.nameLabel;
+    if(document.getElementById('roleLabel')) document.getElementById('roleLabel').innerText = trans.roleLabel;
     if(document.getElementById('colorLabel')) document.getElementById('colorLabel').innerText = trans.colorLabel;
     if(document.getElementById('dateLabel')) document.getElementById('dateLabel').innerText = trans.dateLabel;
     if(document.getElementById('minsLabel')) document.getElementById('minsLabel').innerText = trans.minsLabel;
+    if(document.getElementById('customizeLabel')) document.getElementById('customizeLabel').innerText = trans.customizeLabel;
+    if(document.getElementById('smartLabel')) document.getElementById('smartLabel').innerText = trans.smartLabel;
+    updateRoleSelect(lang);
     if(document.getElementById('mainSaveBtn')) document.getElementById('mainSaveBtn').innerText = trans.saveBtn;
     
     if(document.getElementById('countdownTitle')) document.getElementById('countdownTitle').innerText = trans.countdownTitle;
@@ -309,6 +346,7 @@ function applyLanguage(lang) {
     
     changeQuote();
     renderTasks(); 
+    updateSmartSuggestion();
 }
 
 if(document.getElementById('langSelect')) {
@@ -327,6 +365,9 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     const userNameInput = document.getElementById('userNameInput');
     const newName = userNameInput.value.trim() || (currentLang === 'ar' ? "ملهم" : "Molham");
     localStorage.setItem('userName', newName);
+
+    const roleSelect = document.getElementById('roleSelect');
+    localStorage.setItem('userRole', roleSelect ? roleSelect.value : 'medStudent');
 
     const minsInput = document.getElementById('minsInput');
     const newMins = parseFloat(minsInput.value) || 25;
@@ -380,6 +421,7 @@ function toggleTimer() {
     if (timer === null) {
         // حالة البداية أو الاستئناف
         startBtn.innerText = trans.startBtnPause;
+        updateSmartSuggestion();
         
         const endTime = Date.now() + (timeLeft * 1000);
         
@@ -419,6 +461,7 @@ function toggleTimer() {
         timer = null;
         
         startBtn.innerText = trans.startBtnResume;
+        updateSmartSuggestion();
         
         // حساب نقاطك فوراً عما أنجزته حتى ثانية الإيقاف
         if (!isBreak) {
@@ -653,6 +696,7 @@ function renderTasks() {
             
         taskList.appendChild(li);
     });
+    updateSmartSuggestion();
 }
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
