@@ -1,7 +1,7 @@
 {
-  "name": "لوحة تحكم الجراح",
-  "short_name": "الجراح",
-  "start_url": "index.html",
+  "name": "Molham Dashboard | لوحة ملهم الدراسية",
+  "short_name": "Molham",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#6366f1",
@@ -9,19 +9,19 @@
     {
       "src": "gnome-books.png",
       "sizes": "192x192",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
       "src": "gnome-books.png",
       "sizes": "512x512",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "any"
     },
     {
       "src": "gnome-books.png",
       "sizes": "any",
-      "type": "image/svg+xml",
+      "type": "image/png",
       "purpose": "maskable"
     }
   ]

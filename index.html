@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <link rel="stylesheet" href="style.css?v=11">
-    <link rel="icon" type="image/svg+xml" href="gnome-books.svg">
-    <link rel="manifest" href="manifest.json?v=8">
+    <link rel="stylesheet" href="style.css?v=12">
+    <link rel="icon" type="image/png" href="gnome-books.png">
+    <link rel="manifest" href="manifest.json?v=9">
+    <link rel="canonical" href="https://molham-dash-borad.com/">
     <meta name="keywords" content="ملهم ممدوح, molham, github pages, موقع ملهم">
     <meta name="description" content="هذا الموقع جميل و مثالي للدراسة و العمل و جميع المهام موقع ملهم هو اداة تنظيم و ترتيب و زيادة الانتاجية مصمم من قبل ملهم.">
     <meta name="verifywebsiteownership" content="tgf8hWSVWpGMEXVmzfc2SXcru"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Surgeon Dashboard D.MOLHAM MMDOH ❤️</title>
+    <title>Molham Dashboard | لوحتك الدراسية</title>
+    <meta name="theme-color" content="#6366f1">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&display=swap" rel="stylesheet">
     <script defer src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
@@ -84,6 +86,13 @@
             </div>
         </header>
 
+        <section class="overview-section" aria-label="ملخص اليوم">
+            <article class="overview-card"><span class="overview-icon">✓</span><div><span class="overview-label">المهام المنجزة</span><strong id="completedTasksStat">0 / 0</strong></div></article>
+            <article class="overview-card"><span class="overview-icon">⌛</span><div><span class="overview-label">تركيز هذا الأسبوع</span><strong id="focusHoursStat">0 د</strong></div></article>
+            <article class="overview-card"><span class="overview-icon">🔥</span><div><span class="overview-label">سلسلة الدراسة</span><strong id="streakStat">0 أيام</strong></div></article>
+            <article class="overview-card"><span class="overview-icon">★</span><div><span class="overview-label">رصيد الإنجاز</span><strong id="pointsStat">0</strong></div></article>
+        </section>
+
         <div class="dashboard-grid">
             <aside class="side-col">
                 <section class="info-card countdown-card">
@@ -123,9 +132,33 @@
                 </section>
             </main>
         </div>
-    </div>
     
+        <section class="workspace-section" aria-label="مساحة التخطيط">
+            <article class="workspace-card planner-card">
+                <div class="section-heading"><div><span class="section-kicker">خطة اليوم</span><h2>مذاكرتك القادمة</h2></div><span class="section-icon">📚</span></div>
+                <div class="planner-form">
+                    <input id="planTitle" type="text" placeholder="مثال: مراجعة محاضرة التشريح">
+                    <input id="planSubject" type="text" placeholder="المادة">
+                    <select id="planPriority" aria-label="الأولوية"><option value="high">أولوية عالية</option><option value="medium" selected>أولوية متوسطة</option><option value="low">أولوية منخفضة</option></select>
+                    <button type="button" id="addPlanButton" class="compact-action">إضافة للخطة</button>
+                </div>
+                <ul id="studyPlanList" class="plan-list" aria-live="polite"></ul>
+            </article>
+            <article class="workspace-card notes-card">
+                <div class="section-heading"><div><span class="section-kicker">مساحتك الخاصة</span><h2>ملاحظات سريعة</h2></div><span class="section-icon">✦</span></div>
+                <textarea id="quickNote" maxlength="1200" placeholder="اكتب فكرة، ملخصًا، أو تذكيرًا لنفسك..."></textarea>
+                <div class="notes-footer"><span id="noteStatus">يُحفظ تلقائيًا على حسابك</span><button type="button" id="saveNoteButton" class="compact-action">حفظ الملاحظة</button></div>
+            </article>
+            <article class="workspace-card week-card">
+                <div class="section-heading"><div><span class="section-kicker">الاستمرارية</span><h2>أيام الدراسة</h2></div><span class="section-icon">🗓</span></div>
+                <p class="week-caption">علّم الأيام التي أنجزت فيها جلسة دراسة حقيقية.</p>
+                <div id="studyWeek" class="study-week" role="group" aria-label="أيام الدراسة الأسبوعية"></div>
+            </article>
+        </section>
+
+    </div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script src="script.js?v=15"></script>
+    <script src="script.js?v=16"></script>
+    <script src="dashboard.js?v=1"></script>
 </body>
 </html>

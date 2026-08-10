@@ -20,7 +20,7 @@ const FIREBASE_CONFIG = {
     messagingSenderId: '527443679426',
     appId: '1:527443679426:web:a5b4de91a9507f8845c35b'
 };
-const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'themeColor', 'surgeonTasks'];
+const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'themeColor', 'surgeonTasks', 'studyPlan', 'quickNote', 'studyDays', 'focusLog'];
 let cloudUser = null;
 let cloudSaveTimer = null;
 
@@ -82,6 +82,7 @@ function refreshDashboardFromStorage() {
     updateTimerDisplay();
     applyLanguage(currentLang);
     displayDate();
+    window.dispatchEvent(new Event('molhamCloudStateLoaded'));
 }
 
 async function writeCloudState() {

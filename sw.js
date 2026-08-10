@@ -1,13 +1,13 @@
-const CACHE_NAME = 'surgeon-dashboard-v8';
+const CACHE_NAME = 'molham-dashboard-v9';
 
 // الأصول والملفات المطلوبة للتخزين حتى يعمل الموقع بدون إنترنت
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
-  './style.css?v=11',
-  './script.js?v=15',
-  './manifest.json?v=8',
-  './gnome-books.svg',
+  './style.css?v=12',
+  './script.js?v=16',
+  './dashboard.js?v=1',
+  './manifest.json?v=9',
   './gnome-books.png',
   'https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap',
   'https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&display=swap'
