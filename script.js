@@ -1,6 +1,8 @@
 // ==========================================
 // 1️⃣ المتغيرات والبيانات المحفوظة (State)
 // ==========================================
+// Dashboard data stays only for the current browser session. Firebase is the permanent source for each account.
+const localStorage = window.sessionStorage;
 let timer = null;
 let timeLeft = null;
 let isBreak = false;
@@ -36,6 +38,13 @@ function showLoginError(message) {
     errorBox.hidden = false;
 }
 
+function setCloudStatus(message, state = 'connected') {
+    const status = document.getElementById('cloudSyncStatus');
+    if (!status) return;
+    status.textContent = message;
+    status.dataset.state = state;
+}
+
 function setSignedInView(user) {
     const loginScreen = document.getElementById('loginScreen');
     const accountControl = document.getElementById('accountControl');
@@ -47,6 +56,7 @@ function setSignedInView(user) {
     if (accountControl) accountControl.hidden = !user;
     if (!user) return;
 
+    setCloudStatus('جاري تحميل بيانات حسابك…', 'saving');
     if (accountName) accountName.textContent = user.name || user.displayName || user.email;
     if (accountEmail) accountEmail.textContent = user.email || '';
     if (accountAvatar) {
@@ -88,18 +98,25 @@ function refreshDashboardFromStorage() {
 }
 
 async function writeCloudState() {
-    if (!cloudUser || !isFirebaseConfigured()) return;
+    if (!cloudUser || !isFirebaseConfigured() || !window.firebase) {
+        throw new Error('Cloud account is not ready');
+    }
+    setCloudStatus('جارٍ حفظ التغييرات في حسابك…', 'saving');
     await firebase.firestore().collection('users').doc(cloudUser.uid).set({
         state: getCloudState(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
+    setCloudStatus('✓ تم الحفظ في حسابك', 'connected');
 }
 
 function queueCloudSave() {
     if (!cloudUser) return;
     clearTimeout(cloudSaveTimer);
     cloudSaveTimer = setTimeout(() => {
-        writeCloudState().catch(() => showLoginError('تعذر حفظ التغييرات على السحابة. تحقق من الاتصال.'));
+        writeCloudState().catch(() => {
+            setCloudStatus('تعذر الحفظ السحابي', 'error');
+            showLoginError('تعذر حفظ التغييرات على السحابة. تحقق من الاتصال.');
+        });
     }, 500);
 }
 
@@ -118,6 +135,8 @@ async function loadCloudState(user) {
         clearLocalUserState();
         Object.entries(doc.data().state).forEach(([key, value]) => localStorage.setItem(key, value));
     } else {
+        // A new account starts empty; it never inherits a dashboard from this device.
+        clearLocalUserState();
         if (!localStorage.getItem('userName') && user.displayName) localStorage.setItem('userName', user.displayName);
         await writeCloudState();
     }
@@ -140,7 +159,9 @@ function watchCloudState(user) {
         localStorage.setItem('molhamCloudUserId', user.uid);
         if (user.displayName) localStorage.setItem('userName', user.displayName);
         refreshDashboardFromStorage();
+        setCloudStatus('✓ تمت مزامنة بيانات الحساب', 'connected');
     }, error => {
+        setCloudStatus('تعذر الاتصال بالسحابة', 'error');
         console.warn('Cloud sync listener error:', error);
     });
 }
