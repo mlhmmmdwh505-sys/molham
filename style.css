@@ -628,7 +628,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 
     .pomo-actions {
         display: flex !important;
-        flex-direction: row !important; /* الحفاظ على الأزرار بجانب بعضها */
+        flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
         width: 100% !important;
@@ -636,8 +636,9 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     }
 
     .pomo-actions button, #startBtn, #resetBtn {
-        flex: 1 !important;
-        max-width: 140px !important;
+        flex: 0 0 42px !important;
+        width: 140px !important;
+        max-width: 100% !important;
         height: 42px !important;
         font-size: 14px !important;
     }
@@ -782,7 +783,7 @@ header { position: relative; }
 .account-avatar { display: block; width: 100%; height: 100%; border: 0; }
 .account-menu { position: absolute; top: 52px; left: 0; width: 225px; padding: 15px; border: 1px solid var(--glass-border); border-radius: 17px; background: rgba(15,23,42,.96); box-shadow: 0 16px 42px rgba(0,0,0,.35); backdrop-filter: blur(16px); text-align: start; }
 .account-menu[hidden] { display: none !important; }.account-menu-label { display: block; margin-bottom: 4px; color: var(--text-darker); font-size: 11px; }.account-menu strong { display: block; overflow: hidden; color: var(--text-main); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }.account-email { display: block; overflow: hidden; margin-top: 3px; color: var(--text-muted); font-size: 11px; direction: ltr; text-align: left; text-overflow: ellipsis; white-space: nowrap; }.account-menu .logout-button { position: static; width: 100%; min-width: 0 !important; margin-top: 13px; padding: 8px 12px !important; border: 1px solid rgba(251,113,133,.65) !important; background: rgba(127,29,29,.28) !important; color: #fecdd3 !important; }
-.account-settings-icon { display: grid; place-items: center; color: #f8fafc; font: 22px/1 Arial, sans-serif; }.account-menu .guest-login-button { width: 100%; min-width: 0 !important; padding: 8px 12px !important; border: 1px solid rgba(165,180,252,.65) !important; border-radius: 999px; background: rgba(99,102,241,.18) !important; color: #e0e7ff !important; font: 700 12px 'Cairo', sans-serif; cursor: pointer; }.account-menu .logout-button:only-child { margin-top: 0; }
+.account-settings-icon { display: block !important; width: 22px; height: 22px; fill: #f8fafc; pointer-events: none; }.account-menu .guest-login-button { width: 100%; min-width: 0 !important; padding: 8px 12px !important; border: 1px solid rgba(165,180,252,.65) !important; border-radius: 999px; background: rgba(99,102,241,.18) !important; color: #e0e7ff !important; font: 700 12px 'Cairo', sans-serif; cursor: pointer; }.account-menu .logout-button:only-child { margin-top: 0; }
 .cloud-sync-status { display: block; margin-top: 10px; font-size: 11px; color: #86efac; }.cloud-sync-status[data-state="saving"] { color: #fde68a; }.cloud-sync-status[data-state="error"] { color: #fda4af; }
 @media (max-width: 767px) { .date-tag, .mini-score { position: static; margin: 6px auto; }.account-control { position: static; width: fit-content; margin: 8px auto; }.account-menu { top: 50px; left: 50%; transform: translateX(-50%); } }
 

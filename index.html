@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <link rel="stylesheet" href="style.css?v=22">
+    <link rel="stylesheet" href="style.css?v=24">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=9">
     <link rel="canonical" href="https://molham-dash-borad.com/">
@@ -43,7 +43,9 @@
 
         <div id="guestAccountControl" class="account-control" hidden>
             <button type="button" id="guestAccountMenuButton" class="account-trigger" aria-label="إعدادات الحساب" aria-expanded="false">
-                <span class="account-settings-icon" aria-hidden="true">⚙</span>
+                <svg class="account-settings-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.37-.31-.6-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98L14.5 2.42C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.5.42L9.12 5.07c-.61.25-1.17.58-1.69.98l-2.49-1c-.23-.08-.48 0-.6.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.08.65-.08.98s.03.66.08.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.37.31.6.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1c.23.08.48 0 .6-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5z"/>
+                </svg>
             </button>
             <div id="guestAccountMenu" class="account-menu" hidden>
                 <button type="button" id="guestLoginButton" class="guest-login-button">تسجيل الدخول</button>
@@ -151,6 +153,6 @@
         </div>
     </div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script src="script.js?v=24"></script>
+    <script src="script.js?v=25"></script>
 </body>
 </html>
