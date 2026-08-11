@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <link rel="stylesheet" href="style.css?v=14">
+    <link rel="stylesheet" href="style.css?v=22">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=9">
     <link rel="canonical" href="https://molham-dash-borad.com/">
@@ -24,11 +24,12 @@
             <div class="login-logo-wrap"><img src="gnome-books.png" alt="شعار الموقع" class="login-logo"></div>
             <span class="login-eyebrow">منظّم الدراسة الشخصي</span>
             <h1 id="loginTitle">أهلاً بك في لوحة ملهم</h1>
-            <p>سجّل دخولك بحساب Google لتخصيص مساحة دراستك.</p>
+            <p>سجّل دخولك بحساب Google لمزامنة بياناتك فورًا بين أجهزتك، أو تابع كضيف.</p>
             <button id="googleLoginButton" class="firebase-google-button" type="button">
                 <span class="google-mark" aria-hidden="true">G</span>
                 المتابعة باستخدام Google
             </button>
+            <button id="continueAsGuestButton" class="guest-skip-button" type="button">تخطي والمتابعة كضيف</button>
             <p id="googleLoginError" class="login-error" role="alert" hidden></p>
             <p class="login-note">لن نطلب كلمة مرور حساب Google أبدًا.</p>
         </div>
@@ -40,15 +41,20 @@
             <button onclick="resetPoints()" class="reset-mini" title="تصفير النقاط">🗑️</button>
         </div>
 
+        <div id="guestAccountControl" class="account-control" hidden>
+            <button type="button" id="guestAccountMenuButton" class="account-trigger" aria-label="إعدادات الحساب" aria-expanded="false">
+                <span class="account-settings-icon" aria-hidden="true">⚙</span>
+            </button>
+            <div id="guestAccountMenu" class="account-menu" hidden>
+                <button type="button" id="guestLoginButton" class="guest-login-button">تسجيل الدخول</button>
+            </div>
+        </div>
+
         <div id="accountControl" class="account-control" hidden>
-            <button type="button" id="accountMenuButton" class="account-trigger" aria-label="بيانات الحساب" aria-expanded="false">
-                <img id="accountAvatar" class="account-avatar" alt="صورة الحساب">
+            <button type="button" id="accountMenuButton" class="account-trigger" aria-label="إعدادات الحساب" aria-expanded="false">
+                <span class="account-settings-icon" aria-hidden="true">⚙</span>
             </button>
             <div id="accountMenu" class="account-menu" hidden>
-                <span class="account-menu-label">الحساب</span>
-                <strong id="accountName"></strong>
-                <span id="accountEmail" class="account-email"></span>
-                <span id="cloudSyncStatus" class="cloud-sync-status">جاري الاتصال بالسحابة…</span>
                 <button type="button" id="logoutButton" class="logout-button">تسجيل الخروج</button>
             </div>
         </div>
@@ -84,7 +90,9 @@
 
                 <div class="input-group">
                     <label id="colorLabel">اللون</label>
-                    <input type="color" id="colorPicker">
+                    <label class="color-picker-control" for="colorPicker" aria-label="اختر لون الواجهة">
+                        <input type="color" id="colorPicker">
+                    </label>
                 </div>
 
                 <div class="input-group">
@@ -143,6 +151,6 @@
         </div>
     </div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script src="script.js?v=21"></script>
+    <script src="script.js?v=24"></script>
 </body>
 </html>

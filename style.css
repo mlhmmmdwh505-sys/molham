@@ -601,7 +601,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     /* جعل حقول الإدخال (الاسم، اللغة، اللون، إلخ) متوازية وموسطنة */
     .settings-grid input, 
     .settings-grid select,
-    #userNameInput, #langSelect, #minsInput, #gradDateInput, #colorPicker {
+    #userNameInput, #langSelect, #roleSelect, #minsInput, #gradDateInput, #colorPicker {
         width: 85% !important; /* حجم متناسق غير مفرط جانبياً */
         max-width: 320px !important;
         height: 42px !important;
@@ -728,6 +728,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 .google-login-button > div { display: flex; justify-content: center; }
 .firebase-google-button { display: flex; align-items: center; justify-content: center; gap: 12px; width: min(100%, 320px); min-height: 46px; margin: 28px auto 14px; padding: 0 18px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 999px; background: #fff; color: #1f2937; font: 700 14px 'Cairo', sans-serif; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
 .firebase-google-button:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, .25); }
+.guest-skip-button { display: block; width: min(100%, 320px); min-height: 42px; margin: 0 auto 14px; padding: 0 18px; border: 1px solid rgba(165, 180, 252, .55); border-radius: 999px; background: rgba(99, 102, 241, .12); color: #c7d2fe; font: 700 13px 'Cairo', sans-serif; cursor: pointer; transition: transform .2s ease, background .2s ease; }.guest-skip-button:hover { transform: translateY(-2px); background: rgba(99, 102, 241, .24); }
 .google-mark { font-family: Arial, sans-serif; font-weight: 800; font-size: 20px; color: #4285f4; }
 .login-error { margin: -4px 0 12px; color: #fda4af !important; font-size: 13px !important; }
 .login-note { font-size: 12px !important; color: var(--text-darker) !important; }
@@ -775,11 +776,183 @@ header { position: relative; }
 .date-tag { top: 24px; left: 30px; z-index: 12; }
 .mini-score { top: 18px; right: 30px; z-index: 12; }
 .account-control { position: absolute; z-index: 20; top: 17px; left: 190px; bottom: auto; display: flex; color: var(--text-muted); font-size: 12px; }
+.account-control[hidden] { display: none !important; }
 .account-trigger { display: grid !important; place-items: center; min-width: 42px !important; width: 42px; height: 42px; padding: 0 !important; border: 1px solid var(--glass-border) !important; border-radius: 50% !important; background: rgba(15,23,42,.68) !important; overflow: hidden; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
 .account-trigger:hover, .account-trigger[aria-expanded="true"] { transform: translateY(-2px); border-color: var(--primary) !important; box-shadow: 0 0 18px var(--primary-glow); }
 .account-avatar { display: block; width: 100%; height: 100%; border: 0; }
 .account-menu { position: absolute; top: 52px; left: 0; width: 225px; padding: 15px; border: 1px solid var(--glass-border); border-radius: 17px; background: rgba(15,23,42,.96); box-shadow: 0 16px 42px rgba(0,0,0,.35); backdrop-filter: blur(16px); text-align: start; }
 .account-menu[hidden] { display: none !important; }.account-menu-label { display: block; margin-bottom: 4px; color: var(--text-darker); font-size: 11px; }.account-menu strong { display: block; overflow: hidden; color: var(--text-main); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }.account-email { display: block; overflow: hidden; margin-top: 3px; color: var(--text-muted); font-size: 11px; direction: ltr; text-align: left; text-overflow: ellipsis; white-space: nowrap; }.account-menu .logout-button { position: static; width: 100%; min-width: 0 !important; margin-top: 13px; padding: 8px 12px !important; border: 1px solid rgba(251,113,133,.65) !important; background: rgba(127,29,29,.28) !important; color: #fecdd3 !important; }
+.account-settings-icon { display: grid; place-items: center; color: #f8fafc; font: 22px/1 Arial, sans-serif; }.account-menu .guest-login-button { width: 100%; min-width: 0 !important; padding: 8px 12px !important; border: 1px solid rgba(165,180,252,.65) !important; border-radius: 999px; background: rgba(99,102,241,.18) !important; color: #e0e7ff !important; font: 700 12px 'Cairo', sans-serif; cursor: pointer; }.account-menu .logout-button:only-child { margin-top: 0; }
 .cloud-sync-status { display: block; margin-top: 10px; font-size: 11px; color: #86efac; }.cloud-sync-status[data-state="saving"] { color: #fde68a; }.cloud-sync-status[data-state="error"] { color: #fda4af; }
 @media (max-width: 767px) { .date-tag, .mini-score { position: static; margin: 6px auto; }.account-control { position: static; width: fit-content; margin: 8px auto; }.account-menu { top: 50px; left: 50%; transform: translateX(-50%); } }
+
+/* Tablet layout: keep the dashboard contained and use the available horizontal space. */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    html, body { height: auto !important; min-height: 100%; overflow-y: auto !important; }
+    body { display: block; padding: 24px 16px 48px !important; }
+
+    .glass-card {
+        display: block !important;
+        width: min(96vw, 1100px) !important;
+        max-width: calc(100vw - 32px) !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 0 !important;
+        margin: 0 auto !important;
+        padding: 24px !important;
+        overflow: visible !important;
+    }
+
+    .preferences { width: 100% !important; max-width: none !important; }
+    .preferences .settings-bar {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        align-items: end !important;
+        gap: 14px !important;
+        padding: 14px 18px 18px !important;
+    }
+    .preferences .input-group {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
+    .preferences input, .preferences select, .preferences #colorPicker {
+        width: 100% !important;
+        max-width: none !important;
+    }
+    .preferences #mainSaveBtn {
+        grid-column: 1 / -1 !important;
+        justify-self: center;
+        margin: 2px 0 0 !important;
+    }
+
+    .dashboard-grid {
+        display: grid !important;
+        grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+        align-items: start !important;
+        gap: 16px !important;
+        min-width: 0 !important;
+    }
+    .main-col, .side-col {
+        width: auto !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        gap: 16px !important;
+    }
+    .info-card, .tasks-card {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        overflow: hidden !important;
+    }
+    .tasks-card { padding: 16px !important; }
+    .input-section {
+        width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+        max-height: none !important;
+        min-height: 44px !important;
+        margin: 0 !important;
+        gap: 8px !important;
+    }
+    #taskInput {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 44px !important;
+    }
+    .btn-add { flex: 0 0 44px !important; width: 44px !important; height: 44px !important; }
+    #taskList { width: 100% !important; min-width: 0 !important; }
+}
+
+/* زر اختيار اللون: يعرض اللون المختار داخل الكبسولة. */
+.color-picker-control {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 44px;
+    border: 1px solid var(--primary);
+    border-radius: 50px;
+    background: var(--selected-color, var(--primary));
+    cursor: pointer;
+    overflow: hidden;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.color-picker-control #colorPicker {
+    position: absolute;
+    inset: 0;
+    width: 100% !important;
+    max-width: none !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    opacity: 0;
+    cursor: pointer;
+}
+@media only screen and (max-width: 767px) {
+    .preferences .settings-bar .color-picker-control {
+        width: 85% !important;
+        max-width: 320px !important;
+        height: 42px !important;
+        margin: 0 auto !important;
+    }
+}
+
+/* Desktop and laptop layout: two balanced rows of dashboard settings. */
+@media only screen and (min-width: 1025px) {
+    .preferences { width: min(960px, 100%) !important; }
+    .preferences .settings-bar {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        align-items: end !important;
+        gap: 16px 18px !important;
+        padding: 16px 22px 20px !important;
+    }
+    .preferences .input-group {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: none !important;
+    }
+    .preferences input, .preferences select, .preferences #colorPicker {
+        width: 100% !important;
+        max-width: none !important;
+    }
+    .preferences #mainSaveBtn {
+        grid-column: 1 / -1 !important;
+        justify-self: center;
+        margin: 4px 0 0 !important;
+    }
+}
+
+/* Phone layout: every dashboard setting uses one centered width. */
+@media only screen and (max-width: 767px) {
+    .preferences .settings-bar .input-group {
+        width: min(85%, 320px) !important;
+        max-width: 320px !important;
+        margin: 0 auto !important;
+        align-items: center !important;
+    }
+    .preferences .settings-bar .input-group > input,
+    .preferences .settings-bar .input-group > select {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+    }
+}
+
+/* Tablet only: keep the guest sign-in control at the physical left edge. */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    #guestAccountControl {
+        left: 24px !important;
+        right: auto !important;
+    }
+    #guestAccountControl .account-menu {
+        left: 0 !important;
+        right: auto !important;
+    }
+}
 

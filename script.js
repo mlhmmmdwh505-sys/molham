@@ -1,8 +1,8 @@
 // ==========================================
 // 1️⃣ المتغيرات والبيانات المحفوظة (State)
 // ==========================================
-// Dashboard data stays only for the current browser session. Firebase is the permanent source for each account.
-const localStorage = window.sessionStorage;
+// Guests keep their dashboard on this device; signed-in users also get instant cloud sync.
+const localStorage = window.localStorage;
 let timer = null;
 let timeLeft = null;
 let isBreak = false;
@@ -24,8 +24,8 @@ const FIREBASE_CONFIG = {
 };
 const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'surgeonTasks'];
 let cloudUser = null;
-let cloudSaveTimer = null;
 let cloudUnsubscribe = null;
+let guestModeSelected = false;
 
 function isFirebaseConfigured() {
     return !FIREBASE_CONFIG.apiKey.startsWith('PASTE_YOUR') && !FIREBASE_CONFIG.projectId.startsWith('PASTE_YOUR');
@@ -48,12 +48,14 @@ function setCloudStatus(message, state = 'connected') {
 function setSignedInView(user) {
     const loginScreen = document.getElementById('loginScreen');
     const accountControl = document.getElementById('accountControl');
+    const guestAccountControl = document.getElementById('guestAccountControl');
     const accountName = document.getElementById('accountName');
     const accountEmail = document.getElementById('accountEmail');
     const accountAvatar = document.getElementById('accountAvatar');
 
-    if (loginScreen) loginScreen.classList.toggle('is-hidden', Boolean(user));
+    if (loginScreen) loginScreen.classList.toggle('is-hidden', Boolean(user) || guestModeSelected);
     if (accountControl) accountControl.hidden = !user;
+    if (guestAccountControl) guestAccountControl.hidden = Boolean(user) || !guestModeSelected;
     if (!user) return;
 
     setCloudStatus('جاري تحميل بيانات حسابك…', 'saving');
@@ -65,12 +67,26 @@ function setSignedInView(user) {
     }
 }
 
+function continueAsGuest() {
+    guestModeSelected = true;
+    setSignedInView(null);
+}
+
 function getCloudState() {
     return CLOUD_STATE_KEYS.reduce((state, key) => {
         const value = localStorage.getItem(key);
         if (value !== null) state[key] = value;
         return state;
     }, {});
+}
+
+function updateColorPickerPreview(color) {
+    const colorPicker = document.getElementById('colorPicker');
+    const colorControl = document.querySelector('.color-picker-control');
+    if (!colorControl) return;
+
+    const selectedColor = color || (colorPicker && colorPicker.value) || '#6366f1';
+    colorControl.style.setProperty('--selected-color', selectedColor);
 }
 
 function refreshDashboardFromStorage() {
@@ -89,6 +105,7 @@ function refreshDashboardFromStorage() {
     if (document.getElementById('minsInput')) document.getElementById('minsInput').value = savedMins;
     if (document.getElementById('gradDateInput')) document.getElementById('gradDateInput').value = graduationDate;
     if (document.getElementById('colorPicker')) document.getElementById('colorPicker').value = savedColor;
+    updateColorPickerPreview(savedColor);
 
     timeLeft = Math.floor(savedMins * 60);
     updatePointsDisplay();
@@ -109,56 +126,43 @@ async function writeCloudState() {
     setCloudStatus('✓ تم الحفظ في حسابك', 'connected');
 }
 
-function queueCloudSave() {
+function saveCloudStateImmediately() {
     if (!cloudUser) return;
-    clearTimeout(cloudSaveTimer);
-    cloudSaveTimer = setTimeout(() => {
-        writeCloudState().catch(() => {
-            setCloudStatus('تعذر الحفظ السحابي', 'error');
-            showLoginError('تعذر حفظ التغييرات على السحابة. تحقق من الاتصال.');
-        });
-    }, 500);
+    writeCloudState().catch(() => {
+        setCloudStatus('تعذر الحفظ السحابي', 'error');
+        showLoginError('تعذر حفظ التغييرات على السحابة. تحقق من الاتصال.');
+    });
 }
 
 function clearLocalUserState() {
     CLOUD_STATE_KEYS.forEach(key => localStorage.removeItem(key));
 }
 
-async function loadCloudState(user) {
+function applyCloudState(user, state) {
+    clearLocalUserState();
+    Object.entries(state).forEach(([key, value]) => localStorage.setItem(key, value));
+    localStorage.setItem('molhamCloudUserId', user.uid);
+    if (user.displayName) localStorage.setItem('userName', user.displayName);
+    refreshDashboardFromStorage();
+}
+
+function watchCloudState(user) {
     const previousUserId = localStorage.getItem('molhamCloudUserId');
     // Never allow values left by a different account to appear in this account.
     if (previousUserId && previousUserId !== user.uid) clearLocalUserState();
 
-    const doc = await firebase.firestore().collection('users').doc(user.uid).get();
-
-    if (doc.exists && doc.data().state) {
-        clearLocalUserState();
-        Object.entries(doc.data().state).forEach(([key, value]) => localStorage.setItem(key, value));
-    } else {
-        // A new account starts empty; it never inherits a dashboard from this device.
-        clearLocalUserState();
-        if (!localStorage.getItem('userName') && user.displayName) localStorage.setItem('userName', user.displayName);
-        await writeCloudState();
-    }
-
-    // The visible dashboard name always follows the Google account that signed in.
-    if (user.displayName) localStorage.setItem('userName', user.displayName);
-    localStorage.setItem('molhamCloudUserId', user.uid);
-    refreshDashboardFromStorage();
-    await writeCloudState();
-}
-
-function watchCloudState(user) {
     if (cloudUnsubscribe) cloudUnsubscribe();
     cloudUnsubscribe = firebase.firestore().collection('users').doc(user.uid).onSnapshot(snapshot => {
-        // Ignore the immediate local echo. The server copy is what keeps other devices in sync.
-        if (!snapshot.exists || !snapshot.data().state || snapshot.metadata.hasPendingWrites) return;
+        if (!snapshot.exists || !snapshot.data().state) {
+            // First use of an account: turn the current local dashboard into its cloud dashboard.
+            if (!snapshot.metadata.hasPendingWrites) saveCloudStateImmediately();
+            return;
+        }
 
-        clearLocalUserState();
-        Object.entries(snapshot.data().state).forEach(([key, value]) => localStorage.setItem(key, value));
-        localStorage.setItem('molhamCloudUserId', user.uid);
-        if (user.displayName) localStorage.setItem('userName', user.displayName);
-        refreshDashboardFromStorage();
+        // The page has already updated locally. Apply only acknowledged or remote snapshots so an
+        // active timer is not reset by Firestore's local echo; other devices update immediately.
+        if (snapshot.metadata.hasPendingWrites) return;
+        applyCloudState(user, snapshot.data().state);
         setCloudStatus('✓ تمت مزامنة بيانات الحساب', 'connected');
     }, error => {
         setCloudStatus('تعذر الاتصال بالسحابة', 'error');
@@ -181,8 +185,11 @@ async function signInWithGoogle() {
 
 function initializeCloud() {
     document.getElementById('googleLoginButton')?.addEventListener('click', signInWithGoogle);
+    document.getElementById('guestLoginButton')?.addEventListener('click', signInWithGoogle);
+    document.getElementById('continueAsGuestButton')?.addEventListener('click', continueAsGuest);
     document.getElementById('logoutButton')?.addEventListener('click', signOut);
-    initializeAccountMenu();
+    initializeAccountMenu('accountControl', 'accountMenuButton', 'accountMenu');
+    initializeAccountMenu('guestAccountControl', 'guestAccountMenuButton', 'guestAccountMenu');
 
     if (!isFirebaseConfigured()) {
         showLoginError('أضف إعدادات Firebase في ملف script.js لتفعيل تسجيل الدخول والحفظ بين الأجهزة.');
@@ -195,12 +202,11 @@ function initializeCloud() {
     }
 
     firebase.initializeApp(FIREBASE_CONFIG);
-    firebase.auth().onAuthStateChanged(async user => {
+    firebase.auth().onAuthStateChanged(user => {
         cloudUser = user;
         setSignedInView(user);
         if (user) {
             try {
-                await loadCloudState(user);
                 watchCloudState(user);
             } catch (error) {
                 showLoginError('تم تسجيل الدخول، لكن تعذر تحميل بياناتك السحابية.');
@@ -212,10 +218,10 @@ function initializeCloud() {
     });
 }
 
-function initializeAccountMenu() {
-    const trigger = document.getElementById('accountMenuButton');
-    const menu = document.getElementById('accountMenu');
-    const control = document.getElementById('accountControl');
+function initializeAccountMenu(controlId, triggerId, menuId) {
+    const trigger = document.getElementById(triggerId);
+    const menu = document.getElementById(menuId);
+    const control = document.getElementById(controlId);
     if (!trigger || !menu || !control) return;
 
     trigger.addEventListener('click', () => {
@@ -240,7 +246,7 @@ function initializeAccountMenu() {
 }
 
 function signOut() {
-    clearTimeout(cloudSaveTimer);
+    guestModeSelected = false;
     if (cloudUnsubscribe) {
         cloudUnsubscribe();
         cloudUnsubscribe = null;
@@ -328,6 +334,7 @@ window.onload = () => {
     if(document.getElementById('colorPicker')) {
         document.getElementById('colorPicker').value = savedColor;
     }
+    updateColorPickerPreview(savedColor);
     document.documentElement.style.setProperty('--primary', savedColor);
     
     // ضبط الوقت الابتدائي بدون تعليق برمي الخوارزمية
@@ -436,6 +443,13 @@ if(document.getElementById('langSelect')) {
     });
 }
 
+if (document.getElementById('colorPicker')) {
+    document.getElementById('colorPicker').addEventListener('input', function(e) {
+        updateColorPickerPreview(e.target.value);
+    });
+    updateColorPickerPreview();
+}
+
 // ==========================================
 // 4️⃣ زر الحفظ الرئيسي
 // ==========================================
@@ -468,7 +482,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
 
     applyLanguage(currentLang);
     displayDate(); 
-    queueCloudSave();
+    saveCloudStateImmediately();
 
     const saveBtn = document.getElementById('mainSaveBtn');
     const originalText = i18n[currentLang].saveBtn;
@@ -623,7 +637,7 @@ function buyBreak(min) {
 function savePoints() {
     localStorage.setItem('userPoints', points);
     updatePointsDisplay();
-    queueCloudSave();
+    saveCloudStateImmediately();
 }
 
 function updatePointsDisplay() { 
@@ -733,7 +747,7 @@ function addTask() {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks.push({ text: text, done: false });
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
-    queueCloudSave();
+    saveCloudStateImmediately();
     input.value = '';
     renderTasks();
 }
@@ -742,7 +756,7 @@ window.toggleTask = function(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks[index].done = !tasks[index].done;
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
-    queueCloudSave();
+    saveCloudStateImmediately();
     renderTasks();
 }
 
@@ -750,7 +764,7 @@ window.deleteTask = function(index) {
     const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
     tasks.splice(index, 1);
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
-    queueCloudSave();
+    saveCloudStateImmediately();
     renderTasks();
 }
 
