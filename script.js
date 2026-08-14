@@ -62,6 +62,10 @@ function setSignedInView(user) {
     if (accountName) accountName.textContent = user.name || user.displayName || user.email;
     if (accountEmail) accountEmail.textContent = user.email || '';
     if (accountAvatar) {
+        accountAvatar.onerror = () => {
+            accountAvatar.onerror = null;
+            accountAvatar.src = 'gnome-books.png';
+        };
         accountAvatar.src = user.picture || user.photoURL || 'gnome-books.png';
         accountAvatar.alt = `Account photo for ${user.name || user.displayName || 'user'}`;
     }

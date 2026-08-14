@@ -776,16 +776,42 @@ header { position: relative; }
 .glass-card { position: relative; }
 .date-tag { top: 24px; left: 30px; z-index: 12; }
 .mini-score { top: 18px; right: 30px; z-index: 12; }
-.account-control { position: absolute; z-index: 20; top: 17px; left: 190px; bottom: auto; display: flex; color: var(--text-muted); font-size: 12px; }
+.account-control { position: absolute; z-index: 20; top: 17px; left: 190px; bottom: auto; display: flex; flex: 0 0 42px; width: 42px; height: 42px; color: var(--text-muted); font-size: 12px; overflow: visible; }
 .account-control[hidden] { display: none !important; }
-.account-trigger { display: grid !important; place-items: center; min-width: 42px !important; width: 42px; height: 42px; padding: 0 !important; border: 1px solid var(--glass-border) !important; border-radius: 50% !important; background: rgba(15,23,42,.68) !important; overflow: hidden; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.account-trigger { display: grid !important; place-items: center; flex: 0 0 42px; min-width: 42px !important; width: 42px; height: 42px; aspect-ratio: 1; padding: 0 !important; border: 1px solid var(--glass-border) !important; border-radius: 50% !important; background: rgba(15,23,42,.68) !important; overflow: hidden; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
 .account-trigger:hover, .account-trigger[aria-expanded="true"] { transform: translateY(-2px); border-color: var(--primary) !important; box-shadow: 0 0 18px var(--primary-glow); }
 .account-avatar { display: block; width: 100%; height: 100%; border: 0; }
 .account-menu { position: absolute; top: 52px; left: 0; width: 225px; padding: 15px; border: 1px solid var(--glass-border); border-radius: 17px; background: rgba(15,23,42,.96); box-shadow: 0 16px 42px rgba(0,0,0,.35); backdrop-filter: blur(16px); text-align: start; }
 .account-menu[hidden] { display: none !important; }.account-menu-label { display: block; margin-bottom: 4px; color: var(--text-darker); font-size: 11px; }.account-menu strong { display: block; overflow: hidden; color: var(--text-main); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }.account-email { display: block; overflow: hidden; margin-top: 3px; color: var(--text-muted); font-size: 11px; direction: ltr; text-align: left; text-overflow: ellipsis; white-space: nowrap; }.account-menu .logout-button { position: static; width: 100%; min-width: 0 !important; margin-top: 13px; padding: 8px 12px !important; border: 1px solid rgba(251,113,133,.65) !important; background: rgba(127,29,29,.28) !important; color: #fecdd3 !important; }
 .account-settings-icon { display: block !important; width: 22px; height: 22px; fill: #f8fafc; pointer-events: none; }.account-menu .guest-login-button { width: 100%; min-width: 0 !important; padding: 8px 12px !important; border: 1px solid rgba(165,180,252,.65) !important; border-radius: 999px; background: rgba(99,102,241,.18) !important; color: #e0e7ff !important; font: 700 12px 'Cairo', sans-serif; cursor: pointer; }.account-menu .logout-button:only-child { margin-top: 0; }
 .cloud-sync-status { display: block; margin-top: 10px; font-size: 11px; color: #86efac; }.cloud-sync-status[data-state="saving"] { color: #fde68a; }.cloud-sync-status[data-state="error"] { color: #fda4af; }
-@media (max-width: 767px) { .date-tag, .mini-score { position: static; margin: 6px auto; }.account-control { position: static; width: fit-content; margin: 8px auto; }.account-menu { top: 50px; left: 50%; transform: translateX(-50%); } }
+@media (max-width: 767px) {
+    .date-tag, .mini-score { position: static; margin: 6px auto; }
+
+    /* Keep the account control entirely within its own circular hit area. */
+    .glass-card > .account-control {
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        left: auto !important;
+        flex: 0 0 42px !important;
+        width: 42px !important;
+        height: 42px !important;
+        margin: 10px auto 14px !important;
+        align-self: center;
+        overflow: visible !important;
+    }
+    .glass-card > .account-control .account-trigger {
+        flex: 0 0 42px !important;
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        min-height: 42px !important;
+        margin: 0 !important;
+    }
+    .account-menu { top: 50px; left: 50%; transform: translateX(-50%); }
+}
 
 /* Tablet layout: keep the dashboard contained and use the available horizontal space. */
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
@@ -800,11 +826,15 @@ header { position: relative; }
         max-height: none !important;
         min-height: 0 !important;
         margin: 0 auto !important;
-        padding: 24px !important;
+        padding: 30px !important;
         overflow: visible !important;
     }
 
-    .preferences { width: 100% !important; max-width: none !important; }
+    .preferences {
+        width: 100% !important;
+        max-width: none !important;
+        margin-bottom: 30px !important;
+    }
     .preferences .settings-bar {
         display: grid !important;
         grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -829,16 +859,16 @@ header { position: relative; }
 
     .dashboard-grid {
         display: grid !important;
-        grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr) !important;
+        grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr) !important;
         align-items: start !important;
-        gap: 16px !important;
+        gap: 28px !important;
         min-width: 0 !important;
     }
     .main-col, .side-col {
         width: auto !important;
         max-width: none !important;
         min-width: 0 !important;
-        gap: 16px !important;
+        gap: 24px !important;
     }
     .info-card, .tasks-card {
         width: 100% !important;
@@ -847,7 +877,26 @@ header { position: relative; }
         min-height: 0 !important;
         overflow: hidden !important;
     }
-    .tasks-card { padding: 16px !important; }
+    .info-card { padding: 28px 24px !important; }
+    .countdown-card, .focus-card { min-height: 210px !important; }
+    .store-card, .tasks-card { min-height: 230px !important; }
+    .tasks-card {
+        padding: 22px !important;
+        justify-content: flex-start !important;
+    }
+
+    /* الكروت الصغيرة داخل متجر الطاقة: أحجام موحدة ومسافات مريحة للعين. */
+    .store-grid {
+        gap: 18px !important;
+        margin-top: 22px !important;
+    }
+    .store-grid .item {
+        min-height: 108px !important;
+        padding: 18px 10px !important;
+        font-size: 16px !important;
+        line-height: 1.45 !important;
+    }
+    .store-grid .item small { font-size: 14px !important; }
     .input-section {
         width: 100% !important;
         min-width: 0 !important;
@@ -903,6 +952,65 @@ header { position: relative; }
     }
 }
 
+/* Account controls: one clean, dependable place at every screen size. */
+#guestAccountControl[hidden],
+#accountControl[hidden] {
+    display: none !important;
+}
+
+.glass-card > .account-control {
+    position: absolute !important;
+    z-index: 30;
+    top: 18px !important;
+    right: auto !important;
+    bottom: auto !important;
+    left: 24px !important;
+    display: flex !important;
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0 !important;
+}
+.glass-card > .account-control .account-trigger {
+    display: grid !important;
+    place-items: center;
+    flex: 0 0 44px !important;
+    width: 44px !important;
+    min-width: 44px !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    overflow: hidden;
+}
+.glass-card > .account-control .account-menu {
+    top: 54px;
+    right: auto !important;
+    left: 0 !important;
+    transform: none !important;
+}
+.account-avatar {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+}
+
+@media only screen and (max-width: 1024px) {
+    .glass-card > .account-control {
+        top: 16px !important;
+        left: 16px !important;
+    }
+    .date-tag {
+        position: absolute !important;
+        top: 72px !important;
+        left: 18px !important;
+    }
+    header {
+        padding-top: 20px;
+    }
+}
+
 /* Desktop and laptop layout: two balanced rows of dashboard settings. */
 @media only screen and (min-width: 1025px) {
     .preferences { width: min(960px, 100%) !important; }
@@ -945,15 +1053,172 @@ header { position: relative; }
     }
 }
 
-/* Tablet only: keep the guest sign-in control at the physical left edge. */
+/* Tablet and iPad: retain the same anchored account control as desktop. */
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
-    #guestAccountControl {
-        left: 24px !important;
+    .glass-card > .account-control {
+        position: absolute !important;
+        top: 16px !important;
         right: auto !important;
+        bottom: auto !important;
+        left: 16px !important;
+        display: flex !important;
+        flex: 0 0 44px !important;
+        width: 44px !important;
+        height: 44px !important;
+        margin: 0 !important;
+        overflow: visible !important;
     }
-    #guestAccountControl .account-menu {
+    .glass-card > .account-control .account-trigger {
+        flex: 0 0 44px !important;
+        width: 44px !important;
+        height: 44px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        margin: 0 !important;
+    }
+    #guestAccountControl .account-menu,
+    #accountControl .account-menu {
         left: 0 !important;
+        right: auto !important;
+        transform: none !important;
+    }
+}
+
+
+
+
+
+/* =========================================================
+   RESTORED HEADER LAYOUT — matches the supplied reference
+   ========================================================= */
+.glass-card {
+    position: relative !important;
+}
+
+.date-tag {
+    position: absolute !important;
+    top: 25px !important;
+    left: 18px !important;
+    right: auto !important;
+    margin: 0 !important;
+    z-index: 20 !important;
+}
+
+.mini-score {
+    position: absolute !important;
+    top: 20px !important;
+    right: 40px !important;
+    left: auto !important;
+    z-index: 20 !important;
+}
+
+.glass-card > .account-control {
+    position: absolute !important;
+    top: 18px !important;
+    left: 175px !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0 !important;
+    z-index: 40 !important;
+}
+
+.glass-card > .account-control .account-trigger {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+}
+
+/* Keep the same header arrangement on tablet/iPad. */
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .date-tag {
+        top: 25px !important;
+        left: 18px !important;
+    }
+
+    .mini-score {
+        top: 20px !important;
+        right: 24px !important;
+    }
+
+    .glass-card > .account-control {
+        top: 18px !important;
+        left: 175px !important;
         right: auto !important;
     }
 }
 
+
+/* =========================================================
+   📱 MOBILE — same header arrangement as desktop/tablet
+   ========================================================= */
+@media only screen and (max-width: 767px) {
+
+    .glass-card {
+        position: relative !important;
+    }
+
+    /* Date stays at the top-left. */
+    .date-tag {
+        position: absolute !important;
+        top: 17px !important;
+        left: 12px !important;
+        right: auto !important;
+        margin: 0 !important;
+        z-index: 30 !important;
+        white-space: nowrap !important;
+        font-size: 12px !important;
+    }
+
+    /* Gear/avatar stays on the same top row, between date and score. */
+    .glass-card > .account-control {
+        position: absolute !important;
+        top: 9px !important;
+        left: 154px !important;
+        right: auto !important;
+        bottom: auto !important;
+        width: 42px !important;
+        height: 42px !important;
+        margin: 0 !important;
+        z-index: 50 !important;
+        align-self: auto !important;
+    }
+
+    .glass-card > .account-control .account-trigger {
+        width: 42px !important;
+        height: 42px !important;
+        min-width: 42px !important;
+        min-height: 42px !important;
+        margin: 0 !important;
+    }
+
+    /* Points remain at the top-right like desktop/tablet. */
+    .mini-score {
+        position: absolute !important;
+        top: 10px !important;
+        right: 12px !important;
+        left: auto !important;
+        margin: 0 !important;
+        z-index: 30 !important;
+        padding: 5px 12px !important;
+        font-size: 15px !important;
+    }
+
+    /* Move the title/welcome below the top control row. */
+    header {
+        position: relative !important;
+        padding-top: 54px !important;
+    }
+
+    header h1 {
+        font-size: 22px !important;
+        line-height: 1.35 !important;
+        margin-bottom: 3px !important;
+    }
+
+    .welcome-msg {
+        margin-top: 2px !important;
+    }
+}
