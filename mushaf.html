@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#123a34">
+    <meta name="description" content="اقرأ المصحف الشريف صفحةً صفحة، مع حفظ موضع القراءة تلقائيًا.">
+    <title>المصحف الشريف | لوحة ملهم</title>
+    <script>
+        try {
+            document.documentElement.dataset.theme = localStorage.getItem('colorScheme') === 'light' ? 'light' : 'dark';
+        } catch (error) {
+            document.documentElement.dataset.theme = 'dark';
+        }
+    </script>
+    <link rel="manifest" href="manifest.json?v=10">
+    <link rel="icon" type="image/png" href="gnome-books.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="mushaf.css?v=3">
+</head>
+<body>
+    <div class="mushaf-app">
+        <header class="reader-header">
+            <a class="back-link" href="index.html" aria-label="العودة إلى لوحة التحكم">
+                <span class="back-arrow" aria-hidden="true">→</span>
+                <span class="back-copy"><small>العودة إلى</small><strong>لوحة التحكم</strong></span>
+            </a>
+            <div class="reader-brand" aria-label="المصحف الشريف، قراءة صفحة بصفحة">
+                <span class="brand-mark" aria-hidden="true">۞</span>
+                <span><strong>المصحف الشريف</strong><small>قراءة صفحة بصفحة</small></span>
+            </div>
+            <div class="saved-position" id="savedPosition" hidden>
+                <span class="saved-dot" aria-hidden="true"></span>
+                <span id="savedPositionText">موضعك محفوظ</span>
+            </div>
+        </header>
+
+        <main class="reader-main">
+            <section class="reader-intro" aria-labelledby="readerTitle">
+                <div class="intro-copy">
+                    <span class="eyebrow"><span aria-hidden="true">✦</span> وِردك اليومي</span>
+                    <h1 id="readerTitle">اقرأ على مهل</h1>
+                    <p>صفحات المصحف مرتبة كما في المصحف الشريف. تنقّل صفحةً صفحة، وسيُحفظ موضعك تلقائيًا.</p>
+                </div>
+                <form class="page-jump" id="pageJumpForm">
+                    <label for="pageNumberInput">اذهب إلى صفحة</label>
+                    <div class="jump-controls">
+                        <input id="pageNumberInput" type="number" inputmode="numeric" min="1" max="604" value="1" aria-label="رقم الصفحة من ١ إلى ٦٠٤">
+                        <button type="submit">انتقال</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="reading-area" aria-label="صفحة المصحف">
+                <div class="page-paper" id="pagePaper" aria-busy="true">
+                    <div class="paper-inner">
+                        <header class="paper-header">
+                            <span class="paper-side-mark" aria-hidden="true">۞</span>
+                            <span id="surahHeader">المصحف الشريف</span>
+                            <span class="paper-page-label">الصفحة <b id="pageHeaderNumber">١</b></span>
+                        </header>
+                        <div class="paper-rule" aria-hidden="true"><span>✦</span></div>
+                        <div class="page-loading" id="pageLoading" role="status" aria-live="polite">
+                            <span class="loading-mark" aria-hidden="true">۞</span>
+                            <span>جارٍ تجهيز الصفحة…</span>
+                        </div>
+                        <article class="page-content" id="pageContent" aria-label="آيات الصفحة"></article>
+                        <div class="page-error" id="pageError" hidden>
+                            <span aria-hidden="true">☁</span>
+                            <p>تعذّر تحميل الصفحة. تحقّق من اتصال الإنترنت ثم أعد المحاولة.</p>
+                            <button type="button" id="retryPageButton">إعادة المحاولة</button>
+                        </div>
+                        <footer class="paper-footer" aria-hidden="true">
+                            <span class="footer-rule"></span>
+                            <span class="page-medallion" id="pageFooterNumber">١</span>
+                            <span class="footer-rule"></span>
+                        </footer>
+                    </div>
+                </div>
+            </section>
+
+            <nav class="page-navigation" aria-label="التنقل بين صفحات المصحف">
+                <button class="page-step" id="previousPageButton" type="button" aria-label="الصفحة السابقة" disabled>
+                    <span class="step-arrow" aria-hidden="true">→</span><span>السابقة</span>
+                </button>
+                <div class="reading-progress">
+                    <div class="progress-copy"><span>تقدّم القراءة</span><strong id="pageCounter">١ / ٦٠٤</strong></div>
+                    <div class="progress-track" role="progressbar" aria-label="التقدم في صفحات المصحف" aria-valuemin="1" aria-valuemax="604" aria-valuenow="1">
+                        <span id="progressFill"></span>
+                    </div>
+                </div>
+                <button class="page-step" id="nextPageButton" type="button" aria-label="الصفحة التالية">
+                    <span>التالية</span><span class="step-arrow" aria-hidden="true">←</span>
+                </button>
+            </nav>
+            <p class="reader-status" id="readerStatus" aria-live="polite">استخدم السحب أو أزرار التنقل للقراءة.</p>
+        </main>
+
+        <footer class="reader-footer">
+            <span aria-hidden="true">۞</span>
+            <span>اللهم اجعل القرآن ربيع قلوبنا</span>
+            <span aria-hidden="true">۞</span>
+        </footer>
+    </div>
+    <script src="mushaf.js?v=3" defer></script>
+</body>
+</html>
