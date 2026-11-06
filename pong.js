@@ -1,16 +1,31 @@
 const canvas = document.getElementById('pongCanvas');
 const context = canvas.getContext('2d');
 const startButton = document.getElementById('startButton');
-const isEnglish = localStorage.getItem('userLang') === 'en';
+const difficultySelect = document.getElementById('difficultySelect');
+function readLocalSetting(key) {
+    try { return localStorage.getItem(key); } catch (error) { return null; }
+}
+function saveLocalSetting(key, value) {
+    try { localStorage.setItem(key, value); } catch (error) { /* The game remains playable without saved settings. */ }
+}
+const isEnglish = readLocalSetting('userLang') === 'en';
 const text = isEnglish
-    ? { kicker: 'A short break', offline: 'Works offline', start: 'Start game', restart: 'Play again', help: 'Move with mouse, ↑ ↓, or W and S', score: 'First to 5 points wins', you: 'YOU WIN', cpu: 'CPU WINS' }
-    : { kicker: 'استراحة قصيرة', offline: 'تعمل دون إنترنت', start: 'ابدأ اللعب', restart: 'العب مرة أخرى', help: 'حرّك بالماوس أو بالأسهم ↑ ↓ أو W و S', score: 'أول لاعب يصل إلى ٥ نقاط يفوز', you: 'فزت!', cpu: 'فاز الكمبيوتر' };
+    ? { kicker: 'A short break', offline: 'Works offline', start: 'Start game', restart: 'Play again', help: 'Move with mouse, ↑ ↓, or W and S', score: 'First to 5 points wins', you: 'YOU WIN', cpu: 'CPU WINS', difficulty: 'Difficulty', levels: { easy: 'Easy', medium: 'Medium', hard: 'Hard' } }
+    : { kicker: 'استراحة قصيرة', offline: 'تعمل دون إنترنت', start: 'ابدأ اللعب', restart: 'العب مرة أخرى', help: 'حرّك بالماوس أو بالأسهم ↑ ↓ أو W و S', score: 'أول لاعب يصل إلى ٥ نقاط يفوز', you: 'فزت!', cpu: 'فاز الكمبيوتر', difficulty: 'المستوى', levels: { easy: 'سهل', medium: 'متوسط', hard: 'صعب' } };
 
 document.getElementById('gameKicker').textContent = text.kicker;
 document.getElementById('offlineBadge').textContent = text.offline;
 document.getElementById('gameHelp').textContent = text.help;
 document.getElementById('scoreLabel').textContent = text.score;
+document.getElementById('difficultyLabel').textContent = text.difficulty;
+Array.from(difficultySelect.options).forEach(option => {
+    option.textContent = text.levels[option.value];
+});
 startButton.textContent = text.start;
+
+const savedDifficulty = readLocalSetting('pongDifficulty');
+const initialDifficulty = ['easy', 'medium', 'hard'].includes(savedDifficulty) ? savedDifficulty : 'medium';
+difficultySelect.value = initialDifficulty;
 
 const game = {
     width: canvas.width,
@@ -25,6 +40,8 @@ const game = {
     ballVY: 3,
     playerScore: 0,
     cpuScore: 0,
+    difficulty: initialDifficulty,
+    cpuAimOffset: 0,
     running: false,
     keys: new Set(),
     lastFrame: 0
@@ -37,6 +54,15 @@ function resetBall(direction) {
     const angle = (Math.random() * .8 - .4);
     game.ballVX = Math.cos(angle) * speed * direction;
     game.ballVY = Math.sin(angle) * speed;
+    game.cpuAimOffset = (Math.random() * 2 - 1) * getDifficultySettings().aimError;
+}
+
+function getDifficultySettings() {
+    return {
+        easy: { cpuSpeed: 2.5, predictionFrames: 0, aimError: 84 },
+        medium: { cpuSpeed: 3.35, predictionFrames: 3, aimError: 56 },
+        hard: { cpuSpeed: 5.1, predictionFrames: 8, aimError: 12 }
+    }[game.difficulty];
 }
 
 function draw() {
@@ -85,9 +111,10 @@ function update(delta) {
     if (game.keys.has('ArrowDown') || game.keys.has('s')) game.playerY += playerSpeed;
     game.playerY = Math.max(game.paddleHeight / 2 + 8, Math.min(game.height - game.paddleHeight / 2 - 8, game.playerY));
 
-    const cpuAim = game.ballY + game.ballVY * 8;
+    const { cpuSpeed, predictionFrames } = getDifficultySettings();
+    const cpuAim = game.ballY + (game.ballVX > 0 ? game.ballVY * predictionFrames : 0) + game.cpuAimOffset;
     const cpuDifference = cpuAim - game.cpuY;
-    game.cpuY += Math.max(-5.2 * frameScale, Math.min(5.2 * frameScale, cpuDifference));
+    game.cpuY += Math.max(-cpuSpeed * frameScale, Math.min(cpuSpeed * frameScale, cpuDifference));
     game.cpuY = Math.max(game.paddleHeight / 2 + 8, Math.min(game.height - game.paddleHeight / 2 - 8, game.cpuY));
 
     game.ballX += game.ballVX * frameScale;
@@ -136,6 +163,11 @@ function startGame() {
 }
 
 startButton.addEventListener('click', startGame);
+difficultySelect.addEventListener('change', () => {
+    game.difficulty = ['easy', 'medium', 'hard'].includes(difficultySelect.value) ? difficultySelect.value : 'medium';
+    saveLocalSetting('pongDifficulty', game.difficulty);
+    game.cpuAimOffset = (Math.random() * 2 - 1) * getDifficultySettings().aimError;
+});
 canvas.addEventListener('pointermove', event => {
     const rect = canvas.getBoundingClientRect();
     game.playerY = (event.clientY - rect.top) * (game.height / rect.height);

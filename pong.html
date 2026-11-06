@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#07131e">
     <title>Pong | ملهم</title>
     <link rel="stylesheet" href="fonts.css?v=1">
-    <link rel="stylesheet" href="pong.css?v=1">
+    <link rel="stylesheet" href="pong.css?v=2">
 </head>
 <body>
     <main class="game-shell">
@@ -17,6 +17,16 @@
             </div>
             <span class="offline-badge" id="offlineBadge">تعمل دون إنترنت</span>
         </header>
+        <div class="game-controls">
+            <label class="difficulty-control" for="difficultySelect">
+                <span id="difficultyLabel">المستوى</span>
+                <select id="difficultySelect" aria-label="مستوى صعوبة اللعبة">
+                    <option value="easy">سهل</option>
+                    <option value="medium" selected>متوسط</option>
+                    <option value="hard">صعب</option>
+                </select>
+            </label>
+        </div>
         <div class="canvas-wrap">
             <canvas id="pongCanvas" width="960" height="540" tabindex="0" aria-label="لعبة بونج"></canvas>
             <button id="startButton" class="start-button" type="button">ابدأ اللعب</button>
@@ -26,6 +36,6 @@
             <span id="scoreLabel">أول لاعب يصل إلى ٥ نقاط يفوز</span>
         </footer>
     </main>
-    <script src="pong.js?v=1" defer></script>
+    <script src="pong.js?v=2" defer></script>
 </body>
 </html>

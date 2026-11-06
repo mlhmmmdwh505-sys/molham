@@ -6,9 +6,13 @@ html, body { width: 100%; min-width: 280px; height: 100%; margin: 0; overflow: h
 .game-kicker { color: var(--game-muted); font-size: 10px; }
 .game-heading h1 { margin: 0; color: var(--game-green); font: 800 clamp(19px, 3vw, 27px)/1.1 'Orbitron', sans-serif; letter-spacing: .12em; }
 .offline-badge { padding: 5px 9px; border: 1px solid rgba(77,224,170,.28); border-radius: 99px; background: rgba(77,224,170,.08); color: var(--game-green); font-size: 9px; white-space: nowrap; }
+.game-controls { display: flex; width: min(100%, 980px); justify-content: flex-start; margin: 0 auto; }
+.difficulty-control { display: inline-flex; align-items: center; gap: 8px; color: var(--game-muted); font-size: 10px; }
+.difficulty-control select { min-width: 104px; height: 32px; padding: 0 9px; border: 1px solid rgba(77,224,170,.28); border-radius: 10px; outline: none; background: #0b202a; color: var(--game-ink); font: 600 10px 'Cairo', sans-serif; }
+.difficulty-control select:focus-visible { border-color: var(--game-green); box-shadow: 0 0 0 3px rgba(77,224,170,.12); }
 .canvas-wrap { position: relative; width: min(100%, 980px); max-height: calc(100% - 105px); margin: 0 auto; aspect-ratio: 16 / 9; overflow: hidden; border: 1px solid rgba(77,224,170,.24); border-radius: 16px; background: radial-gradient(ellipse at 50% 50%, #102a35, #081722 70%); box-shadow: 0 16px 45px rgba(0,0,0,.3); }
 canvas { display: block; width: 100%; height: 100%; touch-action: none; outline: none; }
 .start-button { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); min-width: 130px; min-height: 44px; padding: 0 18px; border: 1px solid rgba(255,255,255,.35); border-radius: 99px; background: rgba(10,34,40,.94); color: var(--game-ink); font: 700 12px 'Cairo', sans-serif; cursor: pointer; box-shadow: 0 8px 22px rgba(0,0,0,.3); }
 .start-button[hidden] { display: none; }
 .game-footer { display: flex; width: min(100%, 980px); align-items: center; justify-content: space-between; gap: 10px; margin: 0 auto; color: var(--game-muted); font-size: 9px; }
-@media (max-width: 520px) { .game-shell { gap: 7px; padding: 10px; }.game-footer { align-items: flex-start; flex-direction: column; gap: 1px; }.canvas-wrap { border-radius: 12px; }.offline-badge { font-size: 8px; } }
+@media (max-width: 520px) { .game-shell { gap: 7px; padding: 10px; }.game-footer { align-items: flex-start; flex-direction: column; gap: 1px; }.canvas-wrap { border-radius: 12px; }.offline-badge { font-size: 8px; }.difficulty-control select { min-width: 92px; } }
