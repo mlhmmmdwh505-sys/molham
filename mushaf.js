@@ -13,6 +13,8 @@ const pageInput = document.getElementById('pageNumberInput');
 const pageCounter = document.getElementById('pageCounter');
 const pageHeaderNumber = document.getElementById('pageHeaderNumber');
 const pageFooterNumber = document.getElementById('pageFooterNumber');
+const pageJuzNumber = document.getElementById('pageJuzNumber');
+const pageHizbNumber = document.getElementById('pageHizbNumber');
 const progressTrack = document.querySelector('.progress-track');
 const progressFill = document.getElementById('progressFill');
 const readerStatus = document.getElementById('readerStatus');
@@ -81,6 +83,14 @@ function appendSurahHeading(container, surah) {
     }
 }
 
+function formatPageLocations(ayahs, getLocation) {
+    const locations = [...new Set(ayahs
+        .map(getLocation)
+        .map(Number)
+        .filter(value => Number.isInteger(value) && value > 0))];
+    return locations.length ? locations.map(toArabicNumber).join('، ') : '—';
+}
+
 function removeOpeningBasmala(text) {
     const withoutBom = String(text || '').replace(/^\uFEFF/u, '');
     const opening = withoutBom.match(/^(\s*\S+\s+\S+\s+\S+\s+\S+)/u);
@@ -99,6 +109,9 @@ function removeOpeningBasmala(text) {
 function renderPage(pageData) {
     const ayahs = Array.isArray(pageData?.ayahs) ? pageData.ayahs : [];
     if (ayahs.length === 0) throw new Error('No verses returned for this page.');
+
+    pageJuzNumber.textContent = formatPageLocations(ayahs, ayah => ayah.juz);
+    pageHizbNumber.textContent = formatPageLocations(ayahs, ayah => Math.ceil(Number(ayah.hizbQuarter) / 4));
 
     pageContent.replaceChildren();
     const seenSurahs = new Map();
@@ -218,7 +231,7 @@ pagePaper.addEventListener('pointerup', event => {
     const deltaY = event.clientY - touchStart.y;
     touchStart = null;
     if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
-    if (deltaX < 0) goToPage(currentPage + 1);
+    if (deltaX > 0) goToPage(currentPage + 1);
     else goToPage(currentPage - 1);
 });
 pagePaper.addEventListener('pointercancel', () => { touchStart = null; });

@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="mushaf.css?v=5">
+    <link rel="stylesheet" href="mushaf.css?v=6">
 </head>
 <body>
     <div class="mushaf-app">
@@ -70,6 +70,11 @@
                             <span class="paper-page-label">الصفحة <b id="pageHeaderNumber">١</b></span>
                         </header>
                         <div class="paper-rule" aria-hidden="true"><span>✦</span></div>
+                        <div class="page-meta" aria-label="معلومات الجزء والحزب">
+                            <span>الجزء <b id="pageJuzNumber">١</b></span>
+                            <span class="meta-divider" aria-hidden="true">۞</span>
+                            <span>الحزب <b id="pageHizbNumber">١</b></span>
+                        </div>
                         <div class="page-loading" id="pageLoading" role="status" aria-live="polite">
                             <span class="loading-mark" aria-hidden="true">۞</span>
                             <span>جارٍ تجهيز الصفحة…</span>
@@ -103,7 +108,7 @@
                     <span>التالية</span><span class="step-arrow" aria-hidden="true">←</span>
                 </button>
             </nav>
-            <p class="reader-status" id="readerStatus" aria-live="polite">استخدم السحب أو أزرار التنقل للقراءة.</p>
+            <p class="reader-status" id="readerStatus" aria-live="polite">اسحب الصفحة من اليسار إلى اليمين للتالية، أو من اليمين إلى اليسار للسابقة.</p>
         </main>
 
         <footer class="reader-footer">
@@ -112,6 +117,6 @@
             <span aria-hidden="true">۞</span>
         </footer>
     </div>
-    <script src="mushaf.js?v=4" defer></script>
+    <script src="mushaf.js?v=5" defer></script>
 </body>
 </html>
