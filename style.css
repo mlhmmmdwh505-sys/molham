@@ -30,6 +30,16 @@
     -moz-osx-font-smoothing: grayscale;
 }
 
+button,
+a,
+input,
+select,
+textarea,
+[role="button"],
+[onclick] {
+    -webkit-tap-highlight-color: transparent;
+}
+
 html, body {
     width: 100%;
     height: 100vh;
@@ -1750,7 +1760,14 @@ body.focus-mode .main-col { display: flex !important; width: 100% !important; ma
 body.focus-mode .focus-card { position: relative !important; flex: 1 !important; min-height: 0 !important; border-color: color-mix(in srgb, var(--primary) 38%, var(--glass-border)) !important; background: color-mix(in srgb, var(--primary) 9%, var(--glass-bg)) !important; }
 body.focus-mode #pomoDisplay { font-size: clamp(112px, 24vw, 220px) !important; }
 body.focus-mode .focus-mode-toggle { top: 20px; inset-inline-end: 20px; }
-body.focus-mode .pomo-actions { max-width: 520px !important; }
+body.focus-mode .pomo-actions {
+    max-width: 520px !important;
+    position: absolute !important;
+    left: 50% !important;
+    bottom: clamp(24px, 10vh, 64px) !important;
+    transform: translateX(-50%) !important;
+    margin: 0 !important;
+}
 body.focus-mode .pomo-actions { display: flex !important; visibility: visible !important; }
 body.focus-mode .pomo-actions button { display: inline-flex !important; visibility: visible !important; pointer-events: auto !important; }
 
