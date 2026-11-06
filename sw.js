@@ -1,4 +1,4 @@
-const CACHE_NAME = 'molham-dashboard-v43';
+const CACHE_NAME = 'molham-dashboard-v44';
 
 // الأصول والملفات المطلوبة للتخزين حتى يعمل الموقع بدون إنترنت
 const ASSETS_TO_CACHE = [
@@ -16,18 +16,18 @@ const ASSETS_TO_CACHE = [
   './pong.js?v=2',
   './manifest.json?v=11',
   './gnome-books.png',
-  './assets/fonts/amiri-400.ttf',
-  './assets/fonts/amiri-700.ttf',
-  './assets/fonts/amiri-quran-400.ttf',
-  './assets/fonts/cairo-400.ttf',
-  './assets/fonts/cairo-600.ttf',
-  './assets/fonts/cairo-700.ttf',
-  './assets/fonts/cairo-800.ttf',
-  './assets/fonts/orbitron-700.ttf',
-  './assets/fonts/orbitron-800.ttf',
-  './assets/vendor/firebase-app-compat.js',
-  './assets/vendor/firebase-auth-compat.js',
-  './assets/vendor/firebase-firestore-compat.js'
+  './amiri-400.ttf',
+  './amiri-700.ttf',
+  './amiri-quran-400.ttf',
+  './cairo-400.ttf',
+  './cairo-600.ttf',
+  './cairo-700.ttf',
+  './cairo-800.ttf',
+  './orbitron-700.ttf',
+  './orbitron-800.ttf',
+  './firebase-app-compat.js',
+  './firebase-auth-compat.js',
+  './firebase-firestore-compat.js'
 ];
 
 // 1. مرحلة التثبيت: حفظ جميع الملفات المهمة في الـ Cache

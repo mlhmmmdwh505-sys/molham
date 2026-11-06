@@ -3,7 +3,7 @@
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('./assets/fonts/cairo-400.ttf') format('truetype');
+    src: url('./cairo-400.ttf') format('truetype');
 }
 
 @font-face {
@@ -11,7 +11,7 @@
     font-style: normal;
     font-weight: 600;
     font-display: swap;
-    src: url('./assets/fonts/cairo-600.ttf') format('truetype');
+    src: url('./cairo-600.ttf') format('truetype');
 }
 
 @font-face {
@@ -19,7 +19,7 @@
     font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url('./assets/fonts/cairo-700.ttf') format('truetype');
+    src: url('./cairo-700.ttf') format('truetype');
 }
 
 @font-face {
@@ -27,7 +27,7 @@
     font-style: normal;
     font-weight: 800;
     font-display: swap;
-    src: url('./assets/fonts/cairo-800.ttf') format('truetype');
+    src: url('./cairo-800.ttf') format('truetype');
 }
 
 @font-face {
@@ -35,7 +35,7 @@
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('./assets/fonts/amiri-400.ttf') format('truetype');
+    src: url('./amiri-400.ttf') format('truetype');
 }
 
 @font-face {
@@ -43,7 +43,7 @@
     font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url('./assets/fonts/amiri-700.ttf') format('truetype');
+    src: url('./amiri-700.ttf') format('truetype');
 }
 
 @font-face {
@@ -51,7 +51,7 @@
     font-style: normal;
     font-weight: 400;
     font-display: swap;
-    src: url('./assets/fonts/amiri-quran-400.ttf') format('truetype');
+    src: url('./amiri-quran-400.ttf') format('truetype');
 }
 
 @font-face {
@@ -59,7 +59,7 @@
     font-style: normal;
     font-weight: 700;
     font-display: swap;
-    src: url('./assets/fonts/orbitron-700.ttf') format('truetype');
+    src: url('./orbitron-700.ttf') format('truetype');
 }
 
 @font-face {
@@ -67,5 +67,5 @@
     font-style: normal;
     font-weight: 800;
     font-display: swap;
-    src: url('./assets/fonts/orbitron-800.ttf') format('truetype');
+    src: url('./orbitron-800.ttf') format('truetype');
 }
