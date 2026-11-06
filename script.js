@@ -37,7 +37,6 @@ const FIREBASE_CONFIG = {
 const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme', 'surgeonTasks', 'focusLog'];
 let cloudUser = null;
 let cloudUnsubscribe = null;
-let cloudSaveStatusTimer = null;
 let cloudSaveSequence = 0;
 let guestModeSelected = false;
 
@@ -664,22 +663,16 @@ function cloudSyncErrorMessage(error) {
 function saveCloudStateImmediately() {
     if (!cloudUser) return;
     const sequence = ++cloudSaveSequence;
-    if (cloudSaveStatusTimer) clearTimeout(cloudSaveStatusTimer);
-    setCloudStatus('جارٍ حفظ التغييرات في حسابك…', 'saving');
-    cloudSaveStatusTimer = setTimeout(() => {
-        if (sequence !== cloudSaveSequence) return;
-        setCloudStatus('الحفظ لسه مستني تأكيد Firebase؛ ممكن ما يظهرش على الأجهزة التانية لحد ما يتأكد.', 'saving');
-    }, 10000);
+    const localSaveMessage = navigator.onLine
+        ? '✓ تم الحفظ على هذا الجهاز؛ المزامنة تعمل بالخلفية.'
+        : '✓ تم الحفظ على هذا الجهاز؛ ستتم المزامنة عند عودة الاتصال.';
+    setCloudStatus(localSaveMessage, navigator.onLine ? 'connected' : 'saving');
 
     writeCloudState().then(() => {
         if (sequence !== cloudSaveSequence) return;
-        if (cloudSaveStatusTimer) clearTimeout(cloudSaveStatusTimer);
-        cloudSaveStatusTimer = null;
-        setCloudStatus('✓ تم الحفظ في حسابك', 'connected');
+        setCloudStatus('✓ تمت المزامنة مع حسابك', 'connected');
     }).catch(error => {
         if (sequence !== cloudSaveSequence) return;
-        if (cloudSaveStatusTimer) clearTimeout(cloudSaveStatusTimer);
-        cloudSaveStatusTimer = null;
         setCloudStatus(cloudSyncErrorMessage(error), 'error');
         console.warn('Cloud sync write error:', error);
     });
