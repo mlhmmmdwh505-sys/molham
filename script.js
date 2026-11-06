@@ -5,6 +5,7 @@
 const localStorage = window.localStorage;
 let timer = null;
 let timeLeft = null;
+let timerUsesHoursFormat = false;
 let isBreak = false;
 let points = Number.parseInt(localStorage.getItem('userPoints') || '0', 10);
 if (!Number.isFinite(points)) points = 0;
@@ -431,6 +432,7 @@ function updateFocusModeButton() {
 function setFocusMode(enabled) {
     document.body.classList.toggle('focus-mode', Boolean(enabled));
     updateFocusModeButton();
+    if (enabled) changeFocusVerse();
     const quickFocusButton = document.getElementById('quickFocusButton');
     if (quickFocusButton) {
         const label = quickFocusButton.querySelector('span:last-child');
@@ -628,7 +630,7 @@ function refreshDashboardFromStorage() {
     if (document.getElementById('colorPicker')) document.getElementById('colorPicker').value = savedColor;
     updateColorPickerPreview(savedColor);
 
-    timeLeft = Math.floor(savedMins * 60);
+    setTimerDuration(savedMins);
     updatePointsDisplay();
     updateTimerDisplay();
     applyLanguage(currentLang);
@@ -796,6 +798,14 @@ const quotes = {
     ]
 };
 
+const focusVerses = [
+    { text: 'وَأَن لَّيْسَ لِلْإِنسَـٰنِ إِلَّا مَا سَعَىٰ ۝ وَأَنَّ سَعْيَهُۥ سَوْفَ يُرَىٰ', reference: 'سورة النجم • ٣٩–٤٠' },
+    { text: 'إِنَّ مَعَ الْعُسْرِ يُسْرًا', reference: 'سورة الشرح • ٦' },
+    { text: 'لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا', reference: 'سورة البقرة • ٢٨٦' },
+    { text: 'فَاسْتَبِقُوا الْخَيْرَاتِ', reference: 'سورة البقرة • ١٤٨' },
+    { text: 'وَالَّذِينَ جَاهَدُوا فِينَا لَنَهْدِيَنَّهُمْ سُبُلَنَا', reference: 'سورة العنكبوت • ٦٩' }
+];
+
 const i18n = {
     ar: {
         welcome: "مرحباً بك،", mainTitle: "لوحة تحكم ",
@@ -859,7 +869,7 @@ window.onload = () => {
     document.documentElement.style.setProperty('--primary', savedColor);
     
     // ضبط الوقت الابتدائي بدون تعليق برمي الخوارزمية
-    timeLeft = Math.floor(savedMins * 60);
+    setTimerDuration(savedMins);
     updateTimerDisplay();
     
     if(document.getElementById('taskInput')) {
@@ -1002,7 +1012,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     localStorage.setItem('gradDate', graduationDate);
     
     if (timer === null) {
-        timeLeft = Math.floor(newMins * 60);
+        setTimerDuration(newMins);
         updateTimerDisplay();
     }
 
@@ -1036,7 +1046,7 @@ function toggleTimer() {
     
     if (timeLeft === null || timeLeft <= 0) {
         const mins = parseFloat(minsInput.value) || 25;
-        timeLeft = Math.floor(mins * 60);
+        setTimerDuration(mins);
     }
     
     if (timer === null) {
@@ -1074,7 +1084,7 @@ function toggleTimer() {
                 // إعادة ضبط المؤقت تلقائياً بعد الانتهاء
                 isBreak = false;
                 const mins = parseFloat(minsInput.value) || 25;
-                timeLeft = Math.floor(mins * 60);
+                setTimerDuration(mins);
                 totalSecondsWorked = 0;
                 updateTimerDisplay();
                 startBtn.innerText = trans.startBtnJob;
@@ -1113,7 +1123,7 @@ function resetTimer() {
     
     const minsInput = document.getElementById('minsInput');
     const mins = parseFloat(minsInput ? minsInput.value : 25) || 25;
-    timeLeft = Math.floor(mins * 60);
+    setTimerDuration(mins);
     
     updateTimerDisplay();
     
@@ -1123,12 +1133,24 @@ function resetTimer() {
     }
 }
 
+function setTimerDuration(minutes) {
+    timeLeft = Math.floor(minutes * 60);
+    timerUsesHoursFormat = minutes >= 60;
+}
+
 function updateTimerDisplay() {
-    const m = Math.floor(timeLeft / 60);
-    const s = timeLeft % 60;
+    const totalSeconds = Math.max(0, Math.floor(Number(timeLeft) || 0));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const pad = value => String(value).padStart(2, '0');
     const displayElem = document.getElementById('pomoDisplay');
     if (displayElem) {
-        displayElem.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
+        const showHours = timerUsesHoursFormat || hours > 0;
+        displayElem.textContent = showHours
+            ? `${hours}:${pad(minutes)}:${pad(seconds)}`
+            : `${pad(Math.floor(totalSeconds / 60))}:${pad(seconds)}`;
+        displayElem.classList.toggle('has-hours', showHours);
     }
     renderDailyOverview();
 }
@@ -1166,7 +1188,7 @@ function buyBreak(min) {
         savePoints();
         
         isBreak = true;
-        timeLeft = min * 60;
+        setTimerDuration(min);
         totalSecondsWorked = 0; // تصفير العداد لعدم حساب نقاط في الراحة
         
         updateTimerDisplay();
@@ -1257,6 +1279,16 @@ function changeQuote() {
     const qElem = document.getElementById('motivationQuote');
     const currentQuotes = quotes[currentLang];
     if(qElem) qElem.innerText = currentQuotes[Math.floor(Math.random() * currentQuotes.length)];
+}
+
+function changeFocusVerse() {
+    const textElem = document.getElementById('focusVerseText');
+    const referenceElem = document.getElementById('focusVerseReference');
+    if (!textElem || !referenceElem || focusVerses.length === 0) return;
+
+    const verse = focusVerses[Math.floor(Math.random() * focusVerses.length)];
+    textElem.textContent = verse.text;
+    referenceElem.textContent = verse.reference;
 }
 
 function displayDate() {

@@ -8,7 +8,7 @@
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="stylesheet" href="style.css?v=58">
+    <link rel="stylesheet" href="style.css?v=62">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=10">
     <link rel="canonical" href="https://molham-dash-borad.com/">
@@ -212,6 +212,10 @@
             <main class="main-col">
                 <section class="info-card focus-card">
                     <button type="button" id="focusModeToggle" class="focus-mode-toggle" aria-pressed="false">⛶ وضع التركيز</button>
+                    <p class="focus-verse" aria-live="polite">
+                        <span id="focusVerseText"></span>
+                        <span id="focusVerseReference" class="focus-verse-reference"></span>
+                    </p>
                     <div id="pomoDisplay">25:00</div>
                     <div class="pomo-actions">
                         <button onclick="toggleTimer()" id="startBtn" class="btn-main">ابدأ المهمة</button>
@@ -275,6 +279,6 @@
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script src="script.js?v=40"></script>
+    <script src="script.js?v=42"></script>
 </body>
 </html>

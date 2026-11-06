@@ -26,18 +26,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box !important;
+    -webkit-tap-highlight-color: transparent !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-}
-
-button,
-a,
-input,
-select,
-textarea,
-[role="button"],
-[onclick] {
-    -webkit-tap-highlight-color: transparent;
 }
 
 html, body {
@@ -102,7 +93,7 @@ header h1 {
 .date-tag { position: absolute; top: 25px; left: 40px; font-size: 14px; color: var(--text-darker); font-weight: 500; }
 .mini-score { position: absolute; top: 20px; right: 40px; background: var(--gold-glow); padding: 6px 18px; border-radius: 50px; border: 1px solid var(--gold-border); color: var(--gold); display: flex; align-items: center; gap: 12px; font-weight: bold; font-size: 18px; z-index: 10; }
 .reset-mini { background: none !important; border: none !important; color: var(--danger) !important; cursor: pointer; font-size: 14px; opacity: 0.6; padding: 0 !important; min-width: auto !important; transition: transform 0.2s ease, opacity 0.2s ease; }
-.reset-mini:hover { opacity: 1; transform: scale(1.2); }
+@media (hover: hover) and (pointer: fine) { .reset-mini:hover { opacity: 1; transform: scale(1.2); } }
 
 /* ==========================================================================
    ⚙️ 3. شريط الإعدادات الذكي (Settings Bar Area)
@@ -181,7 +172,9 @@ button {
     align-items: center;
     justify-content: center;
 }
-button:hover { background: var(--primary) !important; box-shadow: 0 0 15px var(--primary); }
+@media (hover: hover) and (pointer: fine) {
+    button:hover { background: var(--primary) !important; box-shadow: 0 0 15px var(--primary); }
+}
 
 /* زر الحفظ الرئيسي ينفصل في سطر مستقل بالمنتصف بالأسفل */
 .settings-bar button, button#mainSaveBtn {
@@ -352,10 +345,12 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     font-weight: 800 !important;
 }
 
-.item:hover { 
-    border-color: var(--success) !important; 
-    background: var(--success-hover) !important; 
-    transform: scale(1.03) !important; 
+@media (hover: hover) and (pointer: fine) {
+    .item:hover {
+        border-color: var(--success) !important;
+        background: var(--success-hover) !important;
+        transform: scale(1.03) !important;
+    }
 }
 
 
@@ -601,6 +596,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
 
 /* Theme switch, styled to match the compact pill in the supplied reference. */
 .theme-toggle {
+    --theme-thumb-travel: 36px;
     position: relative !important;
     z-index: 1 !important;
     top: auto !important;
@@ -642,12 +638,12 @@ body.login-visible .top-actions .mini-score {
     border: 1px solid rgba(30, 45, 27, .12);
     border-radius: inherit;
     background: #24321f;
-    transition: background .25s ease, border-color .25s ease;
+    transition: background-color .38s cubic-bezier(.22, 1, .36, 1), border-color .38s ease;
 }
 .theme-toggle-thumb {
     position: absolute;
     top: 3px;
-    right: 3px;
+    left: 3px;
     display: grid;
     place-items: center;
     width: 30px;
@@ -656,10 +652,21 @@ body.login-visible .top-actions .mini-score {
     background: #fff;
     color: #24321f;
     box-shadow: 0 1px 4px rgba(0, 0, 0, .12);
-    transition: right .25s ease, left .25s ease, color .25s ease;
+    transform: translateX(var(--theme-thumb-travel));
+    transition: transform .42s cubic-bezier(.22, 1, .36, 1), color .3s ease, box-shadow .3s ease;
+    will-change: transform;
 }
-.theme-icon { display: block; width: 17px; height: 17px; }
-.theme-icon-sun { display: none; }
+.theme-icon {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 17px;
+    height: 17px;
+    margin: auto;
+    transition: opacity .24s ease, transform .38s cubic-bezier(.22, 1, .36, 1);
+}
+.theme-icon-moon { opacity: 1; transform: rotate(0) scale(1); }
+.theme-icon-sun { opacity: 0; transform: rotate(-55deg) scale(.65); }
 
 html[data-theme="light"] {
     color-scheme: light;
@@ -679,12 +686,21 @@ html[data-theme="light"] .theme-toggle-track {
     background: #ffd094;
 }
 html[data-theme="light"] .theme-toggle-thumb {
-    right: auto;
-    left: 3px;
+    transform: translateX(0);
     color: #f59e0b;
 }
-html[data-theme="light"] .theme-icon-moon { display: none; }
-html[data-theme="light"] .theme-icon-sun { display: block; }
+html[data-theme="light"] .theme-icon-moon { opacity: 0; transform: rotate(55deg) scale(.65); }
+html[data-theme="light"] .theme-icon-sun { opacity: 1; transform: rotate(0) scale(1); }
+
+@media (max-width: 767px) {
+    .top-actions .theme-toggle { --theme-thumb-travel: 24px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .theme-toggle-track,
+    .theme-toggle-thumb,
+    .theme-icon { transition-duration: .01ms !important; }
+}
 
 /* Muted, high contrast surfaces for the full dashboard and sign-in view. */
 html[data-theme="light"] .glass-card {
@@ -753,7 +769,9 @@ html[data-theme="light"] .guest-skip-button {
     background: rgba(99, 102, 241, .08);
     color: #4338ca;
 }
-html[data-theme="light"] .guest-skip-button:hover { background: rgba(99, 102, 241, .15); }
+@media (hover: hover) and (pointer: fine) {
+    html[data-theme="light"] .guest-skip-button:hover { background: rgba(99, 102, 241, .15); }
+}
 
 @media (max-width: 1024px) {
     .top-actions {
@@ -918,8 +936,9 @@ html[data-theme="light"] .guest-skip-button:hover { background: rgba(99, 102, 24
 .google-login-button { min-height: 44px; display: flex; justify-content: center; margin: 28px auto 14px; }
 .google-login-button > div { display: flex; justify-content: center; }
 .firebase-google-button { display: flex; align-items: center; justify-content: center; gap: 12px; width: min(100%, 320px); min-height: 46px; margin: 28px auto 14px; padding: 0 18px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 999px; background: #fff; color: #1f2937; font: 700 14px 'Cairo', sans-serif; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
-.firebase-google-button:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, .25); }
-.guest-skip-button { display: block; width: min(100%, 320px); min-height: 42px; margin: 0 auto 14px; padding: 0 18px; border: 1px solid rgba(165, 180, 252, .55); border-radius: 999px; background: rgba(99, 102, 241, .12); color: #c7d2fe; font: 700 13px 'Cairo', sans-serif; cursor: pointer; transition: transform .2s ease, background .2s ease; }.guest-skip-button:hover { transform: translateY(-2px); background: rgba(99, 102, 241, .24); }
+@media (hover: hover) and (pointer: fine) { .firebase-google-button:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, .25); } }
+.guest-skip-button { display: block; width: min(100%, 320px); min-height: 42px; margin: 0 auto 14px; padding: 0 18px; border: 1px solid rgba(165, 180, 252, .55); border-radius: 999px; background: rgba(99, 102, 241, .12); color: #c7d2fe; font: 700 13px 'Cairo', sans-serif; cursor: pointer; transition: transform .2s ease, background .2s ease; }
+@media (hover: hover) and (pointer: fine) { .guest-skip-button:hover { transform: translateY(-2px); background: rgba(99, 102, 241, .24); } }
 .google-mark { font-family: Arial, sans-serif; font-weight: 800; font-size: 20px; color: #4285f4; }
 .login-error { margin: -4px 0 12px; color: #fda4af !important; font-size: 13px !important; }
 .login-note { font-size: 12px !important; color: var(--text-darker) !important; }
@@ -927,7 +946,7 @@ html[data-theme="light"] .guest-skip-button:hover { background: rgba(99, 102, 24
 .account-avatar { width: 40px; height: 40px; object-fit: cover; border-radius: 50%; border: 1px solid var(--glass-border); }
 .account-control span { display: none; }
 .logout-button { position: fixed; right: 24px; bottom: 24px; border: 1px solid rgba(251, 113, 133, .65); border-radius: 999px; background: rgba(127, 29, 29, .28); color: #fecdd3; font: 700 12px 'Cairo', sans-serif; cursor: pointer; padding: 8px 14px; transition: background .2s ease, transform .2s ease; }
-.logout-button:hover { background: rgba(127, 29, 29, .5); transform: translateY(-2px); }
+@media (hover: hover) and (pointer: fine) { .logout-button:hover { background: rgba(127, 29, 29, .5); transform: translateY(-2px); } }
 @media (max-width: 600px) { .login-card { padding: 35px 22px 26px; border-radius: 25px; } .account-control { bottom: 16px; left: 16px; } .logout-button { right: 16px; bottom: 16px; } }
 
 /* Molham Dashboard v2: a full study workspace. */
@@ -953,10 +972,12 @@ body { display: flex; align-items: flex-start; justify-content: center; padding:
 .glass-card { width: min(1120px, 100%) !important; padding: 28px 30px 34px !important; background: rgba(15, 23, 42, .76); }
 header { position: relative; }
 .preferences { width: min(860px, 100%); margin: 18px auto 6px; border: 1px solid var(--glass-border); border-radius: 18px; background: rgba(255,255,255,.025); overflow: hidden; }
-.preferences summary { padding: 12px 18px; color: var(--text-muted); font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; transition: background .2s ease, color .2s ease; }.preferences summary::-webkit-details-marker { display: none; }.preferences summary:hover, .preferences[open] summary { color: var(--text-main); background: rgba(255,255,255,.045); }
+.preferences summary { padding: 12px 18px; color: var(--text-muted); font-size: 13px; font-weight: 700; cursor: pointer; list-style: none; transition: background .2s ease, color .2s ease; }.preferences summary::-webkit-details-marker { display: none; }.preferences[open] summary { color: var(--text-main); background: rgba(255,255,255,.045); }
+@media (hover: hover) and (pointer: fine) { .preferences summary:hover { color: var(--text-main); background: rgba(255,255,255,.045); } }
 .preferences .settings-bar { padding: 4px 18px 18px; margin: 0; }.preferences .settings-bar button { margin-bottom: 0 !important; }
 .smart-strip { display: flex; align-items: center; gap: 12px; width: min(800px, 100%); margin: 14px auto 0; padding: 11px 15px; border: 1px solid color-mix(in srgb, var(--primary) 42%, transparent); border-radius: 16px; background: linear-gradient(90deg, color-mix(in srgb, var(--primary) 13%, transparent), rgba(255,255,255,.025)); text-align: start; }.smart-strip > span { flex: 0 0 auto; color: #c7d2fe; font-size: 12px; font-weight: 800; }.smart-strip p { min-width: 0; color: var(--text-muted); font-size: 12px; line-height: 1.65; }
-.info-card { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }.info-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--primary) 52%, transparent); box-shadow: 0 16px 34px rgba(0,0,0,.18); }
+.info-card { transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease; }
+@media (hover: hover) and (pointer: fine) { .info-card:hover { transform: translateY(-4px); border-color: color-mix(in srgb, var(--primary) 52%, transparent); box-shadow: 0 16px 34px rgba(0,0,0,.18); } }
 .focus-card { position: relative; overflow: hidden !important; }.focus-card::before { content: ''; position: absolute; inset: -70px; z-index: -1; background: radial-gradient(circle, color-mix(in srgb, var(--primary) 22%, transparent), transparent 64%); animation: focusGlow 5s ease-in-out infinite; }.focus-card #pomoDisplay { animation: timerBreathe 3.5s ease-in-out infinite; }
 @keyframes focusGlow { 50% { transform: scale(1.18); opacity: .55; } } @keyframes timerBreathe { 50% { text-shadow: 0 0 42px var(--primary-glow); transform: scale(1.025); } }
 @media (max-width: 767px) { body { display: block; padding: 14px 10px 84px; }.glass-card { padding: 20px 14px 26px !important; }.smart-strip { align-items: flex-start; }.smart-strip > span { padding-top: 2px; }.preferences .settings-bar { padding-inline: 12px; } }
@@ -969,7 +990,8 @@ header { position: relative; }
 .account-control { position: absolute; z-index: 20; top: 17px; left: 190px; bottom: auto; display: flex; flex: 0 0 42px; width: 42px; height: 42px; color: var(--text-muted); font-size: 12px; overflow: visible; }
 .account-control[hidden] { display: none !important; }
 .account-trigger { display: grid !important; place-items: center; flex: 0 0 42px; min-width: 42px !important; width: 42px; height: 42px; aspect-ratio: 1; padding: 0 !important; border: 1px solid var(--glass-border) !important; border-radius: 50% !important; background: rgba(15,23,42,.68) !important; overflow: hidden; transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
-.account-trigger:hover, .account-trigger[aria-expanded="true"] { transform: translateY(-2px); border-color: var(--primary) !important; box-shadow: 0 0 18px var(--primary-glow); }
+.account-trigger[aria-expanded="true"] { transform: translateY(-2px); border-color: var(--primary) !important; box-shadow: 0 0 18px var(--primary-glow); }
+@media (hover: hover) and (pointer: fine) { .account-trigger:hover { transform: translateY(-2px); border-color: var(--primary) !important; box-shadow: 0 0 18px var(--primary-glow); } }
 .account-avatar { display: block; width: 100%; height: 100%; border: 0; }
 .account-menu { position: absolute; top: 52px; left: 0; width: 225px; padding: 15px; border: 1px solid var(--glass-border); border-radius: 17px; background: rgba(15,23,42,.96); box-shadow: 0 16px 42px rgba(0,0,0,.35); backdrop-filter: blur(16px); text-align: start; }
 .account-menu[hidden] { display: none !important; }.account-menu-label { display: block; margin-bottom: 4px; color: var(--text-darker); font-size: 11px; }.account-menu strong { display: block; overflow: hidden; color: var(--text-main); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }.account-email { display: block; overflow: hidden; margin-top: 3px; color: var(--text-muted); font-size: 11px; direction: ltr; text-align: left; text-overflow: ellipsis; white-space: nowrap; }.account-menu .logout-button { position: static; width: 100%; min-width: 0 !important; margin-top: 13px; padding: 8px 12px !important; border: 1px solid rgba(251,113,133,.65) !important; background: rgba(127,29,29,.28) !important; color: #fecdd3 !important; }
@@ -1715,7 +1737,8 @@ header { position: relative; }
 }
 #taskList .task-empty { display: block !important; height: auto !important; min-height: 0 !important; max-height: none !important; flex: 0 0 auto !important; padding: 24px 10px !important; border: 1px dashed var(--glass-border) !important; border-radius: 15px !important; background: transparent !important; color: var(--text-muted); font-size: 12px; text-align: center; }
 .focus-mode-toggle { position: absolute; z-index: 2; top: 18px; inset-inline-end: 18px; min-width: 0 !important; height: 38px; padding: 0 14px !important; border: 1px solid var(--glass-border) !important; background: var(--glass-bg) !important; color: var(--text-main) !important; font-size: 12px; }
-.focus-mode-toggle:hover { background: var(--primary) !important; color: #fff !important; }
+@media (hover: hover) and (pointer: fine) { .focus-mode-toggle:hover { background: var(--primary) !important; color: #fff !important; } }
+.focus-verse { display: none; }
 
 .mobile-quick-actions { display: none; }
 .focus-session-toast { position: fixed; z-index: 1300; right: 50%; bottom: 24px; max-width: min(90vw, 480px); padding: 13px 20px; transform: translateX(50%); border: 1px solid color-mix(in srgb, var(--primary) 45%, transparent); border-radius: 16px; background: color-mix(in srgb, var(--bg-gradient-core) 90%, var(--primary)); color: var(--text-main); box-shadow: 0 16px 40px rgba(0, 0, 0, .22); font-size: 13px; font-weight: 700; text-align: center; }
@@ -1760,6 +1783,21 @@ body.focus-mode .main-col { display: flex !important; width: 100% !important; ma
 body.focus-mode .focus-card { position: relative !important; flex: 1 !important; min-height: 0 !important; border-color: color-mix(in srgb, var(--primary) 38%, var(--glass-border)) !important; background: color-mix(in srgb, var(--primary) 9%, var(--glass-bg)) !important; }
 body.focus-mode #pomoDisplay { font-size: clamp(112px, 24vw, 220px) !important; }
 body.focus-mode .focus-mode-toggle { top: 20px; inset-inline-end: 20px; }
+body.focus-mode .focus-verse {
+    display: block !important;
+    position: absolute;
+    top: clamp(58px, 14vh, 100px);
+    left: 50%;
+    width: min(900px, calc(100% - 28px));
+    margin: 0 !important;
+    transform: translateX(-50%);
+    color: var(--text-main);
+    font-size: clamp(14px, 2.4vw, 22px);
+    font-weight: 700;
+    line-height: 1.8;
+    text-align: center;
+}
+.focus-verse-reference { display: block; margin-top: 2px; color: var(--text-muted); font-size: clamp(11px, 1.8vw, 14px); font-style: normal; font-weight: 600; }
 body.focus-mode .pomo-actions {
     max-width: 520px !important;
     position: absolute !important;
@@ -1864,9 +1902,11 @@ body.focus-mode .pomo-actions button { display: inline-flex !important; visibili
     scroll-snap-align: start !important;
     transition: border-color .18s ease, background .18s ease, box-shadow .18s ease, transform .18s ease;
 }
-#taskList .task-row:hover {
-    border-color: color-mix(in srgb, var(--primary) 38%, var(--glass-border)) !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, .12) !important;
+@media (hover: hover) and (pointer: fine) {
+    #taskList .task-row:hover {
+        border-color: color-mix(in srgb, var(--primary) 38%, var(--glass-border)) !important;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, .12) !important;
+    }
 }
 #taskList .task-row span {
     line-height: 1.35 !important;
@@ -1908,9 +1948,11 @@ body.focus-mode .pomo-actions button { display: inline-flex !important; visibili
 #taskList .task-row .task-check.is-checked {
     background: var(--success) !important;
 }
-#taskList .task-row .task-check:hover {
-    background: color-mix(in srgb, var(--primary) 18%, var(--bg-gradient-core)) !important;
-    box-shadow: none !important;
+@media (hover: hover) and (pointer: fine) {
+    #taskList .task-row .task-check:hover {
+        background: color-mix(in srgb, var(--primary) 18%, var(--bg-gradient-core)) !important;
+        box-shadow: none !important;
+    }
 }
 #taskList .task-row .task-delete {
     flex-basis: 30px !important;
@@ -1919,10 +1961,12 @@ body.focus-mode .pomo-actions button { display: inline-flex !important; visibili
     height: 30px !important;
     background: color-mix(in srgb, var(--danger) 9%, transparent) !important;
 }
-#taskList .task-row .task-delete:hover {
-    background: color-mix(in srgb, var(--danger) 18%, transparent) !important;
-    color: var(--danger) !important;
-    box-shadow: none !important;
+@media (hover: hover) and (pointer: fine) {
+    #taskList .task-row .task-delete:hover {
+        background: color-mix(in srgb, var(--danger) 18%, transparent) !important;
+        color: var(--danger) !important;
+        box-shadow: none !important;
+    }
 }
 #taskList .task-row button:focus-visible {
     outline: 2px solid var(--primary) !important;
@@ -1978,7 +2022,7 @@ body.focus-mode .pomo-actions button { display: inline-flex !important; visibili
     font-size: 12px !important;
 }
 .game-enter-button { flex: 1 1 auto !important; background: var(--primary) !important; border-color: var(--primary) !important; color: #fff !important; }
-.game-enter-button:hover:not(:disabled) { filter: brightness(1.08); }
+@media (hover: hover) and (pointer: fine) { .game-enter-button:hover:not(:disabled) { filter: brightness(1.08); } }
 .game-enter-button:disabled { cursor: not-allowed !important; opacity: .58; box-shadow: none !important; }
 .game-session-close { flex: 0 0 auto !important; border-color: color-mix(in srgb, var(--danger) 55%, transparent) !important; background: color-mix(in srgb, var(--danger) 10%, transparent) !important; color: var(--danger) !important; }
 .game-session-close[hidden] { display: none !important; }
@@ -2074,7 +2118,7 @@ html[data-theme="light"] .task-priority.priority-low { color: #236b45; backgroun
     font-size: 25px !important;
     line-height: 1 !important;
 }
-.game-session-modal-close:hover { border-color: var(--danger) !important; color: var(--danger) !important; }
+@media (hover: hover) and (pointer: fine) { .game-session-modal-close:hover { border-color: var(--danger) !important; color: var(--danger) !important; } }
 .game-session-progress-track { height: 4px; overflow: hidden; border-radius: 99px; background: color-mix(in srgb, var(--text-muted) 17%, transparent); }
 .game-session-progress-track span {
     display: block;
@@ -2110,4 +2154,12 @@ html[data-theme="light"] .game-session-overlay { background: rgba(21, 27, 42, .7
 }
 @media (max-height: 620px) {
     .game-session-dialog { width: min(560px, 100%); }
+}
+
+/* Keep long timer readings readable without changing the timer layout. */
+#pomoDisplay.has-hours { font-size: clamp(46px, 9vw, 88px) !important; }
+body.focus-mode #pomoDisplay.has-hours { font-size: clamp(52px, 14vw, 126px) !important; }
+@media (max-width: 767px) {
+    #pomoDisplay.has-hours { font-size: clamp(40px, 12vw, 62px) !important; }
+    body.focus-mode #pomoDisplay.has-hours { font-size: clamp(42px, 12vw, 72px) !important; }
 }
