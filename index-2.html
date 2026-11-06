@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <script>
+        try {
+            document.documentElement.dataset.theme = localStorage.getItem('colorScheme') === 'light' ? 'light' : 'dark';
+        } catch (error) {
+            document.documentElement.dataset.theme = 'dark';
+        }
+    </script>
+    <link rel="stylesheet" href="style.css?v=55">
+    <link rel="icon" type="image/png" href="gnome-books.png">
+    <link rel="manifest" href="manifest.json?v=10">
+    <link rel="canonical" href="https://molham-dash-borad.com/">
+    <meta name="keywords" content="ملهم ممدوح, molham, github pages, موقع ملهم">
+    <meta name="description" content="هذا الموقع جميل و مثالي للدراسة و العمل و جميع المهام موقع ملهم هو اداة تنظيم و ترتيب و زيادة الانتاجية مصمم من قبل ملهم.">
+    <meta name="verifywebsiteownership" content="tgf8hWSVWpGMEXVmzfc2SXcru"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Molham Dashboard | لوحتك الدراسية</title>
+    <meta name="theme-color" content="#11190f">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800&display=swap" rel="stylesheet">
+    <script defer src="https://www.gstatic.com/firebasejs/12.16.0/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/12.16.0/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/12.16.0/firebase-firestore-compat.js"></script>
+</head>
+<body class="login-visible">
+    <section id="loginScreen" class="login-screen" aria-labelledby="loginTitle">
+        <div class="login-card">
+            <div class="login-logo-wrap"><img src="gnome-books.png" alt="شعار الموقع" class="login-logo"></div>
+            <span class="login-eyebrow">منظّم الدراسة الشخصي</span>
+            <h1 id="loginTitle">أهلاً بك في لوحة ملهم</h1>
+            <p>سجّل دخولك بحساب Google لمزامنة بياناتك فورًا بين أجهزتك، أو تابع كضيف.</p>
+            <button id="googleLoginButton" class="firebase-google-button" type="button">
+                <span class="google-mark" aria-hidden="true">G</span>
+                المتابعة باستخدام Google
+            </button>
+            <button id="continueAsGuestButton" class="guest-skip-button" type="button">تخطي والمتابعة كضيف</button>
+            <p id="googleLoginError" class="login-error" role="alert" hidden></p>
+            <p class="login-note">لن نطلب كلمة مرور حساب Google أبدًا.</p>
+        </div>
+    </section>
+
+    <div class="glass-card">
+        <div class="top-actions">
+            <div class="mini-score">
+                <span>🪙 <span id="userPoints">0</span></span>
+                <button onclick="resetPoints()" class="reset-mini" title="تصفير النقاط">🗑️</button>
+            </div>
+            <button id="themeToggle" class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="التبديل إلى الوضع الفاتح" title="التبديل إلى الوضع الفاتح">
+                <span class="theme-toggle-track" aria-hidden="true">
+                    <span class="theme-toggle-thumb">
+                        <svg class="theme-icon theme-icon-moon" viewBox="0 0 24 24" focusable="false">
+                            <path d="M19.4 15.1A8.2 8.2 0 0 1 8.9 4.6 8.5 8.5 0 1 0 19.4 15.1Z" fill="currentColor"/>
+                            <path d="m17.7 4 .45 1.15L19.3 5.6l-1.15.45L17.7 7.2l-.45-1.15-1.15-.45 1.15-.45L17.7 4Zm2.7 4 .3.75.75.3-.75.3-.3.75-.3-.75-.75-.3.75-.3.3-.75Z" fill="currentColor"/>
+                        </svg>
+                        <svg class="theme-icon theme-icon-sun" viewBox="0 0 24 24" focusable="false">
+                            <circle cx="12" cy="12" r="4" fill="currentColor"/>
+                            <path d="M12 2v2m0 16v2M4.93 4.93l1.42 1.42m11.3 11.3 1.42 1.42M2 12h2m16 0h2M4.93 19.07l1.42-1.42m11.3-11.3 1.42-1.42" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"/>
+                        </svg>
+                    </span>
+                </span>
+            </button>
+        </div>
+
+        <div id="guestAccountControl" class="account-control" hidden>
+            <button type="button" id="guestAccountMenuButton" class="account-trigger" aria-label="إعدادات الحساب" aria-expanded="false">
+                <svg class="account-settings-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.37-.31-.6-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98L14.5 2.42C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.5.42L9.12 5.07c-.61.25-1.17.58-1.69.98l-2.49-1c-.23-.08-.48 0-.6.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.08.65-.08.98s.03.66.08.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.37.31.6.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.25 1.17-.58 1.69-.98l2.49 1c.23.08.48 0 .6-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5z"/>
+                </svg>
+            </button>
+            <div id="guestAccountMenu" class="account-menu" hidden>
+                <button type="button" id="guestLoginButton" class="guest-login-button">تسجيل الدخول</button>
+            </div>
+        </div>
+
+        <div id="accountControl" class="account-control" hidden>
+            <button type="button" id="accountMenuButton" class="account-trigger" aria-label="بيانات الحساب" aria-expanded="false">
+                <img id="accountAvatar" class="account-avatar" src="gnome-books.png" alt="صورة الحساب">
+            </button>
+            <div id="accountMenu" class="account-menu" hidden>
+                <button type="button" id="logoutButton" class="logout-button">تسجيل الخروج</button>
+            </div>
+        </div>
+
+        <div class="date-tag" id="dateDisplay"></div>
+
+        <header>
+            <h1 id="mainTitle">لوحة تحكم <span id="mainTitleName">دكتور ملهم</span> 🩺</h1>
+            <p class="welcome-msg"><span id="welcomeWord">مرحباً بك،</span> <span id="userNameDisplay">دكتور ملهم</span> ✨</p>
+            <p id="motivationQuote" style="color: var(--primary); font-style: italic; margin-top: 10px; min-height: 24px; font-weight: bold;"></p>
+            <div class="smart-strip" aria-live="polite"><span>✨ <span id="smartLabel">اقتراح ذكي</span></span><p id="smartSuggestion"></p></div>
+
+           <details class="preferences">
+                <summary id="customizeLabel">⚙️ تخصيص لوحتك</summary>
+                <div class="settings-bar">
+                <div class="input-group">
+                    <label id="langLabel">اللغة</label>
+                    <select id="langSelect">
+                        <option value="ar">العربية</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label id="nameLabel">الاسم</label>
+                    <input type="text" id="userNameInput" placeholder="اكتب الاسم هنا ...">
+                </div>
+
+                <div class="input-group">
+                    <label id="roleLabel">الدور</label>
+                    <select id="roleSelect"></select>
+                </div>
+
+                <div class="input-group">
+                    <label id="colorLabel">اللون</label>
+                    <label class="color-picker-control" for="colorPicker" aria-label="اختر لون الواجهة">
+                        <input type="color" id="colorPicker">
+                    </label>
+                </div>
+
+                <div class="input-group">
+                    <label id="minsLabel">الدقائق</label>
+                    <input type="number" id="minsInput" min="1" max="120" value="25">
+                </div>
+
+                <div class="input-group">
+                    <label id="dateLabel">التاريخ</label>
+                    <input type="date" id="gradDateInput">
+                </div>
+
+                <button id="mainSaveBtn">تأكيد الإعدادات</button>
+            </div>
+            </details>
+        </header>
+
+        <section class="daily-overview" id="dailyOverview" aria-label="ملخص اليوم">
+            <article class="daily-stat-card daily-stat-completed">
+                <span class="daily-stat-icon" aria-hidden="true">✓</span>
+                <div class="daily-stat-copy">
+                    <span class="daily-stat-label" id="dailyCompletedLabel">إنجاز اليوم</span>
+                    <strong id="dailyCompletedStat">0</strong>
+                    <div class="daily-progress-track" aria-hidden="true"><span id="dailyProgressBar"></span></div>
+                    <small id="dailyProgressText">أنجز مهمة اليوم لتحصل على ١٠ نقاط</small>
+                </div>
+            </article>
+            <article class="daily-stat-card">
+                <span class="daily-stat-icon" aria-hidden="true">☷</span>
+                <div class="daily-stat-copy">
+                    <span class="daily-stat-label" id="dailyRemainingLabel">مهام متبقية</span>
+                    <strong id="dailyRemainingStat">0</strong>
+                    <small id="dailyRemainingHint">مهام تنتظر إنجازك</small>
+                </div>
+            </article>
+            <article class="daily-stat-card">
+                <span class="daily-stat-icon" aria-hidden="true">◷</span>
+                <div class="daily-stat-copy">
+                    <span class="daily-stat-label" id="dailyFocusLabel">مذاكرة اليوم</span>
+                    <strong id="dailyFocusStat">0 د</strong>
+                    <small id="dailyFocusHint">وقت تركيز فعلي</small>
+                </div>
+            </article>
+            <article class="daily-stat-card">
+                <span class="daily-stat-icon" aria-hidden="true">✦</span>
+                <div class="daily-stat-copy">
+                    <span class="daily-stat-label" id="dailyStreakLabel">سلسلة الالتزام</span>
+                    <strong id="dailyStreakStat">0 يوم</strong>
+                    <small id="dailyStreakHint">ابدأ جلسة مذاكرة اليوم</small>
+                </div>
+            </article>
+        </section>
+
+        <div class="dashboard-grid">
+            <aside class="side-col">
+                <section class="info-card countdown-card">
+                    <h3 id="countdownTitle">⏳ حلم التخرج</h3>
+                    <div id="countdown" class="modern-timer">
+                        <div class="unit"><span id="years">00</span><label id="labelYears">سنة</label></div>
+                        <div class="unit"><span id="days">00</span><label id="labelDays">يوم</label></div>
+                        <div class="unit"><span id="hours">00</span><label id="labelHours">ساعة</label></div>
+                    </div>
+                </section>
+
+                <section class="info-card store-card">
+                    <h3 id="storeTitle">☕ متجر الطاقة 1د = 15ن</h3>
+                    <div class="store-grid">
+                        <div class="item" onclick="buyBreak(5)" id="itemBreak5">5 د = <small>75ن</small></div>
+                        <div class="item" onclick="buyBreak(10)" id="itemBreak10">10 د = <small>150ن</small></div>
+                        <div class="item" onclick="buyBreak(15)" id="itemBreak15">15 د = <small>225ن</small></div>
+                    </div>
+                </section>
+
+                <section class="info-card game-pass-card" aria-labelledby="gamePassTitle">
+                    <div class="game-pass-heading">
+                        <span class="game-pass-icon" aria-hidden="true">🎮</span>
+                        <div class="game-pass-heading-copy">
+                            <h3 id="gamePassTitle">استراحة لعب على Scratch</h3>
+                            <p id="gamePassSubtitle">لعبة Pong لمدة ٥ دقائق</p>
+                        </div>
+                        <span class="game-pass-cost" id="gamePassCost">٢٠٠ 🪙</span>
+                    </div>
+                    <div class="game-pass-actions">
+                        <button type="button" class="game-enter-button" id="gameEnterButton">العب Pong • ٢٠٠ نقطة</button>
+                        <button type="button" class="game-session-close" id="closeGameSessionButton" hidden>إنهاء اللعب</button>
+                    </div>
+                    <p class="game-pass-status" id="gamePassStatus" aria-live="polite">جاهز للدخول</p>
+                    <small class="game-pass-note" id="gamePassNote">تُغلق اللعبة تلقائيًا بعد ٥ دقائق. إنهاؤها مبكرًا لا يعيد النقاط.</small>
+                </section>
+            </aside>
+
+            <main class="main-col">
+                <section class="info-card focus-card">
+                    <button type="button" id="focusModeToggle" class="focus-mode-toggle" aria-pressed="false">⛶ وضع التركيز</button>
+                    <div id="pomoDisplay">25:00</div>
+                    <div class="pomo-actions">
+                        <button onclick="toggleTimer()" id="startBtn" class="btn-main">ابدأ المهمة</button>
+                        <button onclick="resetTimer()" id="resetBtn">اعادة ضبط</button>
+                    </div>
+                </section>
+
+                <section class="info-card tasks-card todo-box">
+                    <div class="input-section">
+                        <input type="text" id="taskInput" placeholder="أضف مهمة جديدة...">
+                        <button onclick="addTask()" class="btn-add" id="taskAddButton" aria-label="إضافة مهمة">+</button>
+                    </div>
+                    <div class="task-toolbar">
+                        <label class="task-control">
+                            <span id="taskPriorityLabel">الأولوية</span>
+                            <select id="taskPriority">
+                                <option value="medium">متوسطة</option>
+                                <option value="high">عالية</option>
+                                <option value="low">منخفضة</option>
+                            </select>
+                        </label>
+                    </div>
+                    <ul id="taskList" class="custom-scroll"></ul>
+                </section>
+            </main>
+        </div>
+
+        <section class="study-week-card info-card" aria-labelledby="studyWeekTitle">
+            <div class="study-week-heading">
+                <div>
+                    <span class="section-kicker" id="studyWeekKicker">استمرارية هادئة</span>
+                    <h2 id="studyWeekTitle">سجل المذاكرة هذا الأسبوع</h2>
+                </div>
+                <strong id="weeklyStudyTotal">0 د</strong>
+            </div>
+            <p class="study-week-caption" id="studyWeekCaption">ابدأ جلسة تركيز ليظهر تقدمك هنا.</p>
+            <div class="study-week-chart" id="studyWeekChart" role="img" aria-label="سجل دقائق المذاكرة خلال آخر سبعة أيام"></div>
+        </section>
+    </div>
+    <div class="game-session-overlay" id="gameSessionModal" hidden>
+        <section class="game-session-dialog" role="dialog" aria-modal="true" aria-labelledby="gameSessionModalTitle" aria-describedby="gameSessionModalHint">
+            <div class="game-session-header">
+                <div class="game-session-heading">
+                    <span class="game-session-icon" aria-hidden="true">🎮</span>
+                    <div>
+                        <h2 id="gameSessionModalTitle">لعبة Pong</h2>
+                        <p><span id="gameSessionModalHint">تبقّى من وقت اللعب</span> <strong id="gameSessionCountdown" aria-live="off">05:00</strong></p>
+                    </div>
+                </div>
+                <button type="button" class="game-session-modal-close" id="closeGameModalButton" aria-label="إنهاء وإغلاق اللعبة">×</button>
+            </div>
+            <div class="game-session-progress-track" aria-hidden="true"><span id="gameSessionProgress"></span></div>
+            <div class="game-session-stage">
+                <iframe id="embeddedGameFrame" title="لعبة Pong من Scratch" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock" allow="fullscreen; gamepad" allowfullscreen></iframe>
+            </div>
+        </section>
+    </div>
+    <nav class="mobile-quick-actions" id="mobileQuickActions" aria-label="اختصارات سريعة">
+        <button type="button" id="quickAddTaskButton"><span aria-hidden="true">＋</span><span id="quickAddTaskLabel">إضافة مهمة</span></button>
+        <button type="button" id="quickFocusButton"><span aria-hidden="true">⏱</span><span id="quickFocusLabel">بدء التركيز</span></button>
+    </nav>
+    <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
+<video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
+    <script src="script.js?v=40"></script>
+</body>
+</html>

@@ -6,11 +6,22 @@ const localStorage = window.localStorage;
 let timer = null;
 let timeLeft = null;
 let isBreak = false;
-let points = localStorage.getItem('userPoints') ? parseInt(localStorage.getItem('userPoints')) : 0;
+let points = Number.parseInt(localStorage.getItem('userPoints') || '0', 10);
+if (!Number.isFinite(points)) points = 0;
 let graduationDate = localStorage.getItem('gradDate') || "2027-12-31";
 let currentLang = localStorage.getItem('userLang') || "ar"; 
 let temporaryLang = currentLang;  
 let totalSecondsWorked = 0; // لحساب ثواني العمل الفعلية بدقة فائقة من أجل النقاط
+let focusStartedAt = null;
+let focusSegmentEndsAt = null;
+let focusToastTimeout = null;
+const GAME_PASS_COST = 200;
+const GAME_PASS_DURATION_MS = 5 * 60 * 1000;
+const SCRATCH_GAME_EMBED_URL = 'https://scratch.mit.edu/projects/10000036/embed';
+let gameSessionEndsAt = 0;
+let gameSessionInterval = null;
+let gameSessionTimeout = null;
+let gameSessionActive = false;
 
 // Copy this object from Firebase Console > Project settings > Your apps > Web app.
 // Firebase config is public by design; the Firestore security rules protect each user's data.
@@ -22,10 +33,515 @@ const FIREBASE_CONFIG = {
     messagingSenderId: '527443679426',
     appId: '1:527443679426:web:a5b4de91a9507f8845c35b'
 };
-const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'surgeonTasks'];
+const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'surgeonTasks', 'focusLog'];
 let cloudUser = null;
 let cloudUnsubscribe = null;
 let guestModeSelected = false;
+
+function updateThemeToggleLabel() {
+    const toggle = document.getElementById('themeToggle');
+    if (!toggle) return;
+
+    const isLight = document.documentElement.dataset.theme === 'light';
+    const label = currentLang === 'ar'
+        ? (isLight ? 'التبديل إلى الوضع الداكن' : 'التبديل إلى الوضع الفاتح')
+        : (isLight ? 'Switch to dark mode' : 'Switch to light mode');
+    toggle.setAttribute('aria-checked', String(isLight));
+    toggle.setAttribute('aria-label', label);
+    toggle.title = label;
+}
+
+function setColorScheme(theme, persist = true) {
+    const nextTheme = theme === 'light' ? 'light' : 'dark';
+    document.documentElement.dataset.theme = nextTheme;
+    if (persist) localStorage.setItem('colorScheme', nextTheme);
+
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.content = nextTheme === 'light' ? '#fffaf1' : '#11190f';
+    updateThemeToggleLabel();
+}
+
+function initializeThemeToggle() {
+    const toggle = document.getElementById('themeToggle');
+    if (!toggle) return;
+
+    setColorScheme(document.documentElement.dataset.theme, false);
+    toggle.addEventListener('click', () => {
+        const nextTheme = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+        setColorScheme(nextTheme);
+    });
+}
+
+const dashboardLabels = {
+    ar: {
+        overview: 'ملخص اليوم', completed: 'إنجاز اليوم', remaining: 'مهام متبقية', focus: 'مذاكرة اليوم', streak: 'سلسلة الالتزام',
+        waiting: 'مهام تنتظر إنجازك', focusHint: 'وقت تركيز فعلي', streakEmpty: 'ابدأ جلسة مذاكرة اليوم',
+        noTasksToday: 'أنجز مهمة اليوم لتحصل على ١٠ نقاط', taskProgress: (done, total) => `أنجزت ${done} من ${total} مهام نشطة اليوم`,
+        taskRewardNotice: 'أحسنت! +١٠ نقاط 🪙',
+        gameTitle: 'استراحة لعب على Scratch', gameSubtitle: 'لعبة Pong لمدة ٥ دقائق', gameCost: '٢٠٠ 🪙',
+        enterGame: 'العب Pong • ٢٠٠ نقطة', endGame: 'إنهاء اللعب', gameTimerButton: 'باقي',
+        gameNeedPoints: points => `رصيدك ${points} / ٢٠٠ نقطة`,
+        gameReady: 'جاهز للعب', gameActive: 'اللعبة مفتوحة داخل الموقع.',
+        gameNote: 'تُغلق اللعبة تلقائيًا بعد ٥ دقائق. إنهاؤها مبكرًا لا يعيد النقاط.',
+        gameExpired: 'انتهت الخمس دقائق وأُغلقت اللعبة.', gameClosed: 'أنهيت اللعب مبكرًا. لا تُسترد النقاط.',
+        gameModalTitle: 'لعبة Pong', gameModalHint: 'تبقّى من وقت اللعب', closeGameModal: 'إنهاء وإغلاق اللعبة',
+        priority: 'الأولوية', taskAdd: 'إضافة مهمة',
+        priorityHigh: 'عالية', priorityMedium: 'متوسطة', priorityLow: 'منخفضة',
+        noTasks: 'أضف أول مهمة من الحقل أعلاه.',
+        weekKicker: 'استمرارية هادئة', weekTitle: 'سجل المذاكرة هذا الأسبوع', weekEmpty: 'ابدأ جلسة تركيز ليظهر تقدمك هنا.', weekTotal: total => `ذاكرت ${total} خلال آخر 7 أيام`,
+        focusMode: 'وضع التركيز', exitFocus: 'إنهاء التركيز', quickAdd: 'إضافة مهمة', quickFocus: 'بدء التركيز', quickResume: 'متابعة التركيز', quickBreak: 'بدء الاستراحة',
+        sessionComplete: minutes => `أحسنت! أنهيت جلسة تركيز مدتها ${minutes}.`, streakDays: count => `${count} ${count === 1 ? 'يوم' : 'أيام'}`,
+        taskPriorityLabel: 'الأولوية',
+        emptyStreak: 'ابدأ جلسة مذاكرة اليوم'
+    },
+    en: {
+        overview: 'Today at a glance', completed: 'Completed today', remaining: 'Tasks remaining', focus: 'Study time today', streak: 'Study streak',
+        waiting: 'Tasks waiting for you', focusHint: 'Focused time', streakEmpty: 'Start a study session today',
+        noTasksToday: 'Finish a task today to earn 10 points', taskProgress: (done, total) => `${done} of ${total} active tasks completed today`,
+        taskRewardNotice: 'Well done! +10 points 🪙',
+        gameTitle: 'Scratch game break', gameSubtitle: 'Pong for 5 minutes', gameCost: '200 🪙',
+        enterGame: 'Play Pong • 200 points', endGame: 'End game', gameTimerButton: 'Left',
+        gameNeedPoints: points => `Balance: ${points} / 200 points`,
+        gameReady: 'Ready to play', gameActive: 'The game is open inside the dashboard.',
+        gameNote: 'The game closes automatically after 5 minutes. Ending early does not refund points.',
+        gameExpired: 'Five minutes are up and the game was closed.', gameClosed: 'You ended the game early. Points are not refunded.',
+        gameModalTitle: 'Pong', gameModalHint: 'Time left', closeGameModal: 'End and close game',
+        priority: 'Priority', taskAdd: 'Add task',
+        priorityHigh: 'High', priorityMedium: 'Medium', priorityLow: 'Low',
+        noTasks: 'Add your first task above.',
+        weekKicker: 'Steady progress', weekTitle: 'Study log this week', weekEmpty: 'Start a focus session to see your progress here.', weekTotal: total => `${total} studied over the last 7 days`,
+        focusMode: 'Focus mode', exitFocus: 'Exit focus', quickAdd: 'Add task', quickFocus: 'Start focus', quickResume: 'Resume focus', quickBreak: 'Start break',
+        sessionComplete: minutes => `Well done! You completed a ${minutes} focus session.`, streakDays: count => `${count} ${count === 1 ? 'day' : 'days'}`,
+        taskPriorityLabel: 'Priority',
+        emptyStreak: 'Start a study session today'
+    }
+};
+
+function getDashboardLabels() {
+    return dashboardLabels[currentLang] || dashboardLabels.ar;
+}
+
+function getLocalDayKey(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function readStoredJSON(key, fallback) {
+    try {
+        const value = JSON.parse(localStorage.getItem(key));
+        return value === null ? fallback : value;
+    } catch (error) {
+        return fallback;
+    }
+}
+
+function getStoredTasks() {
+    const tasks = readStoredJSON('surgeonTasks', []);
+    return Array.isArray(tasks) ? tasks.map(task => task && typeof task === 'object' ? task : { text: String(task || ''), done: false }) : [];
+}
+
+function safeSeconds(value) {
+    const seconds = Number(value);
+    return Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
+}
+
+function getFocusLog() {
+    const log = readStoredJSON('focusLog', {});
+    return log && typeof log === 'object' && !Array.isArray(log) ? log : {};
+}
+
+function getLiveFocusSeconds() {
+    return focusStartedAt === null ? 0 : Math.max(0, Math.floor((Date.now() - focusStartedAt) / 1000));
+}
+
+function formatStudyDuration(seconds) {
+    const safeDuration = safeSeconds(seconds);
+    const totalMinutes = Math.floor(safeDuration / 60);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    const hourLabel = currentLang === 'ar' ? 'س' : 'h';
+    const minuteLabel = currentLang === 'ar' ? 'د' : 'm';
+    if (hours) return minutes ? `${hours}${hourLabel} ${minutes}${minuteLabel}` : `${hours}${hourLabel}`;
+    if (!totalMinutes && safeDuration > 0) return `<1${minuteLabel}`;
+    return `${totalMinutes}${minuteLabel}`;
+}
+
+function getStudyStreak(focusLog) {
+    const activeDates = new Set(Object.entries(focusLog)
+        .filter(([, seconds]) => safeSeconds(seconds) > 0)
+        .map(([date]) => date));
+    const today = getLocalDayKey();
+    if (getLiveFocusSeconds() > 0) activeDates.add(today);
+
+    let cursor = new Date();
+    cursor.setHours(0, 0, 0, 0);
+    if (!activeDates.has(today)) cursor.setDate(cursor.getDate() - 1);
+    let streak = 0;
+    while (activeDates.has(getLocalDayKey(cursor))) {
+        streak += 1;
+        cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+}
+
+function renderDailyOverview() {
+    if (!document.getElementById('dailyOverview')) return;
+    const labels = getDashboardLabels();
+    const tasks = getStoredTasks();
+    const today = getLocalDayKey();
+    const completedToday = tasks.filter(task => task.done && task.completedAt === today).length;
+    const remaining = tasks.filter(task => !task.done).length;
+    const dailyTaskTotal = remaining + completedToday;
+    const focusLog = getFocusLog();
+    const focusToday = safeSeconds(focusLog[today]) + getLiveFocusSeconds();
+    const streak = getStudyStreak(focusLog);
+    const percent = dailyTaskTotal ? Math.round((completedToday / dailyTaskTotal) * 100) : 0;
+
+    document.getElementById('dailyCompletedStat').textContent = String(completedToday);
+    document.getElementById('dailyRemainingStat').textContent = String(remaining);
+    document.getElementById('dailyFocusStat').textContent = formatStudyDuration(focusToday);
+    document.getElementById('dailyStreakStat').textContent = labels.streakDays(streak);
+    document.getElementById('dailyProgressBar').style.width = `${percent}%`;
+    document.getElementById('dailyProgressText').textContent = dailyTaskTotal
+        ? labels.taskProgress(completedToday, dailyTaskTotal)
+        : labels.noTasksToday;
+    document.getElementById('dailyRemainingHint').textContent = labels.waiting;
+    document.getElementById('dailyFocusHint').textContent = labels.focusHint;
+    document.getElementById('dailyStreakHint').textContent = streak ? labels.streak : labels.streakEmpty;
+
+    const quickFocusButton = document.getElementById('quickFocusButton');
+    const quickFocusLabel = quickFocusButton?.querySelector('span:last-child');
+    if (quickFocusLabel) quickFocusLabel.textContent = timer === null ? (isBreak ? labels.quickBreak : labels.quickFocus) : labels.quickResume;
+}
+
+function renderStudyWeek() {
+    const chart = document.getElementById('studyWeekChart');
+    if (!chart) return;
+    const labels = getDashboardLabels();
+    const log = getFocusLog();
+    const today = getLocalDayKey();
+    const dates = Array.from({ length: 7 }, (_, index) => {
+        const date = new Date();
+        date.setHours(0, 0, 0, 0);
+        date.setDate(date.getDate() - 6 + index);
+        return date;
+    });
+    const entries = dates.map(date => {
+        const key = getLocalDayKey(date);
+        const seconds = safeSeconds(log[key]) + (key === today ? getLiveFocusSeconds() : 0);
+        return { date, key, seconds };
+    });
+    const maxSeconds = Math.max(3600, ...entries.map(entry => entry.seconds));
+    const weekSeconds = entries.reduce((total, entry) => total + entry.seconds, 0);
+    const weekdayNames = currentLang === 'ar'
+        ? ['ح', 'ن', 'ث', 'ر', 'خ', 'ج', 'س']
+        : ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+    const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
+
+    chart.replaceChildren();
+    entries.forEach(entry => {
+        const day = document.createElement('div');
+        day.className = `study-day-column${entry.key === today ? ' is-today' : ''}${entry.seconds ? ' has-study' : ''}`;
+        const dateText = entry.date.toLocaleDateString(locale, { weekday: 'long', month: 'short', day: 'numeric' });
+        const minutes = Math.floor(entry.seconds / 60);
+        day.setAttribute('aria-label', `${dateText}: ${formatStudyDuration(entry.seconds)}`);
+
+        const duration = document.createElement('span');
+        duration.className = 'study-day-duration';
+        duration.textContent = minutes
+            ? String(minutes)
+            : entry.seconds
+                ? (currentLang === 'ar' ? '<1د' : '<1m')
+                : '–';
+        const track = document.createElement('span');
+        track.className = 'study-day-track';
+        const fill = document.createElement('span');
+        fill.className = 'study-day-fill';
+        fill.style.height = entry.seconds ? `${Math.max(8, Math.round((entry.seconds / maxSeconds) * 100))}%` : '0%';
+        track.append(fill);
+        const dayLabel = document.createElement('span');
+        dayLabel.className = 'study-day-label';
+        dayLabel.textContent = weekdayNames[entry.date.getDay()];
+        const dateNumber = document.createElement('span');
+        dateNumber.className = 'study-day-number';
+        dateNumber.textContent = String(entry.date.getDate());
+        day.append(duration, track, dayLabel, dateNumber);
+        chart.append(day);
+    });
+
+    document.getElementById('weeklyStudyTotal').textContent = formatStudyDuration(weekSeconds);
+    document.getElementById('studyWeekCaption').textContent = weekSeconds
+        ? labels.weekTotal(formatStudyDuration(weekSeconds))
+        : labels.weekEmpty;
+}
+
+function renderDashboardInsights() {
+    renderDailyOverview();
+    renderStudyWeek();
+}
+
+function commitActiveFocusTime() {
+    if (focusStartedAt === null) return 0;
+    const elapsedMilliseconds = Math.max(0, Date.now() - focusStartedAt);
+    const plannedMilliseconds = focusSegmentEndsAt === null ? elapsedMilliseconds : Math.max(0, focusSegmentEndsAt - focusStartedAt);
+    const elapsed = Math.floor(Math.min(elapsedMilliseconds, plannedMilliseconds) / 1000);
+    focusStartedAt = null;
+    focusSegmentEndsAt = null;
+    if (!elapsed) return 0;
+
+    const focusLog = getFocusLog();
+    const today = getLocalDayKey();
+    focusLog[today] = safeSeconds(focusLog[today]) + elapsed;
+    localStorage.setItem('focusLog', JSON.stringify(focusLog));
+    saveCloudStateImmediately();
+    renderDashboardInsights();
+    return elapsed;
+}
+
+function showDashboardNotice(message) {
+    const toast = document.getElementById('focusSessionToast');
+    if (!toast) return;
+    toast.textContent = message;
+    toast.hidden = false;
+    clearTimeout(focusToastTimeout);
+    focusToastTimeout = setTimeout(() => { toast.hidden = true; }, 5200);
+}
+
+function showFocusSessionSummary(seconds) {
+    if (seconds < 1) return;
+    const minutes = Math.max(1, Math.round(seconds / 60));
+    showDashboardNotice(getDashboardLabels().sessionComplete(currentLang === 'ar' ? `${minutes} دقيقة` : `${minutes} minutes`));
+}
+
+function formatGameTimeRemaining() {
+    const seconds = Math.max(0, Math.ceil((gameSessionEndsAt - Date.now()) / 1000));
+    const minutes = Math.floor(seconds / 60);
+    const remainder = seconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(remainder).padStart(2, '0')}`;
+}
+
+function updateGamePassUI(statusMessage = '') {
+    const enterButton = document.getElementById('gameEnterButton');
+    const closeButton = document.getElementById('closeGameSessionButton');
+    const status = document.getElementById('gamePassStatus');
+    if (!enterButton || !status) return;
+
+    const labels = getDashboardLabels();
+    const currentPoints = Number.isFinite(points) ? Math.max(0, points) : 0;
+    const active = gameSessionActive && gameSessionEndsAt > Date.now();
+    enterButton.disabled = active || currentPoints < GAME_PASS_COST;
+    enterButton.textContent = active ? `${labels.gameTimerButton} • ${formatGameTimeRemaining()}` : labels.enterGame;
+    if (closeButton) closeButton.hidden = !active;
+    status.textContent = statusMessage || (active
+        ? labels.gameActive
+        : currentPoints < GAME_PASS_COST ? labels.gameNeedPoints(currentPoints) : labels.gameReady);
+
+    const modalCountdown = document.getElementById('gameSessionCountdown');
+    if (modalCountdown && active) modalCountdown.textContent = formatGameTimeRemaining();
+    const progress = document.getElementById('gameSessionProgress');
+    if (progress && active) {
+        const remaining = Math.max(0, gameSessionEndsAt - Date.now());
+        progress.style.transform = `scaleX(${remaining / GAME_PASS_DURATION_MS})`;
+    }
+}
+
+function setGameSessionBackgroundInert(inert) {
+    const modal = document.getElementById('gameSessionModal');
+    Array.from(document.body.children).forEach(element => {
+        if (element !== modal && element.tagName !== 'SCRIPT') element.inert = inert;
+    });
+}
+
+function endEmbeddedGameSession(expired = false) {
+    if (!gameSessionActive) return;
+    if (gameSessionInterval !== null) {
+        clearInterval(gameSessionInterval);
+        gameSessionInterval = null;
+    }
+    if (gameSessionTimeout !== null) {
+        clearTimeout(gameSessionTimeout);
+        gameSessionTimeout = null;
+    }
+    gameSessionActive = false;
+    gameSessionEndsAt = 0;
+    const frame = document.getElementById('embeddedGameFrame');
+    if (frame) frame.src = 'about:blank';
+    const modal = document.getElementById('gameSessionModal');
+    if (modal) modal.hidden = true;
+    setGameSessionBackgroundInert(false);
+    updateGamePassUI(expired ? getDashboardLabels().gameExpired : getDashboardLabels().gameClosed);
+    document.getElementById('gameEnterButton')?.focus({ preventScroll: true });
+}
+
+function scheduleGameSessionExpiry() {
+    if (gameSessionTimeout !== null) clearTimeout(gameSessionTimeout);
+    const remaining = Math.max(0, gameSessionEndsAt - Date.now());
+    gameSessionTimeout = setTimeout(() => endEmbeddedGameSession(true), remaining);
+}
+
+function updateEmbeddedGameSession() {
+    if (!gameSessionActive) return;
+    if (Date.now() >= gameSessionEndsAt) {
+        endEmbeddedGameSession(true);
+        return;
+    }
+    updateGamePassUI();
+}
+
+function checkGameSessionOnReturn() {
+    if (gameSessionActive && document.visibilityState === 'visible') updateEmbeddedGameSession();
+}
+
+function enterEmbeddedGame() {
+    if (gameSessionActive) return;
+    if (!Number.isFinite(points) || points < GAME_PASS_COST) {
+        updateGamePassUI(getDashboardLabels().gameNeedPoints(Number.isFinite(points) ? Math.max(0, points) : 0));
+        return;
+    }
+
+    const modal = document.getElementById('gameSessionModal');
+    const frame = document.getElementById('embeddedGameFrame');
+    if (!modal || !frame) return;
+
+    gameSessionActive = true;
+    gameSessionEndsAt = Date.now() + GAME_PASS_DURATION_MS;
+    points -= GAME_PASS_COST;
+    localStorage.setItem('userPoints', String(points));
+    updatePointsDisplay();
+    saveCloudStateImmediately();
+    setGameSessionBackgroundInert(true);
+    modal.hidden = false;
+    frame.src = SCRATCH_GAME_EMBED_URL;
+    document.getElementById('closeGameModalButton')?.focus({ preventScroll: true });
+    updateGamePassUI();
+    gameSessionInterval = setInterval(updateEmbeddedGameSession, 1000);
+    scheduleGameSessionExpiry();
+}
+
+function updateFocusModeButton() {
+    const button = document.getElementById('focusModeToggle');
+    if (!button) return;
+    const isActive = document.body.classList.contains('focus-mode');
+    button.setAttribute('aria-pressed', String(isActive));
+    button.textContent = isActive ? getDashboardLabels().exitFocus : getDashboardLabels().focusMode;
+}
+
+function setFocusMode(enabled) {
+    document.body.classList.toggle('focus-mode', Boolean(enabled));
+    updateFocusModeButton();
+    const quickFocusButton = document.getElementById('quickFocusButton');
+    if (quickFocusButton) {
+        const label = quickFocusButton.querySelector('span:last-child');
+        if (label) label.textContent = timer === null ? (isBreak ? getDashboardLabels().quickBreak : getDashboardLabels().quickFocus) : getDashboardLabels().quickResume;
+    }
+}
+
+function applyDashboardLanguage() {
+    const labels = getDashboardLabels();
+    const textById = {
+        dailyCompletedLabel: labels.completed,
+        dailyRemainingLabel: labels.remaining,
+        dailyFocusLabel: labels.focus,
+        dailyStreakLabel: labels.streak,
+        dailyRemainingHint: labels.waiting,
+        dailyFocusHint: labels.focusHint,
+        studyWeekKicker: labels.weekKicker,
+        studyWeekTitle: labels.weekTitle,
+        taskPriorityLabel: labels.taskPriorityLabel,
+        gamePassTitle: labels.gameTitle,
+        gamePassSubtitle: labels.gameSubtitle,
+        gamePassCost: labels.gameCost,
+        gamePassNote: labels.gameNote,
+        quickAddTaskLabel: labels.quickAdd,
+        quickFocusLabel: labels.quickFocus
+    };
+    Object.entries(textById).forEach(([id, text]) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = text;
+    });
+
+    const overview = document.getElementById('dailyOverview');
+    if (overview) overview.setAttribute('aria-label', labels.overview);
+    const chart = document.getElementById('studyWeekChart');
+    if (chart) chart.setAttribute('aria-label', currentLang === 'ar' ? 'سجل دقائق المذاكرة خلال آخر سبعة أيام' : 'Study minutes over the last seven days');
+    const priority = document.getElementById('taskPriority');
+    if (priority) {
+        priority.options[0].textContent = labels.priorityMedium;
+        priority.options[1].textContent = labels.priorityHigh;
+        priority.options[2].textContent = labels.priorityLow;
+    }
+    const addButton = document.getElementById('taskAddButton');
+    if (addButton) {
+        addButton.setAttribute('aria-label', labels.taskAdd);
+        addButton.title = labels.taskAdd;
+    }
+    const gameButton = document.getElementById('gameEnterButton');
+    if (gameButton) gameButton.textContent = labels.enterGame;
+    const endGameButton = document.getElementById('closeGameSessionButton');
+    if (endGameButton) endGameButton.textContent = labels.endGame;
+    const modalTitle = document.getElementById('gameSessionModalTitle');
+    if (modalTitle) modalTitle.textContent = labels.gameModalTitle;
+    const modalHint = document.getElementById('gameSessionModalHint');
+    if (modalHint) modalHint.textContent = labels.gameModalHint;
+    const modalClose = document.getElementById('closeGameModalButton');
+    if (modalClose) modalClose.setAttribute('aria-label', labels.closeGameModal);
+    updateFocusModeButton();
+    updateGamePassUI();
+}
+
+function initializeDashboardFeatures() {
+    const taskList = document.getElementById('taskList');
+    const taskInput = document.getElementById('taskInput');
+    const focusButton = document.getElementById('focusModeToggle');
+    const quickAddButton = document.getElementById('quickAddTaskButton');
+    const quickFocusButton = document.getElementById('quickFocusButton');
+    const gameButton = document.getElementById('gameEnterButton');
+    const endGameButton = document.getElementById('closeGameSessionButton');
+
+    if (taskList) {
+        taskList.addEventListener('click', event => {
+            const action = event.target.closest('[data-task-action]');
+            if (!action) return;
+            const index = Number(action.dataset.taskIndex);
+            if (action.dataset.taskAction === 'toggle') window.toggleTask(index);
+            if (action.dataset.taskAction === 'delete') window.deleteTask(index);
+        });
+    }
+    if (focusButton) focusButton.addEventListener('click', () => setFocusMode(!document.body.classList.contains('focus-mode')));
+    if (quickAddButton) quickAddButton.addEventListener('click', () => {
+        setFocusMode(false);
+        document.querySelector('.tasks-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        window.setTimeout(() => taskInput?.focus({ preventScroll: true }), 180);
+    });
+    if (quickFocusButton) quickFocusButton.addEventListener('click', () => {
+        if (timer === null) toggleTimer();
+        setFocusMode(true);
+    });
+    if (gameButton) gameButton.addEventListener('click', enterEmbeddedGame);
+    if (endGameButton) endGameButton.addEventListener('click', () => endEmbeddedGameSession(false));
+    const modalCloseButton = document.getElementById('closeGameModalButton');
+    if (modalCloseButton) modalCloseButton.addEventListener('click', () => endEmbeddedGameSession(false));
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && gameSessionActive) {
+            endEmbeddedGameSession(false);
+            return;
+        }
+        if (event.key === 'Escape' && document.body.classList.contains('focus-mode')) setFocusMode(false);
+    });
+    document.addEventListener('visibilitychange', checkGameSessionOnReturn);
+    window.addEventListener('focus', checkGameSessionOnReturn);
+    window.addEventListener('pagehide', commitActiveFocusTime, { once: true });
+    window.addEventListener('pagehide', () => {
+        if (gameSessionActive) endEmbeddedGameSession(false);
+    }, { once: true });
+
+    applyDashboardLanguage();
+    updateGamePassUI();
+    renderTasks();
+    renderDashboardInsights();
+}
 
 function isFirebaseConfigured() {
     return !FIREBASE_CONFIG.apiKey.startsWith('PASTE_YOUR') && !FIREBASE_CONFIG.projectId.startsWith('PASTE_YOUR');
@@ -54,6 +570,7 @@ function setSignedInView(user) {
     const accountAvatar = document.getElementById('accountAvatar');
 
     if (loginScreen) loginScreen.classList.toggle('is-hidden', Boolean(user) || guestModeSelected);
+    document.body.classList.toggle('login-visible', !user && !guestModeSelected);
     if (accountControl) accountControl.hidden = !user;
     if (guestAccountControl) guestAccountControl.hidden = Boolean(user) || !guestModeSelected;
     if (!user) return;
@@ -346,10 +863,11 @@ window.onload = () => {
     updateTimerDisplay();
     
     if(document.getElementById('taskInput')) {
-        document.getElementById('taskInput').addEventListener('keypress', (e) => {
+        document.getElementById('taskInput').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') addTask();
         });
     }
+    initializeDashboardFeatures();
 };
 
 // ==========================================
@@ -377,7 +895,7 @@ function updateRoleSelect(lang) {
 function updateSmartSuggestion() {
     const suggestion = document.getElementById('smartSuggestion');
     if (!suggestion) return;
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
+    const tasks = getStoredTasks();
     const pending = tasks.filter(task => !task.done);
     const role = getRoleName(currentLang);
     if (timer !== null) {
@@ -436,9 +954,13 @@ function applyLanguage(lang) {
         }
     }
     
+    applyDashboardLanguage();
     changeQuote();
     renderTasks(); 
     updateSmartSuggestion();
+    renderDailyOverview();
+    renderStudyWeek();
+    updateThemeToggleLabel();
 }
 
 if(document.getElementById('langSelect')) {
@@ -523,6 +1045,10 @@ function toggleTimer() {
         updateSmartSuggestion();
         
         const endTime = Date.now() + (timeLeft * 1000);
+        if (!isBreak) {
+            focusStartedAt = Date.now();
+            focusSegmentEndsAt = endTime;
+        }
         
         timer = setInterval(() => {
             const remainingMillis = endTime - Date.now();
@@ -533,13 +1059,16 @@ function toggleTimer() {
             }
             
             if (timeLeft <= 0) {
+                const completedStudySession = !isBreak;
+                const completedSeconds = completedStudySession ? commitActiveFocusTime() : 0;
                 clearInterval(timer);
                 timer = null;
                 playAlarm();
                 
-                if (!isBreak) {
+                if (completedStudySession) {
                     addPoints();
                     changeQuote();
+                    showFocusSessionSummary(completedSeconds);
                 }
                 
                 // إعادة ضبط المؤقت تلقائياً بعد الانتهاء
@@ -564,6 +1093,7 @@ function toggleTimer() {
         
         // حساب نقاطك فوراً عما أنجزته حتى ثانية الإيقاف
         if (!isBreak) {
+            commitActiveFocusTime();
             addPoints(); 
         }
     }
@@ -573,6 +1103,10 @@ function resetTimer() {
     if (timer !== null) {
         clearInterval(timer);
         timer = null;
+        if (!isBreak) {
+            commitActiveFocusTime();
+            addPoints();
+        }
     }
     isBreak = false;
     totalSecondsWorked = 0;
@@ -596,6 +1130,7 @@ function updateTimerDisplay() {
     if (displayElem) {
         displayElem.innerText = `${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`;
     }
+    renderDailyOverview();
 }
 
 // ==========================================
@@ -621,6 +1156,10 @@ function buyBreak(min) {
         if (timer !== null) {
             clearInterval(timer);
             timer = null;
+            if (!isBreak) {
+                commitActiveFocusTime();
+                addPoints();
+            }
         }
         
         points -= cost;
@@ -648,6 +1187,7 @@ function updatePointsDisplay() {
     if(document.getElementById('userPoints')) {
         document.getElementById('userPoints').innerText = points; 
     }
+    updateGamePassUI();
 }
 
 function resetPoints() {
@@ -748,8 +1288,16 @@ function addTask() {
     if (!input) return;
     const text = input.value.trim();
     if (text === '') return;
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    tasks.push({ text: text, done: false });
+    const tasks = getStoredTasks();
+    const priorityInput = document.getElementById('taskPriority');
+    tasks.unshift({
+        text,
+        done: false,
+        priority: priorityInput?.value || 'medium',
+        createdAt: Date.now(),
+        completedAt: null,
+        pointsAwarded: false
+    });
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
     saveCloudStateImmediately();
     input.value = '';
@@ -757,45 +1305,91 @@ function addTask() {
 }
 
 window.toggleTask = function(index) {
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    tasks[index].done = !tasks[index].done;
+    const tasks = getStoredTasks();
+    const task = tasks[Number(index)];
+    if (!task) return;
+    task.done = !task.done;
+    task.completedAt = task.done ? getLocalDayKey() : null;
+    const reward = task.done && !task.pointsAwarded;
+    if (reward) {
+        task.pointsAwarded = true;
+        points = (Number.isFinite(points) ? points : 0) + 10;
+        localStorage.setItem('userPoints', String(points));
+        updatePointsDisplay();
+    }
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
     saveCloudStateImmediately();
     renderTasks();
+    if (reward) showDashboardNotice(getDashboardLabels().taskRewardNotice);
 }
 
 window.deleteTask = function(index) {
-    const tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    tasks.splice(index, 1);
+    const tasks = getStoredTasks();
+    if (!Number.isInteger(Number(index)) || Number(index) < 0 || Number(index) >= tasks.length) return;
+    tasks.splice(Number(index), 1);
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
     saveCloudStateImmediately();
     renderTasks();
 }
 
 function renderTasks() {
-    var taskList = document.getElementById('taskList');
+    const taskList = document.getElementById('taskList');
     if (!taskList) return;
-    
-    taskList.innerHTML = '';
-    var tasks = JSON.parse(localStorage.getItem('surgeonTasks')) || [];
-    var isAr = currentLang === 'ar';
-    var textAlignment = isAr ? 'text-align: right !important;' : 'text-align: left !important;';
-    
-    tasks.forEach(function(task, index) {
-        var li = document.createElement('li');
-        var strikeStyle = task.done ? "text-decoration: line-through !important; opacity: 0.5 !important;" : "";
-        var icon = task.done ? "✅" : "⭕";
-        
-        li.innerHTML = 
-            '<div onclick="toggleTask(' + index + ')" style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 12px !important; flex: 1 !important; min-width: 0 !important; cursor: pointer !important;">' +
-                '<span style="flex-shrink: 0 !important; font-size: 16px !important;">' + icon + '</span>' +
-                '<span style="flex-grow: 1 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important; font-weight: 600 !important; font-size: 15px !important; color: #ffffff !important; ' + textAlignment + ' ' + strikeStyle + '">' + task.text + '</span>' +
-            '</div>' +
-            '<button onclick="deleteTask(' + index + ')" class="reset-mini" style="min-width: auto !important; width: auto !important; background: none !important; border: none !important; cursor: pointer !important; padding: 0 5px !important; flex-shrink: 0 !important; font-size: 14px !important; color: #ff4444 !important; margin-inline-start: 15px !important;">❌</button>';
-            
-        taskList.appendChild(li);
+
+    const labels = getDashboardLabels();
+    const tasks = getStoredTasks();
+    const visibleTasks = tasks.map((task, index) => ({ task, index }));
+
+    taskList.replaceChildren();
+    if (!visibleTasks.length) {
+        const empty = document.createElement('li');
+        empty.className = 'task-empty';
+        empty.textContent = labels.noTasks;
+        taskList.append(empty);
+    }
+
+    visibleTasks.forEach(({ task, index }) => {
+        const item = document.createElement('li');
+        item.className = `task-row${task.done ? ' is-done' : ''}`;
+
+        const complete = document.createElement('button');
+        complete.type = 'button';
+        complete.className = `task-check${task.done ? ' is-checked' : ''}`;
+        complete.dataset.taskAction = 'toggle';
+        complete.dataset.taskIndex = String(index);
+        complete.setAttribute('aria-pressed', String(Boolean(task.done)));
+        complete.setAttribute('aria-label', task.done ? (currentLang === 'ar' ? 'إعادة فتح المهمة' : 'Reopen task') : (currentLang === 'ar' ? 'إنهاء المهمة' : 'Complete task'));
+        complete.textContent = task.done ? '✓' : '';
+
+        const content = document.createElement('div');
+        content.className = 'task-content';
+        const title = document.createElement('span');
+        title.className = 'task-title';
+        title.textContent = String(task.text || '');
+        const meta = document.createElement('div');
+        meta.className = 'task-meta';
+
+        const priority = ['high', 'medium', 'low'].includes(task.priority) ? task.priority : 'medium';
+        const priorityBadge = document.createElement('span');
+        priorityBadge.className = `task-priority priority-${priority}`;
+        priorityBadge.textContent = priority === 'high' ? labels.priorityHigh : priority === 'low' ? labels.priorityLow : labels.priorityMedium;
+        meta.append(priorityBadge);
+        content.append(title, meta);
+
+        const remove = document.createElement('button');
+        remove.type = 'button';
+        remove.className = 'task-delete';
+        remove.dataset.taskAction = 'delete';
+        remove.dataset.taskIndex = String(index);
+        remove.setAttribute('aria-label', currentLang === 'ar' ? 'حذف المهمة' : 'Delete task');
+        remove.title = currentLang === 'ar' ? 'حذف المهمة' : 'Delete task';
+        remove.textContent = '×';
+
+        item.append(complete, content, remove);
+        taskList.append(item);
     });
     updateSmartSuggestion();
+    renderDailyOverview();
 }
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -806,5 +1400,6 @@ if ('serviceWorker' in navigator) {
 }
 
 window.addEventListener('load', () => {
+    initializeThemeToggle();
     initializeCloud();
 });
