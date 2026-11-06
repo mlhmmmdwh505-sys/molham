@@ -73,12 +73,39 @@ button { -webkit-appearance: none; appearance: none; }
 .eyebrow { display: inline-flex; align-items: center; gap: 7px; color: var(--reader-gold); font-size: 11px; font-weight: 800; }
 .reader-intro h1 { margin: 3px 0 2px; font: 700 clamp(25px, 4vw, 34px)/1.25 'Amiri', serif; letter-spacing: -.2px; }
 .reader-intro p { margin: 0; color: var(--reader-muted); font-size: 12px; line-height: 1.8; }
-.page-jump { flex: 0 0 auto; }
-.page-jump label { display: block; margin-bottom: 6px; color: var(--reader-muted); font-size: 10px; font-weight: 700; }
+.reader-jump-tools { display: flex; flex: 0 0 auto; align-items: end; gap: 12px; }
+.page-jump, .surah-jump { flex: 0 0 auto; }
+.page-jump label, .surah-jump label { display: block; margin-bottom: 6px; color: var(--reader-muted); font-size: 10px; font-weight: 700; }
 .jump-controls { display: flex; gap: 7px; }
-.jump-controls input { width: 86px; height: 42px; padding: 0 10px; border: 1px solid var(--reader-border); border-radius: 13px; outline: none; background: var(--reader-surface); color: inherit; text-align: center; font-variant-numeric: tabular-nums; }
-.jump-controls input:focus-visible { border-color: var(--reader-gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--reader-gold) 22%, transparent); }
+.jump-controls input, .jump-controls select { height: 42px; border: 1px solid var(--reader-border); border-radius: 13px; outline: none; background: var(--reader-surface); color: inherit; }
+.jump-controls input { width: 86px; padding: 0 10px; text-align: center; font-variant-numeric: tabular-nums; }
+.jump-controls select { min-width: 168px; padding: 0 10px; }
+.jump-controls select option { background: #17332e; color: #f3f4ed; }
+.jump-controls input:focus-visible, .jump-controls select:focus-visible { border-color: var(--reader-gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--reader-gold) 22%, transparent); }
 .jump-controls button, .page-error button { min-width: 70px; height: 42px; padding: 0 15px; border: 1px solid color-mix(in srgb, var(--reader-gold) 60%, transparent); border-radius: 13px; background: color-mix(in srgb, var(--reader-green) 48%, var(--reader-surface)); color: #fffdf5; cursor: pointer; font-size: 11px; font-weight: 800; transition: transform .18s ease, background-color .18s ease; }
+
+.khatma-card { width: min(940px, 100%); margin: 0 auto 16px; padding: 17px 20px 13px; border: 1px solid var(--reader-border); border-radius: 20px; background: linear-gradient(135deg, color-mix(in srgb, var(--reader-green) 19%, transparent), transparent 66%), var(--reader-surface); box-shadow: 0 14px 36px rgba(0, 0, 0, .1); }
+.khatma-heading { display: flex; align-items: center; gap: 12px; }
+.khatma-mark { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; border: 1px solid var(--reader-border); border-radius: 14px; color: var(--reader-gold); font: 26px/1 'Amiri', serif; }
+.khatma-eyebrow { color: var(--reader-gold); font-size: 9px; font-weight: 800; }
+.khatma-heading h2 { margin: 0; font: 700 20px/1.3 'Amiri', serif; }
+.khatma-heading p { margin: 2px 0 0; color: var(--reader-muted); font-size: 10px; line-height: 1.6; }
+.khatma-content { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 18px; margin-top: 15px; }
+.khatma-metrics { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.khatma-metric-copy { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; color: var(--reader-muted); font-size: 10px; }
+.khatma-metric-copy strong { color: #f4ead2; font-size: 11px; font-variant-numeric: tabular-nums; }
+.khatma-progress-track { height: 6px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.13); }
+.khatma-progress-track > span { display: block; width: 0; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--reader-green), var(--reader-gold)); transition: width .35s ease; }
+.khatma-metric small { display: block; min-height: 17px; margin-top: 5px; color: var(--reader-muted); font-size: 9px; line-height: 1.6; }
+.khatma-actions { display: flex; align-items: end; gap: 9px; }
+.khatma-plan-form label { display: block; margin-bottom: 5px; color: var(--reader-muted); font-size: 9px; font-weight: 700; }
+.khatma-plan-controls { display: flex; align-items: center; gap: 6px; color: var(--reader-muted); font-size: 10px; }
+.khatma-plan-controls input { width: 57px; height: 38px; padding: 0 6px; border: 1px solid var(--reader-border); border-radius: 11px; outline: none; background: var(--reader-surface); color: inherit; text-align: center; }
+.khatma-plan-controls input:focus-visible { border-color: var(--reader-gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--reader-gold) 22%, transparent); }
+.khatma-plan-controls button, .continue-reading-button { min-height: 38px; padding: 0 12px; border: 1px solid color-mix(in srgb, var(--reader-gold) 55%, transparent); border-radius: 11px; background: color-mix(in srgb, var(--reader-green) 48%, var(--reader-surface)); color: #fffdf5; cursor: pointer; font-size: 10px; font-weight: 800; }
+.continue-reading-button { white-space: nowrap; }
+.khatma-plan-controls button:disabled, .continue-reading-button:disabled, .jump-controls button:disabled { opacity: .5; cursor: wait; }
+.khatma-status { margin: 9px 0 0; color: var(--reader-muted); font-size: 9px; text-align: end; }
 
 .reading-area { display: flex; justify-content: center; }
 .page-paper {
@@ -152,7 +179,7 @@ html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) sc
 @media (hover: hover) and (pointer: fine) {
     .back-link:hover .back-arrow { transform: translateX(3px); background: var(--reader-surface); }
     .reader-theme-toggle:hover { transform: translateY(-2px); border-color: var(--reader-gold); }
-    .jump-controls button:hover, .page-error button:hover, .page-step:not(:disabled):hover { transform: translateY(-2px); border-color: var(--reader-gold); background: color-mix(in srgb, var(--reader-green) 58%, var(--reader-surface)); }
+    .jump-controls button:hover, .page-error button:hover, .page-step:not(:disabled):hover, .khatma-plan-controls button:hover, .continue-reading-button:hover { transform: translateY(-2px); border-color: var(--reader-gold); background: color-mix(in srgb, var(--reader-green) 58%, var(--reader-surface)); }
 }
 
 @media (max-width: 700px) {
@@ -171,10 +198,26 @@ html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) sc
     .reader-intro { align-items: stretch; flex-direction: column; gap: 13px; margin-bottom: 14px; }
     .reader-intro h1 { font-size: 28px; }
     .reader-intro p { max-width: 470px; font-size: 11px; }
-    .page-jump { display: flex; align-items: end; justify-content: space-between; gap: 10px; }
-    .page-jump label { margin: 0 0 10px; }
+    .reader-jump-tools { width: 100%; flex-direction: column; align-items: stretch; gap: 9px; }
+    .page-jump, .surah-jump { display: flex; flex-direction: column; align-items: stretch; gap: 5px; }
+    .page-jump label, .surah-jump label { margin: 0; }
+    .jump-controls { width: 100%; }
     .jump-controls input { width: 82px; height: 38px; }
+    .jump-controls select { min-width: 0; height: 38px; flex: 1; }
     .jump-controls button { height: 38px; }
+    .khatma-card { margin-bottom: 13px; padding: 14px 13px 11px; border-radius: 17px; }
+    .khatma-heading { gap: 9px; }
+    .khatma-mark { flex-basis: 36px; width: 36px; height: 36px; border-radius: 12px; font-size: 23px; }
+    .khatma-heading h2 { font-size: 18px; }
+    .khatma-heading p { font-size: 9px; }
+    .khatma-content { grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+    .khatma-metrics { grid-template-columns: 1fr; gap: 8px; }
+    .khatma-metric small { min-height: 14px; }
+    .khatma-actions { align-items: end; justify-content: space-between; gap: 8px; }
+    .khatma-plan-form { min-width: 0; }
+    .khatma-plan-controls { flex-wrap: wrap; }
+    .khatma-plan-controls button, .continue-reading-button { padding: 0 9px; }
+    .khatma-status { text-align: start; }
     .page-paper { min-height: min(62dvh, 690px); padding: 7px; border-radius: 17px; }
     .page-paper::before { inset: 6px; border-radius: 12px; }
     .paper-inner { min-height: max(58dvh, 390px); padding: 14px 17px 12px; }

@@ -1,7 +1,11 @@
 const PAGE_COUNT = 604;
 const PAGE_API = 'https://api.alquran.cloud/v1/page';
+const SURAH_API = 'https://api.alquran.cloud/v1/surah';
+const AYAH_API = 'https://api.alquran.cloud/v1/ayah';
 const LAST_PAGE_KEY = 'mushafLastPage';
+const KHATMA_PLAN_KEY = 'mushafKhatmaPlan';
 const pageCache = new Map();
+const surahPageCache = new Map();
 
 const pagePaper = document.getElementById('pagePaper');
 const pageContent = document.getElementById('pageContent');
@@ -10,6 +14,8 @@ const pageError = document.getElementById('pageError');
 const previousButton = document.getElementById('previousPageButton');
 const nextButton = document.getElementById('nextPageButton');
 const pageInput = document.getElementById('pageNumberInput');
+const surahSelect = document.getElementById('surahSelect');
+const surahJumpButton = document.getElementById('surahJumpButton');
 const pageCounter = document.getElementById('pageCounter');
 const pageHeaderNumber = document.getElementById('pageHeaderNumber');
 const pageFooterNumber = document.getElementById('pageFooterNumber');
@@ -22,9 +28,25 @@ const savedPosition = document.getElementById('savedPosition');
 const savedPositionText = document.getElementById('savedPositionText');
 const surahHeader = document.getElementById('surahHeader');
 const themeToggle = document.getElementById('readerThemeToggle');
+const khatmaForm = document.getElementById('khatmaForm');
+const khatmaDurationInput = document.getElementById('khatmaDuration');
+const khatmaSaveButton = document.getElementById('khatmaSaveButton');
+const khatmaDailyProgress = document.getElementById('khatmaDailyProgress');
+const khatmaDailyFill = document.getElementById('khatmaDailyFill');
+const khatmaDailyTrack = khatmaDailyFill.parentElement;
+const khatmaDailyHint = document.getElementById('khatmaDailyHint');
+const khatmaOverallProgress = document.getElementById('khatmaOverallProgress');
+const khatmaOverallFill = document.getElementById('khatmaOverallFill');
+const khatmaOverallTrack = khatmaOverallFill.parentElement;
+const khatmaOverallHint = document.getElementById('khatmaOverallHint');
+const khatmaStatus = document.getElementById('khatmaStatus');
+const continueReadingButton = document.getElementById('continueReadingButton');
+const readingArea = document.getElementById('readingArea');
 
 let currentPage = readLastPage();
 let isLoading = false;
+let surahCatalog = [];
+let khatmaPlan = readKhatmaPlan();
 
 function setMushafTheme(theme, persist = true) {
     const isLight = theme === 'light';
@@ -52,6 +74,143 @@ function readLastPage() {
     } catch (error) {
         return 1;
     }
+}
+
+function readKhatmaPlan() {
+    try {
+        const plan = JSON.parse(localStorage.getItem(KHATMA_PLAN_KEY) || 'null');
+        if (!plan || !Number.isInteger(Number(plan.startPage)) || !Number.isFinite(dateKeyOrdinal(plan.targetDate))) return null;
+        const startPage = Math.min(PAGE_COUNT, Math.max(1, Number(plan.startPage)));
+        const readPages = Array.isArray(plan.readPages) ? plan.readPages.map(Number).filter(page => Number.isInteger(page) && page >= startPage && page <= PAGE_COUNT) : [];
+        const dailyReads = plan.dailyReads && typeof plan.dailyReads === 'object' && !Array.isArray(plan.dailyReads) ? plan.dailyReads : {};
+        return { ...plan, startPage, readPages: [...new Set(readPages)], dailyReads };
+    } catch (error) {
+        return null;
+    }
+}
+
+function localDateKey(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function addDaysToDateKey(dateKey, days) {
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const date = new Date(year, month - 1, day, 12);
+    date.setDate(date.getDate() + days);
+    return localDateKey(date);
+}
+
+function dateKeyOrdinal(dateKey) {
+    const [year, month, day] = String(dateKey || '').split('-').map(Number);
+    if (!Number.isInteger(year) || !Number.isInteger(month) || !Number.isInteger(day)) return NaN;
+    const date = new Date(Date.UTC(year, month - 1, day));
+    if (date.getUTCFullYear() !== year || date.getUTCMonth() !== month - 1 || date.getUTCDate() !== day) return NaN;
+    return Math.floor(date.getTime() / 86400000);
+}
+
+function getPagesForDate(pages) {
+    return [...new Set((Array.isArray(pages) ? pages : [])
+        .map(Number)
+        .filter(page => Number.isInteger(page) && page >= (khatmaPlan?.startPage || 1) && page <= PAGE_COUNT))];
+}
+
+function renderKhatma() {
+    continueReadingButton.textContent = `كمّل من صفحة ${toArabicNumber(currentPage)}`;
+    continueReadingButton.disabled = isLoading;
+    khatmaSaveButton.textContent = khatmaPlan ? 'إعادة بدء الخطة' : 'ابدأ الخطة';
+    if (khatmaPlan?.durationDays && document.activeElement !== khatmaDurationInput) {
+        khatmaDurationInput.value = String(khatmaPlan.durationDays);
+    }
+
+    if (!khatmaPlan) {
+        khatmaDailyProgress.textContent = '—';
+        khatmaDailyFill.style.width = '0%';
+        khatmaDailyTrack.setAttribute('aria-valuenow', '0');
+        khatmaDailyHint.textContent = 'ابدأ خطة لمعرفة عدد الصفحات المطلوبة اليوم.';
+        khatmaOverallProgress.textContent = '—';
+        khatmaOverallFill.style.width = '0%';
+        khatmaOverallTrack.setAttribute('aria-valuenow', '0');
+        khatmaOverallHint.textContent = 'تبدأ الخطة من الصفحة التي تقرؤها الآن.';
+        khatmaStatus.textContent = 'الصفحات التي تفتحها تُحسب مرة واحدة ضمن تقدم الخطة.';
+        return;
+    }
+
+    const totalPages = PAGE_COUNT - khatmaPlan.startPage + 1;
+    const readPages = getPagesForDate(khatmaPlan.readPages);
+    const today = localDateKey();
+    const todayPages = getPagesForDate(khatmaPlan.dailyReads[today]);
+    const daysLeft = Math.max(1, dateKeyOrdinal(khatmaPlan.targetDate) - dateKeyOrdinal(today) + 1);
+    const pagesReadBeforeToday = Math.max(0, readPages.length - todayPages.length);
+    const pagesAtStartOfToday = Math.max(0, totalPages - pagesReadBeforeToday);
+    const dailyGoal = readPages.length >= totalPages ? 0 : Math.ceil(pagesAtStartOfToday / daysLeft);
+    const dailyPercent = dailyGoal === 0 ? 100 : Math.min(100, (todayPages.length / dailyGoal) * 100);
+    const overallPercent = Math.min(100, (readPages.length / totalPages) * 100);
+    const remainingPages = Math.max(0, totalPages - readPages.length);
+
+    khatmaDailyProgress.textContent = `${toArabicNumber(todayPages.length)} / ${toArabicNumber(dailyGoal)} صفحة`;
+    khatmaDailyFill.style.width = `${dailyPercent}%`;
+    khatmaDailyTrack.setAttribute('aria-valuenow', String(Math.round(dailyPercent)));
+    khatmaDailyHint.textContent = dailyGoal === 0
+        ? 'أتممت الختمة، تقبّل الله منك.'
+        : todayPages.length >= dailyGoal
+            ? 'أتممت ورد اليوم، تقبّل الله منك.'
+            : `باقي ${toArabicNumber(Math.max(0, dailyGoal - todayPages.length))} صفحة من ورد اليوم.`;
+
+    khatmaOverallProgress.textContent = `${toArabicNumber(readPages.length)} / ${toArabicNumber(totalPages)} صفحة`;
+    khatmaOverallFill.style.width = `${overallPercent}%`;
+    khatmaOverallTrack.setAttribute('aria-valuenow', String(Math.round(overallPercent)));
+    khatmaOverallHint.textContent = remainingPages === 0
+        ? 'اكتملت صفحات الخطة.'
+        : `باقي ${toArabicNumber(remainingPages)} صفحة • ${toArabicNumber(daysLeft)} يوم حتى موعد الختمة.`;
+    khatmaStatus.textContent = `الخطة تبدأ من صفحة ${toArabicNumber(khatmaPlan.startPage)} • موعد الختمة ${khatmaPlan.targetDate.split('-').reverse().map(toArabicNumber).join('/')}.`;
+}
+
+function saveKhatmaPlan() {
+    try {
+        localStorage.setItem(KHATMA_PLAN_KEY, JSON.stringify(khatmaPlan));
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+function recordKhatmaPage(pageNumber) {
+    if (!khatmaPlan || pageNumber < khatmaPlan.startPage || pageNumber > PAGE_COUNT) return;
+    const today = localDateKey();
+    const readPages = new Set(getPagesForDate(khatmaPlan.readPages));
+    readPages.add(pageNumber);
+    const dailyReads = { ...khatmaPlan.dailyReads };
+    const todayPages = new Set(getPagesForDate(dailyReads[today]));
+    todayPages.add(pageNumber);
+    dailyReads[today] = [...todayPages];
+
+    const cutoff = dateKeyOrdinal(today) - 30;
+    Object.keys(dailyReads).forEach(dateKey => {
+        if (dateKeyOrdinal(dateKey) < cutoff) delete dailyReads[dateKey];
+    });
+
+    khatmaPlan = { ...khatmaPlan, readPages: [...readPages], dailyReads };
+    const saved = saveKhatmaPlan();
+    renderKhatma();
+    if (!saved) khatmaStatus.textContent = 'تعذّر حفظ تقدم الخطة على هذا الجهاز.';
+}
+
+function startKhatmaPlan(durationDays) {
+    const today = localDateKey();
+    khatmaPlan = {
+        startDate: today,
+        targetDate: addDaysToDateKey(today, durationDays - 1),
+        durationDays,
+        startPage: currentPage,
+        readPages: [currentPage],
+        dailyReads: { [today]: [currentPage] }
+    };
+    const saved = saveKhatmaPlan();
+    renderKhatma();
+    if (!saved) khatmaStatus.textContent = 'تعذّر حفظ الخطة على هذا الجهاز.';
 }
 
 function toArabicNumber(value) {
@@ -157,6 +316,54 @@ async function getPageData(pageNumber, forceRefresh = false) {
     return payload.data;
 }
 
+async function loadSurahCatalog() {
+    if (surahCatalog.length) return surahCatalog;
+    surahSelect.disabled = true;
+    surahJumpButton.disabled = true;
+    surahSelect.replaceChildren(new Option('جارٍ تحميل السور…', ''));
+    try {
+        const response = await fetch(SURAH_API);
+        if (!response.ok) throw new Error(`Surah request failed (${response.status}).`);
+        const payload = await response.json();
+        if (payload.code !== 200 || !Array.isArray(payload.data)) throw new Error('Unexpected surah response.');
+        surahCatalog = payload.data;
+        const options = [new Option('اختر سورة…', '')];
+        surahCatalog.forEach(surah => {
+            options.push(new Option(`${toArabicNumber(surah.number)}. ${surah.name}`, String(surah.number)));
+        });
+        surahSelect.replaceChildren(...options);
+        surahJumpButton.textContent = 'انتقال';
+        return surahCatalog;
+    } catch (error) {
+        console.error('Unable to load Quran surahs:', error);
+        surahSelect.replaceChildren(new Option('تعذّر تحميل السور', ''));
+        surahJumpButton.textContent = 'إعادة المحاولة';
+        readerStatus.textContent = 'تعذّر تحميل قائمة السور. تحقّق من اتصال الإنترنت ثم أعد المحاولة.';
+        return [];
+    } finally {
+        surahSelect.disabled = false;
+        surahJumpButton.disabled = false;
+    }
+}
+
+async function getSurahStartPage(surahNumber) {
+    if (surahPageCache.has(surahNumber)) return surahPageCache.get(surahNumber);
+    if (!surahCatalog.length) await loadSurahCatalog();
+    const surahIndex = surahCatalog.findIndex(surah => Number(surah.number) === surahNumber);
+    if (surahIndex < 0) throw new Error('Surah was not found.');
+
+    const firstAyahNumber = surahCatalog.slice(0, surahIndex).reduce((total, surah) => total + Number(surah.numberOfAyahs), 1);
+    const response = await fetch(`${AYAH_API}/${firstAyahNumber}/quran-uthmani`);
+    if (!response.ok) throw new Error(`Ayah request failed (${response.status}).`);
+    const payload = await response.json();
+    const pageNumber = Number(payload?.data?.page);
+    if (payload.code !== 200 || !Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > PAGE_COUNT) {
+        throw new Error('Unexpected surah starting page.');
+    }
+    surahPageCache.set(surahNumber, pageNumber);
+    return pageNumber;
+}
+
 async function loadPage(pageNumber, forceRefresh = false) {
     if (isLoading) return;
     currentPage = Math.min(PAGE_COUNT, Math.max(1, Math.trunc(pageNumber)));
@@ -172,6 +379,7 @@ async function loadPage(pageNumber, forceRefresh = false) {
     try {
         const pageData = await getPageData(currentPage, forceRefresh);
         renderPage(pageData);
+        recordKhatmaPage(currentPage);
         pageLoading.hidden = true;
         pageContent.hidden = false;
         try { localStorage.setItem(LAST_PAGE_KEY, String(currentPage)); } catch (error) { /* Reading still works without saved progress. */ }
@@ -188,6 +396,7 @@ async function loadPage(pageNumber, forceRefresh = false) {
         pagePaper.setAttribute('aria-busy', 'false');
         pagePaper.classList.remove('is-loading');
         updatePageControls();
+        renderKhatma();
     }
 }
 
@@ -215,8 +424,60 @@ document.getElementById('pageJumpForm').addEventListener('submit', event => {
     goToPage(pageNumber);
 });
 
+document.getElementById('surahJumpForm').addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!surahCatalog.length) {
+        const surahs = await loadSurahCatalog();
+        if (!surahs.length) return;
+        readerStatus.textContent = 'اختر السورة من القائمة ثم اضغط انتقال.';
+        return;
+    }
+    const surahNumber = Number.parseInt(surahSelect.value, 10);
+    if (!Number.isInteger(surahNumber)) {
+        readerStatus.textContent = 'اختر سورة أولًا للانتقال إليها.';
+        surahSelect.focus();
+        return;
+    }
+    if (isLoading) {
+        readerStatus.textContent = 'انتظر حتى يكتمل تحميل الصفحة الحالية.';
+        return;
+    }
+
+    surahJumpButton.disabled = true;
+    readerStatus.textContent = 'جارٍ تحديد صفحة السورة…';
+    try {
+        const pageNumber = await getSurahStartPage(surahNumber);
+        goToPage(pageNumber);
+    } catch (error) {
+        console.error('Unable to open selected surah:', error);
+        readerStatus.textContent = 'تعذّر تحديد صفحة السورة. تحقّق من اتصال الإنترنت وحاول مرة أخرى.';
+    } finally {
+        surahJumpButton.disabled = false;
+    }
+});
+
+khatmaForm.addEventListener('submit', event => {
+    event.preventDefault();
+    if (isLoading || !pageError.hidden) {
+        khatmaStatus.textContent = 'انتظر حتى تُحمّل صفحة المصحف بنجاح قبل بدء الخطة.';
+        return;
+    }
+    const durationDays = Number.parseInt(khatmaDurationInput.value, 10);
+    if (!Number.isInteger(durationDays) || durationDays < 1 || durationDays > PAGE_COUNT) {
+        khatmaStatus.textContent = 'اختر مدة بين يوم واحد و٦٠٤ أيام.';
+        khatmaDurationInput.focus();
+        return;
+    }
+    startKhatmaPlan(durationDays);
+});
+
+continueReadingButton.addEventListener('click', () => {
+    readingArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    readerStatus.textContent = `تابع القراءة من الصفحة ${toArabicNumber(currentPage)}.`;
+});
+
 document.addEventListener('keydown', event => {
-    if (event.altKey || event.ctrlKey || event.metaKey || event.target instanceof HTMLInputElement) return;
+    if (event.altKey || event.ctrlKey || event.metaKey || event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement || event.target instanceof HTMLTextAreaElement) return;
     if (event.key === 'ArrowLeft') goToPage(currentPage + 1);
     if (event.key === 'ArrowRight') goToPage(currentPage - 1);
 });
@@ -238,6 +499,8 @@ pagePaper.addEventListener('pointercancel', () => { touchStart = null; });
 
 updatePageControls();
 setMushafTheme(document.documentElement.dataset.theme, false);
+renderKhatma();
+loadSurahCatalog();
 loadPage(currentPage);
 
 if ('serviceWorker' in navigator) {

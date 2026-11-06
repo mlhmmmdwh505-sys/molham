@@ -20,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="mushaf.css?v=6">
+    <link rel="stylesheet" href="mushaf.css?v=7">
 </head>
 <body>
     <div class="mushaf-app">
@@ -52,16 +52,64 @@
                     <h1 id="readerTitle">اقرأ على مهل</h1>
                     <p>صفحات المصحف مرتبة كما في المصحف الشريف. تنقّل صفحةً صفحة، وسيُحفظ موضعك تلقائيًا.</p>
                 </div>
-                <form class="page-jump" id="pageJumpForm">
-                    <label for="pageNumberInput">اذهب إلى صفحة</label>
-                    <div class="jump-controls">
-                        <input id="pageNumberInput" type="number" inputmode="numeric" min="1" max="604" value="1" aria-label="رقم الصفحة من ١ إلى ٦٠٤">
-                        <button type="submit">انتقال</button>
-                    </div>
-                </form>
+                <div class="reader-jump-tools">
+                    <form class="page-jump" id="pageJumpForm">
+                        <label for="pageNumberInput">اذهب إلى صفحة</label>
+                        <div class="jump-controls">
+                            <input id="pageNumberInput" type="number" inputmode="numeric" min="1" max="604" value="1" aria-label="رقم الصفحة من ١ إلى ٦٠٤">
+                            <button type="submit">انتقال</button>
+                        </div>
+                    </form>
+                    <form class="surah-jump" id="surahJumpForm">
+                        <label for="surahSelect">اذهب إلى سورة</label>
+                        <div class="jump-controls">
+                            <select id="surahSelect" aria-label="اختر سورة للانتقال إليها">
+                                <option value="">جارٍ تحميل السور…</option>
+                            </select>
+                            <button id="surahJumpButton" type="submit">انتقال</button>
+                        </div>
+                    </form>
+                </div>
             </section>
 
-            <section class="reading-area" aria-label="صفحة المصحف">
+            <section class="khatma-card" aria-labelledby="khatmaTitle">
+                <div class="khatma-heading">
+                    <span class="khatma-mark" aria-hidden="true">۞</span>
+                    <div>
+                        <span class="khatma-eyebrow">خطة قراءة مرنة</span>
+                        <h2 id="khatmaTitle">متابع الختمة</h2>
+                        <p>حدد مدة الختمة، وسنحسب لك ورد اليوم من موضعك الحالي.</p>
+                    </div>
+                </div>
+                <div class="khatma-content">
+                    <div class="khatma-metrics">
+                        <div class="khatma-metric">
+                            <div class="khatma-metric-copy"><span>ورد اليوم</span><strong id="khatmaDailyProgress">—</strong></div>
+                            <div class="khatma-progress-track" role="progressbar" aria-label="إنجاز ورد اليوم" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="khatmaDailyFill"></span></div>
+                            <small id="khatmaDailyHint">ابدأ خطة لمعرفة عدد الصفحات المطلوبة اليوم.</small>
+                        </div>
+                        <div class="khatma-metric">
+                            <div class="khatma-metric-copy"><span>تقدم الختمة</span><strong id="khatmaOverallProgress">—</strong></div>
+                            <div class="khatma-progress-track" role="progressbar" aria-label="التقدم في الختمة" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="khatmaOverallFill"></span></div>
+                            <small id="khatmaOverallHint">تبدأ الخطة من الصفحة التي تقرؤها الآن.</small>
+                        </div>
+                    </div>
+                    <div class="khatma-actions">
+                        <form class="khatma-plan-form" id="khatmaForm">
+                            <label for="khatmaDuration">مدة الختمة</label>
+                            <div class="khatma-plan-controls">
+                                <input id="khatmaDuration" type="number" inputmode="numeric" min="1" max="604" value="30" aria-label="مدة الختمة بالأيام">
+                                <span>يوم</span>
+                                <button id="khatmaSaveButton" type="submit">ابدأ الخطة</button>
+                            </div>
+                        </form>
+                        <button class="continue-reading-button" id="continueReadingButton" type="button">كمّل القراءة</button>
+                    </div>
+                </div>
+                <p class="khatma-status" id="khatmaStatus" aria-live="polite">الصفحات التي تفتحها تُحسب مرة واحدة ضمن تقدم الخطة.</p>
+            </section>
+
+            <section class="reading-area" id="readingArea" aria-label="صفحة المصحف">
                 <div class="page-paper" id="pagePaper" aria-busy="true">
                     <div class="paper-inner">
                         <header class="paper-header">
@@ -117,6 +165,6 @@
             <span aria-hidden="true">۞</span>
         </footer>
     </div>
-    <script src="mushaf.js?v=5" defer></script>
+    <script src="mushaf.js?v=6" defer></script>
 </body>
 </html>
