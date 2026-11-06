@@ -34,7 +34,7 @@ const FIREBASE_CONFIG = {
     messagingSenderId: '527443679426',
     appId: '1:527443679426:web:a5b4de91a9507f8845c35b'
 };
-const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'surgeonTasks', 'focusLog'];
+const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme', 'surgeonTasks', 'focusLog'];
 let cloudUser = null;
 let cloudUnsubscribe = null;
 let guestModeSelected = false;
@@ -55,7 +55,10 @@ function updateThemeToggleLabel() {
 function setColorScheme(theme, persist = true) {
     const nextTheme = theme === 'light' ? 'light' : 'dark';
     document.documentElement.dataset.theme = nextTheme;
-    if (persist) localStorage.setItem('colorScheme', nextTheme);
+    if (persist) {
+        localStorage.setItem('colorScheme', nextTheme);
+        saveCloudStateImmediately();
+    }
 
     const themeColor = document.querySelector('meta[name="theme-color"]');
     if (themeColor) themeColor.content = nextTheme === 'light' ? '#fffaf1' : '#11190f';
@@ -621,6 +624,7 @@ function refreshDashboardFromStorage() {
     const savedName = localStorage.getItem('userName') || (currentLang === 'ar' ? 'ملهم' : 'Molham');
     const savedMins = parseFloat(localStorage.getItem('userMins')) || 25;
     const savedColor = localStorage.getItem('themeColor') || '#6366f1';
+    setColorScheme(localStorage.getItem('colorScheme') || 'dark', false);
     document.documentElement.style.setProperty('--primary', savedColor);
 
     if (document.getElementById('langSelect')) document.getElementById('langSelect').value = currentLang;
@@ -649,11 +653,19 @@ async function writeCloudState() {
     setCloudStatus('✓ تم الحفظ في حسابك', 'connected');
 }
 
+function cloudSyncErrorMessage(error) {
+    const code = String(error?.code || '').replace(/^firestore\//, '');
+    if (code === 'permission-denied') return 'رفضت قواعد Firestore الحفظ. انشر ملف firestore.rules من Firebase Console.';
+    if (code === 'failed-precondition' || code === 'not-found') return 'قاعدة Cloud Firestore غير مفعّلة أو غير موجودة في مشروع Firebase.';
+    if (code === 'unavailable' || code === 'network-request-failed') return 'تعذر الاتصال بـ Firebase؛ التغييرات الحالية محفوظة على هذا الجهاز فقط.';
+    return `تعذرت مزامنة الحساب${code ? ` (${code})` : ''}.`;
+}
+
 function saveCloudStateImmediately() {
     if (!cloudUser) return;
-    writeCloudState().catch(() => {
-        setCloudStatus('تعذر الحفظ السحابي', 'error');
-        showLoginError('تعذر حفظ التغييرات على السحابة. تحقق من الاتصال.');
+    writeCloudState().catch(error => {
+        setCloudStatus(cloudSyncErrorMessage(error), 'error');
+        console.warn('Cloud sync write error:', error);
     });
 }
 
@@ -676,9 +688,10 @@ function watchCloudState(user) {
 
     if (cloudUnsubscribe) cloudUnsubscribe();
     cloudUnsubscribe = firebase.firestore().collection('users').doc(user.uid).onSnapshot(snapshot => {
-        if (!snapshot.exists || !snapshot.data().state) {
+        const remoteState = snapshot.exists ? snapshot.data().state : null;
+        if (!remoteState || Object.keys(remoteState).length === 0) {
             // First use of an account: turn the current local dashboard into its cloud dashboard.
-            if (!snapshot.metadata.hasPendingWrites) saveCloudStateImmediately();
+            if (!snapshot.metadata.hasPendingWrites && !snapshot.metadata.fromCache) saveCloudStateImmediately();
             return;
         }
 
@@ -688,7 +701,7 @@ function watchCloudState(user) {
         applyCloudState(user, snapshot.data().state);
         setCloudStatus('✓ تمت مزامنة بيانات الحساب', 'connected');
     }, error => {
-        setCloudStatus('تعذر الاتصال بالسحابة', 'error');
+        setCloudStatus(cloudSyncErrorMessage(error), 'error');
         console.warn('Cloud sync listener error:', error);
     });
 }
