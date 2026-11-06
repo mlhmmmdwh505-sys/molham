@@ -8,7 +8,9 @@
     <title>المصحف الشريف | لوحة ملهم</title>
     <script>
         try {
-            document.documentElement.dataset.theme = localStorage.getItem('colorScheme') === 'light' ? 'light' : 'dark';
+            const savedMushafTheme = localStorage.getItem('mushafColorScheme');
+            const firstVisitTheme = localStorage.getItem('colorScheme');
+            document.documentElement.dataset.theme = (savedMushafTheme || firstVisitTheme) === 'light' ? 'light' : 'dark';
         } catch (error) {
             document.documentElement.dataset.theme = 'dark';
         }
@@ -18,7 +20,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="mushaf.css?v=3">
+    <link rel="stylesheet" href="mushaf.css?v=5">
 </head>
 <body>
     <div class="mushaf-app">
@@ -31,9 +33,15 @@
                 <span class="brand-mark" aria-hidden="true">۞</span>
                 <span><strong>المصحف الشريف</strong><small>قراءة صفحة بصفحة</small></span>
             </div>
-            <div class="saved-position" id="savedPosition" hidden>
-                <span class="saved-dot" aria-hidden="true"></span>
-                <span id="savedPositionText">موضعك محفوظ</span>
+            <div class="reader-header-actions">
+                <button class="reader-theme-toggle" id="readerThemeToggle" type="button" role="switch" aria-checked="false" aria-label="التبديل إلى الوضع الفاتح" title="التبديل إلى الوضع الفاتح">
+                    <span class="reader-mode-icon reader-mode-sun" aria-hidden="true">☼</span>
+                    <span class="reader-mode-icon reader-mode-moon" aria-hidden="true">☾</span>
+                </button>
+                <div class="saved-position" id="savedPosition" hidden>
+                    <span class="saved-dot" aria-hidden="true"></span>
+                    <span id="savedPositionText">موضعك محفوظ</span>
+                </div>
             </div>
         </header>
 
@@ -104,6 +112,6 @@
             <span aria-hidden="true">۞</span>
         </footer>
     </div>
-    <script src="mushaf.js?v=3" defer></script>
+    <script src="mushaf.js?v=4" defer></script>
 </body>
 </html>

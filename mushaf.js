@@ -19,9 +19,29 @@ const readerStatus = document.getElementById('readerStatus');
 const savedPosition = document.getElementById('savedPosition');
 const savedPositionText = document.getElementById('savedPositionText');
 const surahHeader = document.getElementById('surahHeader');
+const themeToggle = document.getElementById('readerThemeToggle');
 
 let currentPage = readLastPage();
 let isLoading = false;
+
+function setMushafTheme(theme, persist = true) {
+    const isLight = theme === 'light';
+    document.documentElement.dataset.theme = isLight ? 'light' : 'dark';
+    const label = isLight ? 'التبديل إلى الوضع الداكن' : 'التبديل إلى الوضع الفاتح';
+    themeToggle.setAttribute('aria-checked', String(isLight));
+    themeToggle.setAttribute('aria-label', label);
+    themeToggle.title = label;
+
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.content = '#123a34';
+    if (persist) {
+        try { localStorage.setItem('mushafColorScheme', isLight ? 'light' : 'dark'); } catch (error) { /* The page theme remains available without persistence. */ }
+    }
+}
+
+themeToggle.addEventListener('click', () => {
+    setMushafTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+});
 
 function readLastPage() {
     try {
@@ -204,6 +224,7 @@ pagePaper.addEventListener('pointerup', event => {
 pagePaper.addEventListener('pointercancel', () => { touchStart = null; });
 
 updatePageControls();
+setMushafTheme(document.documentElement.dataset.theme, false);
 loadPage(currentPage);
 
 if ('serviceWorker' in navigator) {
