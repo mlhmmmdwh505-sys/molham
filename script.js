@@ -18,7 +18,7 @@ let focusSegmentEndsAt = null;
 let focusToastTimeout = null;
 const GAME_PASS_COST = 200;
 const GAME_PASS_DURATION_MS = 5 * 60 * 1000;
-const SCRATCH_GAME_EMBED_URL = 'https://scratch.mit.edu/projects/10000036/embed';
+const SCRATCH_GAME_EMBED_URL = './pong.html';
 let gameSessionEndsAt = 0;
 let gameSessionInterval = null;
 let gameSessionTimeout = null;
@@ -79,7 +79,7 @@ const dashboardLabels = {
         waiting: 'مهام تنتظر إنجازك', focusHint: 'وقت تركيز فعلي', streakEmpty: 'ابدأ جلسة مذاكرة اليوم',
         noTasksToday: 'أنجز مهمة اليوم لتحصل على ١٠ نقاط', taskProgress: (done, total) => `أنجزت ${done} من ${total} مهام نشطة اليوم`,
         taskRewardNotice: 'أحسنت! +١٠ نقاط 🪙',
-        gameTitle: 'استراحة لعب على Scratch', gameSubtitle: 'لعبة Pong لمدة ٥ دقائق', gameCost: '٢٠٠ 🪙',
+        gameTitle: 'استراحة Pong بدون إنترنت', gameSubtitle: 'لعبة محلية لمدة ٥ دقائق', gameCost: '٢٠٠ 🪙',
         enterGame: 'العب Pong • ٢٠٠ نقطة', endGame: 'إنهاء اللعب', gameTimerButton: 'باقي',
         gameNeedPoints: points => `رصيدك ${points} / ٢٠٠ نقطة`,
         gameReady: 'جاهز للعب', gameActive: 'اللعبة مفتوحة داخل الموقع.',
@@ -100,7 +100,7 @@ const dashboardLabels = {
         waiting: 'Tasks waiting for you', focusHint: 'Focused time', streakEmpty: 'Start a study session today',
         noTasksToday: 'Finish a task today to earn 10 points', taskProgress: (done, total) => `${done} of ${total} active tasks completed today`,
         taskRewardNotice: 'Well done! +10 points 🪙',
-        gameTitle: 'Scratch game break', gameSubtitle: 'Pong for 5 minutes', gameCost: '200 🪙',
+        gameTitle: 'Offline Pong break', gameSubtitle: 'Local game for 5 minutes', gameCost: '200 🪙',
         enterGame: 'Play Pong • 200 points', endGame: 'End game', gameTimerButton: 'Left',
         gameNeedPoints: points => `Balance: ${points} / 200 points`,
         gameReady: 'Ready to play', gameActive: 'The game is open inside the dashboard.',
@@ -694,6 +694,10 @@ function watchCloudState(user) {
 }
 
 async function signInWithGoogle() {
+    if (!navigator.onLine) {
+        showLoginError('تسجيل Google والمزامنة بين الأجهزة يحتاجان اتصالًا بالإنترنت. يمكنك المتابعة كضيف الآن.');
+        return;
+    }
     if (!isFirebaseConfigured() || !window.firebase) {
         showLoginError('أضف إعدادات Firebase في ملف script.js لتفعيل تسجيل الدخول والحفظ بين الأجهزة.');
         return;
@@ -713,6 +717,7 @@ function initializeCloud() {
     document.getElementById('logoutButton')?.addEventListener('click', signOut);
     initializeAccountMenu('accountControl', 'accountMenuButton', 'accountMenu');
     initializeAccountMenu('guestAccountControl', 'guestAccountMenuButton', 'guestAccountMenu');
+    if (!navigator.onLine) continueAsGuest();
 
     if (!isFirebaseConfigured()) {
         showLoginError('أضف إعدادات Firebase في ملف script.js لتفعيل تسجيل الدخول والحفظ بين الأجهزة.');
@@ -720,11 +725,21 @@ function initializeCloud() {
     }
 
     if (!window.firebase) {
+        if (!navigator.onLine) {
+            continueAsGuest();
+            return;
+        }
         showLoginError('تعذر تحميل خدمة الحفظ. تحقق من اتصال الإنترنت ثم أعد المحاولة.');
         return;
     }
 
     firebase.initializeApp(FIREBASE_CONFIG);
+    const firestore = firebase.firestore();
+    if (typeof firestore.enablePersistence === 'function') {
+        firestore.enablePersistence({ synchronizeTabs: true }).catch(error => {
+            console.info('Offline Firestore persistence is unavailable in this browser:', error);
+        });
+    }
     firebase.auth().onAuthStateChanged(user => {
         cloudUser = user;
         setSignedInView(user);
@@ -734,9 +749,12 @@ function initializeCloud() {
             } catch (error) {
                 showLoginError('تم تسجيل الدخول، لكن تعذر تحميل بياناتك السحابية.');
             }
-        } else if (cloudUnsubscribe) {
-            cloudUnsubscribe();
-            cloudUnsubscribe = null;
+        } else {
+            if (cloudUnsubscribe) {
+                cloudUnsubscribe();
+                cloudUnsubscribe = null;
+            }
+            if (!navigator.onLine) continueAsGuest();
         }
     });
 }

@@ -1,11 +1,7 @@
 const PAGE_COUNT = 604;
-const PAGE_API = 'https://api.alquran.cloud/v1/page';
-const SURAH_API = 'https://api.alquran.cloud/v1/surah';
-const AYAH_API = 'https://api.alquran.cloud/v1/ayah';
 const LAST_PAGE_KEY = 'mushafLastPage';
 const KHATMA_PLAN_KEY = 'mushafKhatmaPlan';
 const pageCache = new Map();
-const surahPageCache = new Map();
 
 const pagePaper = document.getElementById('pagePaper');
 const pageContent = document.getElementById('pageContent');
@@ -46,6 +42,9 @@ const readingArea = document.getElementById('readingArea');
 let currentPage = readLastPage();
 let isLoading = false;
 let surahCatalog = [];
+let surahByNumber = new Map();
+let quranPages = null;
+let quranDataPromise = null;
 let khatmaPlan = readKhatmaPlan();
 
 function setMushafTheme(theme, persist = true) {
@@ -277,8 +276,8 @@ function renderPage(pageData) {
     let previousSurahNumber = null;
 
     ayahs.forEach((ayah, index) => {
-        const surah = ayah.surah || {};
-        const surahNumber = Number(surah.number);
+        const surahNumber = Number(ayah.surahNumber ?? ayah.surah?.number);
+        const surah = ayah.surah || surahByNumber.get(surahNumber) || { number: surahNumber };
         if (surahNumber && !seenSurahs.has(surahNumber)) seenSurahs.set(surahNumber, surah.name || `سورة ${surahNumber}`);
         if (surahNumber && surahNumber !== previousSurahNumber && Number(ayah.numberInSurah) === 1) {
             appendSurahHeading(pageContent, surah);
@@ -307,60 +306,57 @@ function renderPage(pageData) {
 
 async function getPageData(pageNumber, forceRefresh = false) {
     if (!forceRefresh && pageCache.has(pageNumber)) return pageCache.get(pageNumber);
-
-    const response = await fetch(`${PAGE_API}/${pageNumber}/quran-uthmani`);
-    if (!response.ok) throw new Error(`Page request failed (${response.status}).`);
-    const payload = await response.json();
-    if (payload.code !== 200 || !payload.data) throw new Error('Unexpected Quran page response.');
-    pageCache.set(pageNumber, payload.data);
-    return payload.data;
+    const pages = await loadQuranData();
+    const ayahs = pages?.[String(pageNumber)];
+    if (!Array.isArray(ayahs) || ayahs.length === 0) throw new Error(`No offline Quran data for page ${pageNumber}.`);
+    const pageData = { number: pageNumber, ayahs };
+    pageCache.set(pageNumber, pageData);
+    return pageData;
 }
 
-async function loadSurahCatalog() {
-    if (surahCatalog.length) return surahCatalog;
+async function loadQuranData() {
+    if (quranPages && surahCatalog.length) return quranPages;
+    if (quranDataPromise) return quranDataPromise;
     surahSelect.disabled = true;
     surahJumpButton.disabled = true;
-    surahSelect.replaceChildren(new Option('جارٍ تحميل السور…', ''));
-    try {
-        const response = await fetch(SURAH_API);
-        if (!response.ok) throw new Error(`Surah request failed (${response.status}).`);
-        const payload = await response.json();
-        if (payload.code !== 200 || !Array.isArray(payload.data)) throw new Error('Unexpected surah response.');
-        surahCatalog = payload.data;
+    surahSelect.replaceChildren(new Option('جارٍ تجهيز المصحف…', ''));
+    quranDataPromise = Promise.resolve().then(() => {
+        const payload = window.MUSHAF_OFFLINE_DATA;
+        if (!Array.isArray(payload?.surahs) || !payload?.pages || Object.keys(payload.pages).length !== PAGE_COUNT) {
+            throw new Error('Bundled Quran data is unavailable or incomplete.');
+        }
+        quranPages = payload.pages;
+        surahCatalog = payload.surahs;
+        surahByNumber = new Map(surahCatalog.map(surah => [Number(surah.number), surah]));
         const options = [new Option('اختر سورة…', '')];
         surahCatalog.forEach(surah => {
             options.push(new Option(`${toArabicNumber(surah.number)}. ${surah.name}`, String(surah.number)));
         });
         surahSelect.replaceChildren(...options);
         surahJumpButton.textContent = 'انتقال';
-        return surahCatalog;
+        return quranPages;
+    });
+    try {
+        return await quranDataPromise;
     } catch (error) {
-        console.error('Unable to load Quran surahs:', error);
-        surahSelect.replaceChildren(new Option('تعذّر تحميل السور', ''));
+        console.error('Unable to load offline Quran data:', error);
+        quranDataPromise = null;
+        surahSelect.replaceChildren(new Option('تعذّر تجهيز المصحف', ''));
         surahJumpButton.textContent = 'إعادة المحاولة';
-        readerStatus.textContent = 'تعذّر تحميل قائمة السور. تحقّق من اتصال الإنترنت ثم أعد المحاولة.';
-        return [];
+        readerStatus.textContent = 'تعذّر تجهيز ملفات المصحف المخزنة على الجهاز.';
+        throw error;
     } finally {
         surahSelect.disabled = false;
         surahJumpButton.disabled = false;
     }
 }
 
-async function getSurahStartPage(surahNumber) {
-    if (surahPageCache.has(surahNumber)) return surahPageCache.get(surahNumber);
-    if (!surahCatalog.length) await loadSurahCatalog();
-    const surahIndex = surahCatalog.findIndex(surah => Number(surah.number) === surahNumber);
-    if (surahIndex < 0) throw new Error('Surah was not found.');
-
-    const firstAyahNumber = surahCatalog.slice(0, surahIndex).reduce((total, surah) => total + Number(surah.numberOfAyahs), 1);
-    const response = await fetch(`${AYAH_API}/${firstAyahNumber}/quran-uthmani`);
-    if (!response.ok) throw new Error(`Ayah request failed (${response.status}).`);
-    const payload = await response.json();
-    const pageNumber = Number(payload?.data?.page);
-    if (payload.code !== 200 || !Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > PAGE_COUNT) {
-        throw new Error('Unexpected surah starting page.');
+function getSurahStartPage(surahNumber) {
+    const surah = surahByNumber.get(surahNumber);
+    const pageNumber = Number(surah?.page);
+    if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > PAGE_COUNT) {
+        throw new Error('Surah starting page is unavailable.');
     }
-    surahPageCache.set(surahNumber, pageNumber);
     return pageNumber;
 }
 
@@ -427,8 +423,8 @@ document.getElementById('pageJumpForm').addEventListener('submit', event => {
 document.getElementById('surahJumpForm').addEventListener('submit', async event => {
     event.preventDefault();
     if (!surahCatalog.length) {
-        const surahs = await loadSurahCatalog();
-        if (!surahs.length) return;
+        const pages = await loadQuranData().catch(() => null);
+        if (!pages) return;
         readerStatus.textContent = 'اختر السورة من القائمة ثم اضغط انتقال.';
         return;
     }
@@ -446,11 +442,11 @@ document.getElementById('surahJumpForm').addEventListener('submit', async event 
     surahJumpButton.disabled = true;
     readerStatus.textContent = 'جارٍ تحديد صفحة السورة…';
     try {
-        const pageNumber = await getSurahStartPage(surahNumber);
+        const pageNumber = getSurahStartPage(surahNumber);
         goToPage(pageNumber);
     } catch (error) {
         console.error('Unable to open selected surah:', error);
-        readerStatus.textContent = 'تعذّر تحديد صفحة السورة. تحقّق من اتصال الإنترنت وحاول مرة أخرى.';
+        readerStatus.textContent = 'تعذّر تحديد صفحة السورة من بيانات المصحف المخزنة.';
     } finally {
         surahJumpButton.disabled = false;
     }
@@ -500,7 +496,7 @@ pagePaper.addEventListener('pointercancel', () => { touchStart = null; });
 updatePageControls();
 setMushafTheme(document.documentElement.dataset.theme, false);
 renderKhatma();
-loadSurahCatalog();
+loadQuranData().catch(() => {});
 loadPage(currentPage);
 
 if ('serviceWorker' in navigator) {

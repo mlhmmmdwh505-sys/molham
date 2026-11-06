@@ -15,11 +15,9 @@
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="manifest" href="manifest.json?v=10">
+    <link rel="manifest" href="manifest.json?v=11">
     <link rel="icon" type="image/png" href="gnome-books.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Amiri+Quran&family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="fonts.css?v=1">
     <link rel="stylesheet" href="mushaf.css?v=7">
 </head>
 <body>
@@ -130,7 +128,7 @@
                         <article class="page-content" id="pageContent" aria-label="آيات الصفحة"></article>
                         <div class="page-error" id="pageError" hidden>
                             <span aria-hidden="true">☁</span>
-                            <p>تعذّر تحميل الصفحة. تحقّق من اتصال الإنترنت ثم أعد المحاولة.</p>
+                            <p>تعذّر تجهيز الصفحة من البيانات المخزنة. أعد المحاولة أو أعد فتح الموقع.</p>
                             <button type="button" id="retryPageButton">إعادة المحاولة</button>
                         </div>
                         <footer class="paper-footer" aria-hidden="true">
@@ -165,6 +163,7 @@
             <span aria-hidden="true">۞</span>
         </footer>
     </div>
-    <script src="mushaf.js?v=6" defer></script>
+    <script src="quran-data.js" defer></script>
+    <script src="mushaf.js?v=8" defer></script>
 </body>
 </html>
