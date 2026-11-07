@@ -172,6 +172,31 @@ button { -webkit-appearance: none; appearance: none; }
 .reader-footer { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; color: var(--reader-muted); font: 400 14px/1.5 'Amiri', serif; }
 .reader-footer span:first-child, .reader-footer span:last-child { color: var(--reader-gold); font-size: 16px; }
 
+.site-legal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    width: min(1064px, calc(100% - 56px));
+    margin: 0 auto 18px;
+    padding: 14px 18px;
+    border: 1px solid var(--reader-border);
+    border-radius: 18px;
+    background: var(--reader-surface);
+    color: var(--reader-muted);
+    font-size: 10px;
+    line-height: 1.8;
+}
+.site-footer-contact { display: flex; flex-wrap: wrap; align-items: center; gap: 7px 14px; }
+.site-footer-email-group { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+.site-footer-label, .site-footer-credit p { color: var(--paper-heading); font-weight: 800; }
+.site-footer-contact a { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; color: var(--reader-muted); text-decoration: none; }
+.site-footer-contact a:hover, .site-footer-contact bdi { color: var(--paper-ink); }
+.site-footer-ornament { display: grid; flex: 0 0 36px; width: 36px; height: 36px; place-items: center; border: 1px solid var(--reader-border); border-radius: 50%; background: color-mix(in srgb, var(--reader-gold) 12%, transparent); color: var(--reader-gold); font-size: 16px; line-height: 1; }
+.site-footer-credit { max-width: 490px; text-align: start; }
+.site-footer-credit p { margin-bottom: 2px; }
+.site-footer-credit small { font-size: 9px; }
+
 html[data-theme="light"] .page-paper { box-shadow: 0 22px 54px rgba(44,65,50,.16), 0 2px 0 rgba(255,255,255,.8) inset; }
 html[data-theme="light"] .reader-mode-sun { opacity: 0; transform: rotate(55deg) scale(.6); }
 html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) scale(1); }
@@ -241,6 +266,9 @@ html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) sc
     .progress-copy { font-size: 8px; }
     .reader-status { margin-top: 5px; font-size: 9px; }
     .reader-footer { margin-top: 10px; font-size: 12px; }
+    .site-legal-footer { align-items: flex-start; flex-direction: column; gap: 8px; width: calc(100% - 28px); margin-bottom: 14px; padding: 12px; }
+    .site-footer-contact { align-items: flex-start; flex-direction: column; gap: 3px; }
+    .site-footer-ornament { align-self: center; }
 }
 
 @media (prefers-reduced-motion: reduce) {
