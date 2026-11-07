@@ -1,4 +1,4 @@
-const CACHE_NAME = 'molham-dashboard-v67';
+const CACHE_NAME = 'molham-dashboard-v68';
 
 // الأصول والملفات المطلوبة للتخزين حتى يعمل الموقع بدون إنترنت
 const ASSETS_TO_CACHE = [
@@ -65,6 +65,25 @@ self.addEventListener('fetch', (e) => {
   if (request.method !== 'GET') return;
   const requestUrl = new URL(request.url);
   if (requestUrl.origin !== self.location.origin) return;
+
+  if (request.mode === 'navigate') {
+    e.respondWith((async () => {
+      try {
+        const response = await fetch(request, { cache: 'no-cache' });
+        if (response.ok) {
+          const cache = await caches.open(CACHE_NAME);
+          await cache.put(request, response.clone());
+        }
+        return response;
+      } catch (error) {
+        const cachedResponse = await caches.match(request);
+        if (cachedResponse) return cachedResponse;
+        const fallback = requestUrl.pathname.endsWith('/mushaf.html') ? './mushaf.html' : './index.html';
+        return (await caches.match(fallback)) || Response.error();
+      }
+    })());
+    return;
+  }
 
   e.respondWith((async () => {
     const cachedResponse = await caches.match(request);
