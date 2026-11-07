@@ -125,6 +125,10 @@ button { -webkit-appearance: none; appearance: none; }
     transition: opacity .22s ease, transform .22s ease, background .32s ease, border-color .32s ease, color .32s ease, box-shadow .32s ease;
     touch-action: pan-y;
 }
+.page-paper:focus,
+.page-paper:focus-visible,
+.reading-area:focus,
+.reading-area:focus-visible { outline: none !important; }
 .page-paper::before { position: absolute; z-index: 0; inset: 8px; border: 1px solid rgba(183, 156, 91, .32); border-radius: 14px; content: ''; pointer-events: none; }
 .paper-inner { position: relative; z-index: 1; display: flex; min-height: max(62dvh, 500px); flex-direction: column; padding: 20px clamp(20px, 5.4vw, 54px) 16px; }
 .paper-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 34px; color: var(--paper-heading); font: 700 15px/1.4 'Amiri', serif; }
@@ -254,6 +258,7 @@ body.page-zoom-mode .reader-header { position: fixed; z-index: 1200; inset: 0; m
 body.page-zoom-mode .reader-header > :not(.reader-header-actions) { display: none !important; }
 body.page-zoom-mode .reader-header-actions { position: fixed; z-index: 1201; top: 12px; right: 16px; pointer-events: auto; }
 body.page-zoom-mode .reader-header-actions > :not(.reader-zoom-toggle) { display: none !important; }
+body.page-zoom-mode #pageZoomToggle { position: fixed; z-index: 1202; top: 12px; right: 16px; }
 body.page-zoom-mode .reader-intro,
 body.page-zoom-mode .khatma-card,
 body.page-zoom-mode .page-navigation,
@@ -267,6 +272,7 @@ body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 108px); }
 body.page-zoom-mode .page-content { font-size: clamp(32px, 4vw, 46px); line-height: 2; }
 @media (max-width: 700px) {
     body.page-zoom-mode .reader-header-actions { top: 8px; right: 10px; }
+    body.page-zoom-mode #pageZoomToggle { top: 8px; right: 10px; }
     body.page-zoom-mode .reading-area { padding: 58px 6px 8px; }
     body.page-zoom-mode .page-paper { min-height: calc(100dvh - 66px); padding: 7px; border-radius: 15px; }
     body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 96px); padding: 14px 14px 12px; }

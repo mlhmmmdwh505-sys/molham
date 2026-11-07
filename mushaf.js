@@ -448,7 +448,7 @@ function getSurahStartPage(surahNumber) {
     return pageNumber;
 }
 
-async function loadPage(pageNumber, forceRefresh = false) {
+async function loadPage(pageNumber, forceRefresh = false, resetToPageStart = false) {
     if (isLoading) return;
     currentPage = Math.min(PAGE_COUNT, Math.max(1, Math.trunc(pageNumber)));
     isLoading = true;
@@ -481,12 +481,22 @@ async function loadPage(pageNumber, forceRefresh = false) {
         pagePaper.classList.remove('is-loading');
         updatePageControls();
         renderKhatma();
+        if (resetToPageStart && pageError.hidden) {
+            window.requestAnimationFrame(() => {
+                if (document.body.classList.contains('page-zoom-mode')) {
+                    readingArea.scrollTop = 0;
+                    readingArea.scrollLeft = 0;
+                } else {
+                    readingArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        }
     }
 }
 
 function goToPage(pageNumber) {
     if (!Number.isFinite(pageNumber)) return;
-    loadPage(pageNumber);
+    loadPage(pageNumber, false, true);
 }
 
 document.getElementById('previousPageButton').addEventListener('click', () => goToPage(currentPage - 1));
