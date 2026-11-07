@@ -266,6 +266,7 @@ body.page-zoom-mode .page-paper { width: min(1080px, 100%); min-height: calc(100
 body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 108px); }
 body.page-zoom-mode .page-content { font-size: clamp(32px, 4vw, 46px); line-height: 2; }
 @media (max-width: 700px) {
+    body.page-zoom-mode .reader-header-actions { top: 8px; right: 10px; }
     body.page-zoom-mode .reading-area { padding: 58px 6px 8px; }
     body.page-zoom-mode .page-paper { min-height: calc(100dvh - 66px); padding: 7px; border-radius: 15px; }
     body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 96px); padding: 14px 14px 12px; }

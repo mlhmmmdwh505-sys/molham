@@ -87,6 +87,18 @@ document.addEventListener('keydown', event => {
 });
 
 backLink.addEventListener('click', event => {
+    if (window.parent === window && window.opener && !window.opener.closed) {
+        try {
+            if (window.opener.location.origin === window.location.origin) {
+                event.preventDefault();
+                window.opener.focus();
+                window.close();
+                return;
+            }
+        } catch (error) {
+            // Keep the regular dashboard link when this page has no same-origin opener.
+        }
+    }
     if (window.parent === window) return;
     event.preventDefault();
     window.parent.postMessage({ type: 'molham:close-mushaf' }, '*');

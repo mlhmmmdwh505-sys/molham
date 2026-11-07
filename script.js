@@ -370,36 +370,6 @@ function updateGamePassUI(statusMessage = '') {
     }
 }
 
-function setMushafViewerBackgroundInert(inert) {
-    const modal = document.getElementById('mushafViewerModal');
-    Array.from(document.body.children).forEach(element => {
-        if (element !== modal && element.tagName !== 'SCRIPT') element.inert = inert;
-    });
-}
-
-function openMushafViewer() {
-    const modal = document.getElementById('mushafViewerModal');
-    const frame = document.getElementById('mushafViewerFrame');
-    if (!modal || !frame || !modal.hidden) return;
-    modal.hidden = false;
-    document.body.classList.add('mushaf-viewer-open');
-    setMushafViewerBackgroundInert(true);
-    updateMushafBreakStatus();
-    frame.src = 'mushaf.html';
-    document.getElementById('closeMushafViewerButton')?.focus({ preventScroll: true });
-}
-
-function closeMushafViewer() {
-    const modal = document.getElementById('mushafViewerModal');
-    if (!modal || modal.hidden) return;
-    modal.hidden = true;
-    document.body.classList.remove('mushaf-viewer-open');
-    const frame = document.getElementById('mushafViewerFrame');
-    if (frame) frame.src = 'about:blank';
-    setMushafViewerBackgroundInert(false);
-    document.getElementById('mushafOpenLink')?.focus({ preventScroll: true });
-}
-
 function setGameSessionBackgroundInert(inert) {
     const modal = document.getElementById('gameSessionModal');
     Array.from(document.body.children).forEach(element => {
@@ -575,32 +545,11 @@ function initializeDashboardFeatures() {
     });
     if (gameButton) gameButton.addEventListener('click', enterEmbeddedGame);
     if (endGameButton) endGameButton.addEventListener('click', () => endEmbeddedGameSession(false));
-    const mushafOpenLink = document.getElementById('mushafOpenLink');
-    const mushafViewer = document.getElementById('mushafViewerModal');
-    const mushafViewerFrame = document.getElementById('mushafViewerFrame');
-    const closeMushafViewerButton = document.getElementById('closeMushafViewerButton');
-    if (mushafOpenLink) mushafOpenLink.addEventListener('click', event => {
-        event.preventDefault();
-        openMushafViewer();
-    });
-    if (closeMushafViewerButton) closeMushafViewerButton.addEventListener('click', closeMushafViewer);
-    if (mushafViewer) mushafViewer.addEventListener('click', event => {
-        if (event.target === mushafViewer) closeMushafViewer();
-    });
-    window.addEventListener('message', event => {
-        if (mushafViewerFrame && event.source === mushafViewerFrame.contentWindow && event.data?.type === 'molham:close-mushaf') {
-            closeMushafViewer();
-        }
-    });
     const modalCloseButton = document.getElementById('closeGameModalButton');
     if (modalCloseButton) modalCloseButton.addEventListener('click', () => endEmbeddedGameSession(false));
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && gameSessionActive) {
             endEmbeddedGameSession(false);
-            return;
-        }
-        if (event.key === 'Escape' && mushafViewer && !mushafViewer.hidden) {
-            closeMushafViewer();
             return;
         }
         if (event.key === 'Escape' && document.body.classList.contains('focus-mode')) setFocusMode(false);
@@ -1247,27 +1196,6 @@ function setTimerDuration(minutes) {
     timerUsesHoursFormat = minutes >= 60;
 }
 
-function updateMushafBreakStatus() {
-    const status = document.getElementById('mushafBreakStatus');
-    if (!status) return;
-    status.hidden = !isBreak;
-    if (!isBreak) return;
-
-    const totalSeconds = Math.max(0, Math.floor(Number(timeLeft) || 0));
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-    const pad = value => String(value).padStart(2, '0');
-    const remaining = timerUsesHoursFormat || hours > 0
-        ? `${hours}:${pad(minutes)}:${pad(seconds)}`
-        : `${pad(Math.floor(totalSeconds / 60))}:${pad(seconds)}`;
-    const isArabic = currentLang === 'ar';
-    const state = timer === null
-        ? (isArabic ? 'الاستراحة متوقفة' : 'Break paused')
-        : (isArabic ? 'الاستراحة مستمرة' : 'Break running');
-    status.textContent = `${state} · ${remaining}`;
-}
-
 function updateTimerDisplay() {
     const totalSeconds = Math.max(0, Math.floor(Number(timeLeft) || 0));
     const hours = Math.floor(totalSeconds / 3600);
@@ -1282,7 +1210,6 @@ function updateTimerDisplay() {
             : `${pad(Math.floor(totalSeconds / 60))}:${pad(seconds)}`;
         displayElem.classList.toggle('has-hours', showHours);
     }
-    updateMushafBreakStatus();
     renderDailyOverview();
 }
 
