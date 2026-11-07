@@ -2176,6 +2176,75 @@ html[data-theme="light"] .game-session-overlay { background: rgba(21, 27, 42, .7
     .game-session-dialog { width: min(560px, 100%); }
 }
 
+/* The Quran reader stays over the dashboard so its timer keeps running underneath. */
+html.mushaf-session-open,
+body.mushaf-session-open { overflow: hidden !important; overscroll-behavior: none; }
+.mushaf-session-overlay[hidden] { display: none !important; }
+.mushaf-session-overlay {
+    position: fixed;
+    z-index: 2300;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: rgba(2, 6, 23, .82);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+.mushaf-session-dialog {
+    display: flex;
+    flex-direction: column;
+    width: min(1280px, 100%);
+    height: min(940px, calc(100dvh - 32px));
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--glass-border));
+    border-radius: 24px;
+    background: #0e2927;
+    color: #f3f4ed;
+    box-shadow: 0 28px 90px rgba(0, 0, 0, .48);
+}
+.mushaf-overlay-header {
+    display: flex;
+    flex: 0 0 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 5px 12px 5px 18px;
+    border-bottom: 1px solid rgba(226, 205, 153, .16);
+    background: #102a27;
+}
+.mushaf-overlay-header h2 { color: #f3f4ed; font-size: 14px; }
+.mushaf-break-status {
+    margin: 0 auto 0 0;
+    padding: 6px 11px;
+    border: 1px solid rgba(216, 189, 123, .34);
+    border-radius: 999px;
+    background: rgba(216, 189, 123, .1);
+    color: #e7d39f;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.mushaf-break-status[hidden] { display: none !important; }
+.mushaf-overlay-close {
+    width: 36px !important;
+    min-width: 36px !important;
+    height: 36px;
+    padding: 0 !important;
+    border-color: rgba(226, 205, 153, .22) !important;
+    border-radius: 12px !important;
+    font-size: 24px;
+}
+.mushaf-overlay-stage { flex: 1 1 auto; min-height: 0; }
+.mushaf-overlay-stage iframe { display: block; width: 100%; height: 100%; border: 0; background: #0e2927; }
+.mushaf-overlay-close:focus-visible { outline: 3px solid var(--primary) !important; outline-offset: 2px; }
+@media (max-width: 600px) {
+    .mushaf-session-overlay { padding: 0; }
+    .mushaf-session-dialog { width: 100%; height: 100dvh; border: 0; border-radius: 0; }
+    .mushaf-overlay-header { gap: 8px; padding-inline: 10px; }
+    .mushaf-break-status { padding: 5px 8px; font-size: 10px; }
+}
+
 /* Keep long timer readings readable without changing the timer layout. */
 #pomoDisplay.has-hours { font-size: clamp(46px, 9vw, 88px) !important; }
 body.focus-mode #pomoDisplay.has-hours { font-size: clamp(52px, 14vw, 126px) !important; }

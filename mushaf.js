@@ -69,11 +69,34 @@ themeToggle.addEventListener('click', () => {
 });
 
 function setPageZoomMode(enabled) {
+    const wasEnabled = document.body.classList.contains('page-zoom-mode');
+    if (wasEnabled === enabled) return;
+
+    pagePaper.getAnimations().forEach(animation => animation.cancel());
+    const fromRect = pagePaper.getBoundingClientRect();
     document.body.classList.toggle('page-zoom-mode', enabled);
+    const toRect = pagePaper.getBoundingClientRect();
     pageZoomToggle.setAttribute('aria-pressed', String(enabled));
     const label = enabled ? 'إغلاق تكبير صفحة المصحف' : 'تكبير صفحة المصحف';
     pageZoomToggle.setAttribute('aria-label', label);
     pageZoomToggle.title = label;
+
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && toRect.width && toRect.height) {
+        const translateX = fromRect.left - toRect.left;
+        const translateY = fromRect.top - toRect.top;
+        const scaleX = fromRect.width / toRect.width;
+        const scaleY = fromRect.height / toRect.height;
+        pagePaper.animate([
+            { transformOrigin: 'top left', transform: `translate(${translateX}px, ${translateY}px) scale(${scaleX}, ${scaleY})` },
+            { transformOrigin: 'top left', transform: 'translate(0, 0) scale(1, 1)' }
+        ], { duration: 680, easing: 'cubic-bezier(.22, .61, .36, 1)' });
+    }
+
+    if (enabled) {
+        window.requestAnimationFrame(() => readingArea.focus({ preventScroll: true }));
+    } else {
+        pageZoomToggle.focus({ preventScroll: true });
+    }
 }
 
 pageZoomToggle.addEventListener('click', () => {

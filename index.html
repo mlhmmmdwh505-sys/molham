@@ -8,7 +8,7 @@
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="stylesheet" href="style.css?v=72">
+    <link rel="stylesheet" href="style.css?v=75">
     <link rel="stylesheet" href="fonts.css?v=1">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=11">
@@ -48,7 +48,7 @@
                 <span>🪙 <span id="userPoints">0</span></span>
                 <button onclick="resetPoints()" class="reset-mini" title="تصفير النقاط">🗑️</button>
             </div>
-            <a class="mushaf-open-link" id="mushafOpenLink" href="mushaf.html" aria-label="فتح المصحف الشريف">
+            <a class="mushaf-open-link" id="mushafOpenLink" href="mushaf.html" aria-label="فتح المصحف الشريف" aria-haspopup="dialog" aria-controls="mushafSessionOverlay">
                 <span aria-hidden="true">📖</span><span>المصحف</span>
             </a>
             <button id="themeToggle" class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="التبديل إلى الوضع الفاتح" title="التبديل إلى الوضع الفاتح">
@@ -277,12 +277,24 @@
             </div>
         </section>
     </div>
+    <div class="mushaf-session-overlay" id="mushafSessionOverlay" hidden>
+        <section class="mushaf-session-dialog" role="dialog" aria-modal="true" aria-labelledby="mushafOverlayTitle">
+            <header class="mushaf-overlay-header">
+                <h2 id="mushafOverlayTitle">المصحف الشريف</h2>
+                <p class="mushaf-break-status" id="mushafBreakStatus" role="status" aria-live="off" hidden></p>
+                <button type="button" class="mushaf-overlay-close" id="closeMushafOverlayButton" aria-label="إغلاق المصحف">×</button>
+            </header>
+            <div class="mushaf-overlay-stage">
+                <iframe id="mushafFrame" title="المصحف الشريف" src="about:blank"></iframe>
+            </div>
+        </section>
+    </div>
     <nav class="mobile-quick-actions" id="mobileQuickActions" aria-label="اختصارات سريعة">
         <button type="button" id="quickAddTaskButton"><span aria-hidden="true">＋</span><span id="quickAddTaskLabel">إضافة مهمة</span></button>
         <button type="button" id="quickFocusButton"><span aria-hidden="true">⏱</span><span id="quickFocusLabel">بدء التركيز</span></button>
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script src="script.js?v=53"></script>
+    <script src="script.js?v=57"></script>
 </body>
 </html>

@@ -25,6 +25,7 @@ let gameSessionEndsAt = 0;
 let gameSessionInterval = null;
 let gameSessionTimeout = null;
 let gameSessionActive = false;
+let mushafSessionOpen = false;
 
 // Copy this object from Firebase Console > Project settings > Your apps > Web app.
 // Firebase config is public by design; the Firestore security rules protect each user's data.
@@ -377,6 +378,51 @@ function setGameSessionBackgroundInert(inert) {
     });
 }
 
+function setMushafSessionBackgroundInert(inert) {
+    const overlay = document.getElementById('mushafSessionOverlay');
+    Array.from(document.body.children).forEach(element => {
+        if (element !== overlay && element.tagName !== 'SCRIPT') element.inert = inert;
+    });
+}
+
+function openMushafOverlay() {
+    if (mushafSessionOpen) return;
+    const overlay = document.getElementById('mushafSessionOverlay');
+    const frame = document.getElementById('mushafFrame');
+    if (!overlay || !frame) return;
+
+    mushafSessionOpen = true;
+    overlay.hidden = false;
+    document.documentElement.classList.add('mushaf-session-open');
+    document.body.classList.add('mushaf-session-open');
+    setMushafSessionBackgroundInert(true);
+    updateMushafBreakStatus();
+    frame.addEventListener('load', () => {
+        if (!mushafSessionOpen) return;
+        try {
+            const readerPage = frame.contentDocument?.getElementById('pagePaper');
+            if (readerPage) readerPage.focus({ preventScroll: true });
+            else frame.contentWindow?.focus();
+        } catch (error) {
+            frame.focus({ preventScroll: true });
+        }
+    }, { once: true });
+    frame.src = './mushaf.html';
+}
+
+function closeMushafOverlay() {
+    if (!mushafSessionOpen) return;
+    mushafSessionOpen = false;
+    const overlay = document.getElementById('mushafSessionOverlay');
+    const frame = document.getElementById('mushafFrame');
+    document.documentElement.classList.remove('mushaf-session-open');
+    document.body.classList.remove('mushaf-session-open');
+    if (overlay) overlay.hidden = true;
+    if (frame) frame.src = 'about:blank';
+    setMushafSessionBackgroundInert(false);
+    document.getElementById('mushafOpenLink')?.focus({ preventScroll: true });
+}
+
 function endEmbeddedGameSession(expired = false) {
     if (!gameSessionActive) return;
     if (gameSessionInterval !== null) {
@@ -525,8 +571,9 @@ function initializeDashboardFeatures() {
     const gameButton = document.getElementById('gameEnterButton');
     const endGameButton = document.getElementById('closeGameSessionButton');
 
-    if (mushafOpenLink) mushafOpenLink.addEventListener('click', () => {
-        try { sessionStorage.setItem('mushafReturnFromDashboard', '1'); } catch (error) { /* The link still works without session storage. */ }
+    if (mushafOpenLink) mushafOpenLink.addEventListener('click', event => {
+        event.preventDefault();
+        openMushafOverlay();
     });
 
     if (taskList) {
@@ -552,7 +599,27 @@ function initializeDashboardFeatures() {
     if (endGameButton) endGameButton.addEventListener('click', () => endEmbeddedGameSession(false));
     const modalCloseButton = document.getElementById('closeGameModalButton');
     if (modalCloseButton) modalCloseButton.addEventListener('click', () => endEmbeddedGameSession(false));
+    document.getElementById('closeMushafOverlayButton')?.addEventListener('click', closeMushafOverlay);
+    document.getElementById('mushafSessionOverlay')?.addEventListener('click', event => {
+        if (event.target.id === 'mushafSessionOverlay') closeMushafOverlay();
+    });
+    const mushafFrame = document.getElementById('mushafFrame');
+    window.addEventListener('message', event => {
+        if (event.origin !== window.location.origin || event.source !== mushafFrame?.contentWindow) return;
+        if (event.data?.type === 'molham:close-mushaf') closeMushafOverlay();
+    });
     document.addEventListener('keydown', event => {
+        if (!mushafSessionOpen) return;
+        if (['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' '].includes(event.key)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }, true);
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape' && mushafSessionOpen) {
+            closeMushafOverlay();
+            return;
+        }
         if (event.key === 'Escape' && gameSessionActive) {
             endEmbeddedGameSession(false);
             return;
@@ -1217,7 +1284,29 @@ function updateTimerDisplay() {
             : `${pad(Math.floor(totalSeconds / 60))}:${pad(seconds)}`;
         displayElem.classList.toggle('has-hours', showHours);
     }
+    updateMushafBreakStatus();
     renderDailyOverview();
+}
+
+function updateMushafBreakStatus() {
+    const status = document.getElementById('mushafBreakStatus');
+    if (!status) return;
+    status.hidden = !mushafSessionOpen || !isBreak;
+    if (status.hidden) return;
+
+    const totalSeconds = Math.max(0, Math.floor(Number(timeLeft) || 0));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const pad = value => String(value).padStart(2, '0');
+    const remaining = timerUsesHoursFormat || hours > 0
+        ? `${hours}:${pad(minutes)}:${pad(seconds)}`
+        : `${pad(Math.floor(totalSeconds / 60))}:${pad(seconds)}`;
+    const isArabic = currentLang === 'ar';
+    const state = timer === null
+        ? (isArabic ? 'الاستراحة متوقفة' : 'Break paused')
+        : (isArabic ? 'الاستراحة مستمرة' : 'Break running');
+    status.textContent = `${state} · ${remaining}`;
 }
 
 // ==========================================
