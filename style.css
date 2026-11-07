@@ -1792,7 +1792,6 @@ body.focus-mode .glass-card {
 body.focus-mode .top-actions,
 body.focus-mode .account-control,
 body.focus-mode .date-tag,
-body.focus-mode > .site-legal-footer,
 body.focus-mode header,
 body.focus-mode .daily-overview,
 body.focus-mode .side-col,
@@ -2185,34 +2184,3 @@ body.focus-mode #pomoDisplay.has-hours { font-size: clamp(52px, 14vw, 126px) !im
     body.focus-mode #pomoDisplay.has-hours { font-size: clamp(42px, 12vw, 72px) !important; }
 }
 
-.site-legal-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    width: min(1120px, 100%);
-    margin: 16px auto 0;
-    padding: 16px 20px;
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    background: rgba(15, 23, 42, .62);
-    color: var(--text-muted);
-    font-size: 11px;
-    line-height: 1.8;
-}
-.site-footer-contact { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; }
-.site-footer-email-group { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
-.site-footer-label { color: var(--text-main); font-weight: 800; }
-.site-footer-contact a { display: inline-flex; flex-wrap: wrap; align-items: baseline; gap: 4px 7px; color: var(--text-muted); text-decoration: none; }
-.site-footer-contact a:hover { color: var(--text-main); }
-.site-footer-contact bdi { color: var(--text-main); }
-.site-footer-ornament { display: grid; flex: 0 0 38px; width: 38px; height: 38px; place-items: center; border: 1px solid var(--gold-border); border-radius: 50%; background: var(--gold-glow); color: var(--gold); font-size: 17px; line-height: 1; }
-.site-footer-credit { max-width: 520px; text-align: start; }
-.site-footer-credit p { margin-bottom: 2px; color: var(--text-main); }
-.site-footer-credit small { display: block; font-size: 10px; }
-@media (max-width: 767px) {
-    .site-legal-footer { align-items: flex-start; flex-direction: column; gap: 10px; margin-top: 12px; padding: 14px; border-radius: 17px; }
-    .site-footer-contact { align-items: flex-start; flex-direction: column; gap: 4px; }
-    .site-footer-credit { text-align: start; }
-    .site-footer-ornament { align-self: center; }
-}
