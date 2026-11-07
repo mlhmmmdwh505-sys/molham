@@ -80,6 +80,8 @@ function setPageZoomMode(enabled) {
     const label = enabled ? 'إغلاق تكبير صفحة المصحف' : 'تكبير صفحة المصحف';
     pageZoomToggle.setAttribute('aria-label', label);
     pageZoomToggle.title = label;
+    document.body.classList.remove('zoom-controls-hidden');
+    lastZoomScrollTop = 0;
 
     if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && toRect.width && toRect.height) {
         const translateX = fromRect.left - toRect.left;
@@ -98,6 +100,20 @@ function setPageZoomMode(enabled) {
         pageZoomToggle.focus({ preventScroll: true });
     }
 }
+
+let lastZoomScrollTop = 0;
+readingArea.addEventListener('scroll', () => {
+    if (!document.body.classList.contains('page-zoom-mode')) return;
+    const currentTop = readingArea.scrollTop;
+    if (currentTop <= 8) {
+        document.body.classList.remove('zoom-controls-hidden');
+    } else if (currentTop > lastZoomScrollTop + 2) {
+        document.body.classList.add('zoom-controls-hidden');
+    } else if (currentTop < lastZoomScrollTop - 2) {
+        document.body.classList.remove('zoom-controls-hidden');
+    }
+    lastZoomScrollTop = currentTop;
+}, { passive: true });
 
 pageZoomToggle.addEventListener('click', () => {
     setPageZoomMode(!document.body.classList.contains('page-zoom-mode'));
@@ -486,6 +502,8 @@ async function loadPage(pageNumber, forceRefresh = false, resetToPageStart = fal
                 if (document.body.classList.contains('page-zoom-mode')) {
                     readingArea.scrollTop = 0;
                     readingArea.scrollLeft = 0;
+                    document.body.classList.remove('zoom-controls-hidden');
+                    lastZoomScrollTop = 0;
                 } else {
                     readingArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
