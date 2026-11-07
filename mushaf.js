@@ -99,7 +99,22 @@ backLink.addEventListener('click', event => {
             // Keep the regular dashboard link when this page has no same-origin opener.
         }
     }
-    if (window.parent === window) return;
+    if (window.parent === window) {
+        try {
+            const previousPage = new URL(document.referrer);
+            const dashboardFile = new URL('index.html', window.location.href);
+            const dashboardDirectory = new URL('.', window.location.href);
+            const cameFromDashboard = previousPage.origin === window.location.origin
+                && (previousPage.pathname === dashboardFile.pathname || previousPage.pathname === dashboardDirectory.pathname);
+            if (cameFromDashboard && window.history.length > 1) {
+                event.preventDefault();
+                window.history.back();
+            }
+        } catch (error) {
+            // Keep the direct dashboard link available when there is no usable history entry.
+        }
+        return;
+    }
     event.preventDefault();
     window.parent.postMessage({ type: 'molham:close-mushaf' }, '*');
 });

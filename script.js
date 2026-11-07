@@ -556,7 +556,9 @@ function initializeDashboardFeatures() {
     });
     document.addEventListener('visibilitychange', checkGameSessionOnReturn);
     window.addEventListener('focus', checkGameSessionOnReturn);
-    window.addEventListener('pagehide', commitActiveFocusTime, { once: true });
+    window.addEventListener('pagehide', event => {
+        if (!event.persisted) commitActiveFocusTime();
+    });
     window.addEventListener('pagehide', () => {
         if (gameSessionActive) endEmbeddedGameSession(false);
     }, { once: true });
