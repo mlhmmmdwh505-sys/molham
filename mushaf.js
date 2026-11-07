@@ -24,6 +24,8 @@ const savedPosition = document.getElementById('savedPosition');
 const savedPositionText = document.getElementById('savedPositionText');
 const surahHeader = document.getElementById('surahHeader');
 const themeToggle = document.getElementById('readerThemeToggle');
+const pageZoomToggle = document.getElementById('pageZoomToggle');
+const backLink = document.querySelector('.back-link');
 const khatmaForm = document.getElementById('khatmaForm');
 const khatmaDurationInput = document.getElementById('khatmaDuration');
 const khatmaSaveButton = document.getElementById('khatmaSaveButton');
@@ -64,6 +66,30 @@ function setMushafTheme(theme, persist = true) {
 
 themeToggle.addEventListener('click', () => {
     setMushafTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
+});
+
+function setPageZoomMode(enabled) {
+    document.body.classList.toggle('page-zoom-mode', enabled);
+    pageZoomToggle.setAttribute('aria-pressed', String(enabled));
+    const label = enabled ? 'إغلاق تكبير صفحة المصحف' : 'تكبير صفحة المصحف';
+    pageZoomToggle.setAttribute('aria-label', label);
+    pageZoomToggle.title = label;
+}
+
+pageZoomToggle.addEventListener('click', () => {
+    setPageZoomMode(!document.body.classList.contains('page-zoom-mode'));
+});
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && document.body.classList.contains('page-zoom-mode')) {
+        setPageZoomMode(false);
+    }
+});
+
+backLink.addEventListener('click', event => {
+    if (window.parent === window) return;
+    event.preventDefault();
+    window.parent.postMessage({ type: 'molham:close-mushaf' }, '*');
 });
 
 function readLastPage() {

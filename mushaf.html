@@ -19,7 +19,7 @@
     <link rel="manifest" href="manifest.json?v=11">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="stylesheet" href="fonts.css?v=1">
-    <link rel="stylesheet" href="mushaf.css?v=12">
+    <link rel="stylesheet" href="mushaf.css?v=14">
 </head>
 <body>
     <div class="mushaf-app">
@@ -33,6 +33,9 @@
                 <span><strong>المصحف الشريف</strong><small>قراءة صفحة بصفحة</small></span>
             </div>
             <div class="reader-header-actions">
+                <button class="reader-zoom-toggle" id="pageZoomToggle" type="button" aria-pressed="false" aria-label="تكبير صفحة المصحف" title="تكبير صفحة المصحف">
+                    <span aria-hidden="true">⤢</span>
+                </button>
                 <button class="reader-theme-toggle" id="readerThemeToggle" type="button" role="switch" aria-checked="false" aria-label="التبديل إلى الوضع الفاتح" title="التبديل إلى الوضع الفاتح">
                     <span class="reader-mode-icon reader-mode-sun" aria-hidden="true">☼</span>
                     <span class="reader-mode-icon reader-mode-moon" aria-hidden="true">☾</span>
@@ -165,6 +168,6 @@
         </footer>
     </div>
     <script src="quran-data.js" defer></script>
-    <script src="mushaf.js?v=8" defer></script>
+    <script src="mushaf.js?v=9" defer></script>
 </body>
 </html>

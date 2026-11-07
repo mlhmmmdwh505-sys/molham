@@ -59,7 +59,9 @@ button { -webkit-appearance: none; appearance: none; }
 .reader-brand small { color: var(--reader-muted); font-size: 10px; }
 .reader-header-actions { display: flex; align-items: center; gap: 13px; }
 .reader-theme-toggle { position: relative; display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid var(--reader-border); border-radius: 50%; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; transition: background-color .28s ease, border-color .28s ease, transform .28s ease; }
+.reader-zoom-toggle { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid var(--reader-border); border-radius: 50%; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; font-size: 21px; line-height: 1; transition: background-color .28s ease, border-color .28s ease, transform .28s ease; }
 .reader-theme-toggle:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 3px; }
+.reader-zoom-toggle:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 3px; }
 .reader-mode-icon { position: absolute; inset: 0; display: grid; place-items: center; font-size: 21px; line-height: 1; transition: opacity .24s ease, transform .36s cubic-bezier(.22, 1, .36, 1); }
 .reader-mode-sun { opacity: 1; transform: rotate(0) scale(1); }
 .reader-mode-moon { opacity: 0; transform: rotate(-55deg) scale(.6); }
@@ -192,7 +194,7 @@ html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) sc
     .reader-brand strong { font-size: 12px; }
     .reader-brand small { font-size: 9px; }
     .reader-header-actions { gap: 0; }
-    .reader-theme-toggle { width: 38px; height: 38px; flex-basis: 38px; }
+    .reader-theme-toggle, .reader-zoom-toggle { width: 38px; height: 38px; flex-basis: 38px; }
     .saved-position { display: none; }
     .reader-main { margin-top: 20px; }
     .reader-intro { align-items: stretch; flex-direction: column; gap: 13px; margin-bottom: 14px; }
@@ -245,4 +247,27 @@ html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) sc
 
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+
+body.page-zoom-mode { overflow: hidden; }
+body.page-zoom-mode .reader-header { position: fixed; z-index: 1200; inset: 0; min-height: 0; pointer-events: none; }
+body.page-zoom-mode .reader-header > :not(.reader-header-actions) { display: none !important; }
+body.page-zoom-mode .reader-header-actions { position: fixed; z-index: 1201; top: 12px; right: 16px; pointer-events: auto; }
+body.page-zoom-mode .reader-header-actions > :not(.reader-zoom-toggle) { display: none !important; }
+body.page-zoom-mode .reader-intro,
+body.page-zoom-mode .khatma-card,
+body.page-zoom-mode .page-navigation,
+body.page-zoom-mode .reader-status,
+body.page-zoom-mode .reader-footer { display: none !important; }
+body.page-zoom-mode .mushaf-app { width: 100%; min-height: 100dvh; padding: 0; }
+body.page-zoom-mode .reader-main { width: 100%; max-width: none; margin: 0; }
+body.page-zoom-mode .reading-area { position: fixed; z-index: 1100; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: 62px 14px 14px; overflow: auto; background: rgba(7, 22, 23, .98); }
+body.page-zoom-mode .page-paper { width: min(1080px, 100%); min-height: calc(100dvh - 78px); margin: auto; padding: 14px; }
+body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 108px); }
+body.page-zoom-mode .page-content { font-size: clamp(32px, 4vw, 46px); line-height: 2; }
+@media (max-width: 700px) {
+    body.page-zoom-mode .reading-area { padding: 58px 6px 8px; }
+    body.page-zoom-mode .page-paper { min-height: calc(100dvh - 66px); padding: 7px; border-radius: 15px; }
+    body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 96px); padding: 14px 14px 12px; }
+    body.page-zoom-mode .page-content { font-size: clamp(30px, 8vw, 38px); line-height: 2; }
 }

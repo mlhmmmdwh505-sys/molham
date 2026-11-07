@@ -8,7 +8,7 @@
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="stylesheet" href="style.css?v=69">
+    <link rel="stylesheet" href="style.css?v=71">
     <link rel="stylesheet" href="fonts.css?v=1">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=11">
@@ -48,7 +48,7 @@
                 <span>🪙 <span id="userPoints">0</span></span>
                 <button onclick="resetPoints()" class="reset-mini" title="تصفير النقاط">🗑️</button>
             </div>
-            <a class="mushaf-open-link" href="mushaf.html" aria-label="فتح المصحف الشريف">
+            <a class="mushaf-open-link" id="mushafOpenLink" href="mushaf.html" aria-label="فتح المصحف الشريف" aria-haspopup="dialog" aria-controls="mushafViewerModal">
                 <span aria-hidden="true">📖</span><span>المصحف</span>
             </a>
             <button id="themeToggle" class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="التبديل إلى الوضع الفاتح" title="التبديل إلى الوضع الفاتح">
@@ -146,7 +146,7 @@
                     <span class="daily-stat-label" id="dailyCompletedLabel">إنجاز اليوم</span>
                     <strong id="dailyCompletedStat">0</strong>
                     <div class="daily-progress-track" aria-hidden="true"><span id="dailyProgressBar"></span></div>
-                    <small id="dailyProgressText">أنجز مهمة اليوم لتحصل على ١٠ نقاط</small>
+                    <small id="dailyProgressText">كل مهمة تمنحك ٥ نقاط، بحد أقصى ٣٠ نقطة مهام يوميًا</small>
                 </div>
             </article>
             <article class="daily-stat-card">
@@ -200,16 +200,16 @@
                         <span class="game-pass-icon" aria-hidden="true">🎮</span>
                         <div class="game-pass-heading-copy">
                             <h3 id="gamePassTitle">استراحة Pong بدون إنترنت</h3>
-                            <p id="gamePassSubtitle">لعبة محلية لمدة ٥ دقائق</p>
+                            <p id="gamePassSubtitle">لعبة محلية لمدة ١٠ دقائق</p>
                         </div>
-                        <span class="game-pass-cost" id="gamePassCost">٢٠٠ 🪙</span>
+                        <span class="game-pass-cost" id="gamePassCost">١٥٠ 🪙</span>
                     </div>
                     <div class="game-pass-actions">
-                        <button type="button" class="game-enter-button" id="gameEnterButton">العب Pong • ٢٠٠ نقطة</button>
+                        <button type="button" class="game-enter-button" id="gameEnterButton">العب Pong • ١٥٠ نقطة</button>
                         <button type="button" class="game-session-close" id="closeGameSessionButton" hidden>إنهاء اللعب</button>
                     </div>
                     <p class="game-pass-status" id="gamePassStatus" aria-live="polite">جاهز للدخول</p>
-                    <small class="game-pass-note" id="gamePassNote">تُغلق اللعبة تلقائيًا بعد ٥ دقائق. إنهاؤها مبكرًا لا يعيد النقاط.</small>
+                    <small class="game-pass-note" id="gamePassNote">تُغلق اللعبة تلقائيًا بعد ١٠ دقائق. إنهاؤها مبكرًا لا يعيد النقاط.</small>
                 </section>
             </aside>
 
@@ -266,7 +266,7 @@
                     <span class="game-session-icon" aria-hidden="true">🎮</span>
                     <div>
                         <h2 id="gameSessionModalTitle">لعبة Pong</h2>
-                <p><span id="gameSessionModalHint">تبقّى من وقت اللعب</span> <strong id="gameSessionCountdown" aria-live="off">05:00</strong></p>
+                <p><span id="gameSessionModalHint">تبقّى من وقت اللعب</span> <strong id="gameSessionCountdown" aria-live="off">10:00</strong></p>
                     </div>
                 </div>
                 <button type="button" class="game-session-modal-close" id="closeGameModalButton" aria-label="إنهاء وإغلاق اللعبة">×</button>
@@ -277,12 +277,22 @@
             </div>
         </section>
     </div>
+    <div class="mushaf-viewer-overlay" id="mushafViewerModal" hidden>
+        <section class="mushaf-viewer-dialog" role="dialog" aria-modal="true" aria-labelledby="mushafViewerTitle">
+            <div class="mushaf-viewer-toolbar">
+                <h2 id="mushafViewerTitle">المصحف الشريف</h2>
+                <p class="mushaf-break-status" id="mushafBreakStatus" role="status" aria-live="off" hidden></p>
+                <button type="button" id="closeMushafViewerButton" aria-label="إغلاق المصحف">×</button>
+            </div>
+            <iframe id="mushafViewerFrame" title="عارض المصحف الشريف" src="about:blank" loading="eager" allowfullscreen></iframe>
+        </section>
+    </div>
     <nav class="mobile-quick-actions" id="mobileQuickActions" aria-label="اختصارات سريعة">
         <button type="button" id="quickAddTaskButton"><span aria-hidden="true">＋</span><span id="quickAddTaskLabel">إضافة مهمة</span></button>
         <button type="button" id="quickFocusButton"><span aria-hidden="true">⏱</span><span id="quickFocusLabel">بدء التركيز</span></button>
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script src="script.js?v=46"></script>
+    <script src="script.js?v=50"></script>
 </body>
 </html>

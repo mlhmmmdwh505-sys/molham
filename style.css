@@ -2184,3 +2184,73 @@ body.focus-mode #pomoDisplay.has-hours { font-size: clamp(52px, 14vw, 126px) !im
     body.focus-mode #pomoDisplay.has-hours { font-size: clamp(42px, 12vw, 72px) !important; }
 }
 
+body.mushaf-viewer-open { overflow: hidden !important; }
+.mushaf-viewer-overlay[hidden] { display: none !important; }
+.mushaf-viewer-overlay {
+    position: fixed;
+    z-index: 2100;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 14px;
+    background: rgba(2, 8, 18, .78);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+.mushaf-viewer-dialog {
+    display: flex;
+    width: min(1180px, 100%);
+    height: min(920px, 100%);
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid rgba(216, 189, 123, .34);
+    border-radius: 22px;
+    background: #0e2927;
+    box-shadow: 0 28px 90px rgba(0, 0, 0, .48);
+}
+.mushaf-viewer-toolbar {
+    display: flex;
+    flex: 0 0 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 14px;
+    border-bottom: 1px solid rgba(216, 189, 123, .2);
+    color: #f3f4ed;
+}
+.mushaf-viewer-toolbar h2 { font-size: 13px; }
+.mushaf-break-status {
+    margin: 0 auto 0 0;
+    padding: 6px 10px;
+    border: 1px solid rgba(216, 189, 123, .34);
+    border-radius: 999px;
+    background: rgba(216, 189, 123, .1);
+    color: #e7d39f;
+    font-size: 12px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+.mushaf-break-status[hidden] { display: none !important; }
+.mushaf-viewer-toolbar button {
+    display: grid !important;
+    width: 34px;
+    min-width: 34px !important;
+    height: 34px;
+    place-items: center;
+    padding: 0 !important;
+    border: 1px solid rgba(216, 189, 123, .3) !important;
+    border-radius: 11px !important;
+    background: rgba(255, 255, 255, .06) !important;
+    color: #f3f4ed !important;
+    font-size: 22px;
+    line-height: 1;
+}
+.mushaf-viewer-toolbar button:focus-visible { outline: 2px solid #d8bd7b; outline-offset: 2px; }
+.mushaf-viewer-dialog iframe { display: block; width: 100%; min-height: 0; flex: 1; border: 0; background: #0e2927; }
+@media (max-width: 767px) {
+    .mushaf-viewer-overlay { padding: 5px; }
+    .mushaf-viewer-dialog { width: 100%; height: 100%; border-radius: 17px; }
+    .mushaf-viewer-toolbar { flex-basis: 43px; padding-inline: 10px; }
+    .mushaf-break-status { padding: 5px 8px; font-size: 10px; }
+}
+

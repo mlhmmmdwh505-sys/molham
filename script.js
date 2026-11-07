@@ -16,8 +16,10 @@ let totalSecondsWorked = 0; // لحساب ثواني العمل الفعلية �
 let focusStartedAt = null;
 let focusSegmentEndsAt = null;
 let focusToastTimeout = null;
-const GAME_PASS_COST = 200;
-const GAME_PASS_DURATION_MS = 5 * 60 * 1000;
+const GAME_PASS_COST = 150;
+const GAME_PASS_DURATION_MS = 10 * 60 * 1000;
+const TASK_REWARD_POINTS = 5;
+const DAILY_TASK_REWARD_LIMIT = 30;
 const SCRATCH_GAME_EMBED_URL = './pong.html';
 let gameSessionEndsAt = 0;
 let gameSessionInterval = null;
@@ -34,7 +36,7 @@ const FIREBASE_CONFIG = {
     messagingSenderId: '527443679426',
     appId: '1:527443679426:web:a5b4de91a9507f8845c35b'
 };
-const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme', 'surgeonTasks', 'focusLog'];
+const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme', 'surgeonTasks', 'focusLog', 'dailyTaskRewardState'];
 let cloudUser = null;
 let cloudUnsubscribe = null;
 let cloudSaveSequence = 0;
@@ -81,14 +83,14 @@ const dashboardLabels = {
     ar: {
         overview: 'ملخص اليوم', completed: 'إنجاز اليوم', remaining: 'مهام متبقية', focus: 'مذاكرة اليوم', streak: 'سلسلة الالتزام',
         waiting: 'مهام تنتظر إنجازك', focusHint: 'وقت تركيز فعلي', streakEmpty: 'ابدأ جلسة مذاكرة اليوم',
-        noTasksToday: 'أنجز مهمة اليوم لتحصل على ١٠ نقاط', taskProgress: (done, total) => `أنجزت ${done} من ${total} مهام نشطة اليوم`,
-        taskRewardNotice: 'أحسنت! +١٠ نقاط 🪙',
-        gameTitle: 'استراحة Pong بدون إنترنت', gameSubtitle: 'لعبة محلية لمدة ٥ دقائق', gameCost: '٢٠٠ 🪙',
-        enterGame: 'العب Pong • ٢٠٠ نقطة', endGame: 'إنهاء اللعب', gameTimerButton: 'باقي',
-        gameNeedPoints: points => `رصيدك ${points} / ٢٠٠ نقطة`,
+        noTasksToday: 'كل مهمة تمنحك ٥ نقاط، بحد أقصى ٣٠ نقطة مهام يوميًا', taskProgress: (done, total) => `أنجزت ${done} من ${total} مهام نشطة اليوم`,
+        taskRewardNotice: 'أحسنت! +٥ نقاط 🪙', taskRewardLimitNotice: 'وصلت للحد اليومي لنقاط المهام (٣٠). نقاط التركيز ما زالت تُحسب.',
+        gameTitle: 'استراحة Pong بدون إنترنت', gameSubtitle: 'لعبة محلية لمدة ١٠ دقائق', gameCost: '١٥٠ 🪙',
+        enterGame: 'العب Pong • ١٥٠ نقطة', endGame: 'إنهاء اللعب', gameTimerButton: 'باقي',
+        gameNeedPoints: points => `رصيدك ${points} / ١٥٠ نقطة`,
         gameReady: 'جاهز للعب', gameActive: 'اللعبة مفتوحة داخل الموقع.',
-        gameNote: 'تُغلق اللعبة تلقائيًا بعد ٥ دقائق. إنهاؤها مبكرًا لا يعيد النقاط.',
-        gameExpired: 'انتهت الخمس دقائق وأُغلقت اللعبة.', gameClosed: 'أنهيت اللعب مبكرًا. لا تُسترد النقاط.',
+        gameNote: 'تُغلق اللعبة تلقائيًا بعد ١٠ دقائق. إنهاؤها مبكرًا لا يعيد النقاط.',
+        gameExpired: 'انتهت ١٠ دقائق وأُغلقت اللعبة.', gameClosed: 'أنهيت اللعب مبكرًا. لا تُسترد النقاط.',
         gameModalTitle: 'لعبة Pong', gameModalHint: 'تبقّى من وقت اللعب', closeGameModal: 'إنهاء وإغلاق اللعبة',
         priority: 'الأولوية', taskAdd: 'إضافة مهمة',
         priorityHigh: 'عالية', priorityMedium: 'متوسطة', priorityLow: 'منخفضة',
@@ -102,14 +104,14 @@ const dashboardLabels = {
     en: {
         overview: 'Today at a glance', completed: 'Completed today', remaining: 'Tasks remaining', focus: 'Study time today', streak: 'Study streak',
         waiting: 'Tasks waiting for you', focusHint: 'Focused time', streakEmpty: 'Start a study session today',
-        noTasksToday: 'Finish a task today to earn 10 points', taskProgress: (done, total) => `${done} of ${total} active tasks completed today`,
-        taskRewardNotice: 'Well done! +10 points 🪙',
-        gameTitle: 'Offline Pong break', gameSubtitle: 'Local game for 5 minutes', gameCost: '200 🪙',
-        enterGame: 'Play Pong • 200 points', endGame: 'End game', gameTimerButton: 'Left',
-        gameNeedPoints: points => `Balance: ${points} / 200 points`,
+        noTasksToday: 'Each task earns 5 points, up to 30 task points per day', taskProgress: (done, total) => `${done} of ${total} active tasks completed today`,
+        taskRewardNotice: 'Well done! +5 points 🪙', taskRewardLimitNotice: 'Daily task reward limit reached (30). Focus points still count.',
+        gameTitle: 'Offline Pong break', gameSubtitle: 'Local game for 10 minutes', gameCost: '150 🪙',
+        enterGame: 'Play Pong • 150 points', endGame: 'End game', gameTimerButton: 'Left',
+        gameNeedPoints: points => `Balance: ${points} / 150 points`,
         gameReady: 'Ready to play', gameActive: 'The game is open inside the dashboard.',
-        gameNote: 'The game closes automatically after 5 minutes. Ending early does not refund points.',
-        gameExpired: 'Five minutes are up and the game was closed.', gameClosed: 'You ended the game early. Points are not refunded.',
+        gameNote: 'The game closes automatically after 10 minutes. Ending early does not refund points.',
+        gameExpired: 'Ten minutes are up and the game was closed.', gameClosed: 'You ended the game early. Points are not refunded.',
         gameModalTitle: 'Pong', gameModalHint: 'Time left', closeGameModal: 'End and close game',
         priority: 'Priority', taskAdd: 'Add task',
         priorityHigh: 'High', priorityMedium: 'Medium', priorityLow: 'Low',
@@ -140,6 +142,21 @@ function readStoredJSON(key, fallback) {
     } catch (error) {
         return fallback;
     }
+}
+
+function getDailyTaskRewardState() {
+    const today = getLocalDayKey();
+    const stored = readStoredJSON('dailyTaskRewardState', null);
+    if (stored && typeof stored === 'object' && stored.day === today) {
+        const earned = Number(stored.points);
+        return { day: today, points: Math.min(DAILY_TASK_REWARD_LIMIT, Math.max(0, Number.isFinite(earned) ? Math.floor(earned) : 0)) };
+    }
+
+    // Migrate today's task rewards from the previous 10-point system when possible.
+    const previouslyAwardedToday = getStoredTasks().filter(task => task.pointsAwarded && task.completedAt === today).length * 10;
+    const migratedState = { day: today, points: Math.min(DAILY_TASK_REWARD_LIMIT, previouslyAwardedToday) };
+    localStorage.setItem('dailyTaskRewardState', JSON.stringify(migratedState));
+    return migratedState;
 }
 
 function getStoredTasks() {
@@ -209,9 +226,10 @@ function renderDailyOverview() {
     document.getElementById('dailyFocusStat').textContent = formatStudyDuration(focusToday);
     document.getElementById('dailyStreakStat').textContent = labels.streakDays(streak);
     document.getElementById('dailyProgressBar').style.width = `${percent}%`;
+    const taskRewardState = getDailyTaskRewardState();
     document.getElementById('dailyProgressText').textContent = dailyTaskTotal
         ? labels.taskProgress(completedToday, dailyTaskTotal)
-        : labels.noTasksToday;
+        : taskRewardState.points >= DAILY_TASK_REWARD_LIMIT ? labels.taskRewardLimitNotice : labels.noTasksToday;
     document.getElementById('dailyRemainingHint').textContent = labels.waiting;
     document.getElementById('dailyFocusHint').textContent = labels.focusHint;
     document.getElementById('dailyStreakHint').textContent = streak ? labels.streak : labels.streakEmpty;
@@ -350,6 +368,36 @@ function updateGamePassUI(statusMessage = '') {
         const remaining = Math.max(0, gameSessionEndsAt - Date.now());
         progress.style.transform = `scaleX(${remaining / GAME_PASS_DURATION_MS})`;
     }
+}
+
+function setMushafViewerBackgroundInert(inert) {
+    const modal = document.getElementById('mushafViewerModal');
+    Array.from(document.body.children).forEach(element => {
+        if (element !== modal && element.tagName !== 'SCRIPT') element.inert = inert;
+    });
+}
+
+function openMushafViewer() {
+    const modal = document.getElementById('mushafViewerModal');
+    const frame = document.getElementById('mushafViewerFrame');
+    if (!modal || !frame || !modal.hidden) return;
+    modal.hidden = false;
+    document.body.classList.add('mushaf-viewer-open');
+    setMushafViewerBackgroundInert(true);
+    updateMushafBreakStatus();
+    frame.src = 'mushaf.html';
+    document.getElementById('closeMushafViewerButton')?.focus({ preventScroll: true });
+}
+
+function closeMushafViewer() {
+    const modal = document.getElementById('mushafViewerModal');
+    if (!modal || modal.hidden) return;
+    modal.hidden = true;
+    document.body.classList.remove('mushaf-viewer-open');
+    const frame = document.getElementById('mushafViewerFrame');
+    if (frame) frame.src = 'about:blank';
+    setMushafViewerBackgroundInert(false);
+    document.getElementById('mushafOpenLink')?.focus({ preventScroll: true });
 }
 
 function setGameSessionBackgroundInert(inert) {
@@ -527,11 +575,32 @@ function initializeDashboardFeatures() {
     });
     if (gameButton) gameButton.addEventListener('click', enterEmbeddedGame);
     if (endGameButton) endGameButton.addEventListener('click', () => endEmbeddedGameSession(false));
+    const mushafOpenLink = document.getElementById('mushafOpenLink');
+    const mushafViewer = document.getElementById('mushafViewerModal');
+    const mushafViewerFrame = document.getElementById('mushafViewerFrame');
+    const closeMushafViewerButton = document.getElementById('closeMushafViewerButton');
+    if (mushafOpenLink) mushafOpenLink.addEventListener('click', event => {
+        event.preventDefault();
+        openMushafViewer();
+    });
+    if (closeMushafViewerButton) closeMushafViewerButton.addEventListener('click', closeMushafViewer);
+    if (mushafViewer) mushafViewer.addEventListener('click', event => {
+        if (event.target === mushafViewer) closeMushafViewer();
+    });
+    window.addEventListener('message', event => {
+        if (mushafViewerFrame && event.source === mushafViewerFrame.contentWindow && event.data?.type === 'molham:close-mushaf') {
+            closeMushafViewer();
+        }
+    });
     const modalCloseButton = document.getElementById('closeGameModalButton');
     if (modalCloseButton) modalCloseButton.addEventListener('click', () => endEmbeddedGameSession(false));
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape' && gameSessionActive) {
             endEmbeddedGameSession(false);
+            return;
+        }
+        if (event.key === 'Escape' && mushafViewer && !mushafViewer.hidden) {
+            closeMushafViewer();
             return;
         }
         if (event.key === 'Escape' && document.body.classList.contains('focus-mode')) setFocusMode(false);
@@ -1178,6 +1247,27 @@ function setTimerDuration(minutes) {
     timerUsesHoursFormat = minutes >= 60;
 }
 
+function updateMushafBreakStatus() {
+    const status = document.getElementById('mushafBreakStatus');
+    if (!status) return;
+    status.hidden = !isBreak;
+    if (!isBreak) return;
+
+    const totalSeconds = Math.max(0, Math.floor(Number(timeLeft) || 0));
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const pad = value => String(value).padStart(2, '0');
+    const remaining = timerUsesHoursFormat || hours > 0
+        ? `${hours}:${pad(minutes)}:${pad(seconds)}`
+        : `${pad(Math.floor(totalSeconds / 60))}:${pad(seconds)}`;
+    const isArabic = currentLang === 'ar';
+    const state = timer === null
+        ? (isArabic ? 'الاستراحة متوقفة' : 'Break paused')
+        : (isArabic ? 'الاستراحة مستمرة' : 'Break running');
+    status.textContent = `${state} · ${remaining}`;
+}
+
 function updateTimerDisplay() {
     const totalSeconds = Math.max(0, Math.floor(Number(timeLeft) || 0));
     const hours = Math.floor(totalSeconds / 3600);
@@ -1192,6 +1282,7 @@ function updateTimerDisplay() {
             : `${pad(Math.floor(totalSeconds / 60))}:${pad(seconds)}`;
         displayElem.classList.toggle('has-hours', showHours);
     }
+    updateMushafBreakStatus();
     renderDailyOverview();
 }
 
@@ -1382,17 +1473,25 @@ window.toggleTask = function(index) {
     if (!task) return;
     task.done = !task.done;
     task.completedAt = task.done ? getLocalDayKey() : null;
-    const reward = task.done && !task.pointsAwarded;
-    if (reward) {
+    const firstCompletion = task.done && !task.pointsAwarded;
+    let reward = 0;
+    if (firstCompletion) {
         task.pointsAwarded = true;
-        points = (Number.isFinite(points) ? points : 0) + 10;
-        localStorage.setItem('userPoints', String(points));
-        updatePointsDisplay();
+        const rewardState = getDailyTaskRewardState();
+        reward = Math.min(TASK_REWARD_POINTS, DAILY_TASK_REWARD_LIMIT - rewardState.points);
+        if (reward > 0) {
+            rewardState.points += reward;
+            localStorage.setItem('dailyTaskRewardState', JSON.stringify(rewardState));
+            points = (Number.isFinite(points) ? points : 0) + reward;
+            localStorage.setItem('userPoints', String(points));
+            updatePointsDisplay();
+        }
     }
     localStorage.setItem('surgeonTasks', JSON.stringify(tasks));
     saveCloudStateImmediately();
     renderTasks();
-    if (reward) showDashboardNotice(getDashboardLabels().taskRewardNotice);
+    if (reward > 0) showDashboardNotice(getDashboardLabels().taskRewardNotice);
+    else if (firstCompletion) showDashboardNotice(getDashboardLabels().taskRewardLimitNotice);
 }
 
 window.deleteTask = function(index) {
