@@ -100,6 +100,18 @@ backLink.addEventListener('click', event => {
         }
     }
     if (window.parent === window) {
+        let openedFromDashboard = false;
+        try {
+            openedFromDashboard = sessionStorage.getItem('mushafReturnFromDashboard') === '1';
+            if (openedFromDashboard) sessionStorage.removeItem('mushafReturnFromDashboard');
+        } catch (error) {
+            // Fall back to the regular dashboard link when session storage is unavailable.
+        }
+        if (openedFromDashboard && window.history.length > 1) {
+            event.preventDefault();
+            window.history.back();
+            return;
+        }
         try {
             const previousPage = new URL(document.referrer);
             const dashboardFile = new URL('index.html', window.location.href);

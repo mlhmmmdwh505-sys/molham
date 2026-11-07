@@ -518,11 +518,16 @@ function applyDashboardLanguage() {
 function initializeDashboardFeatures() {
     const taskList = document.getElementById('taskList');
     const taskInput = document.getElementById('taskInput');
+    const mushafOpenLink = document.getElementById('mushafOpenLink');
     const focusButton = document.getElementById('focusModeToggle');
     const quickAddButton = document.getElementById('quickAddTaskButton');
     const quickFocusButton = document.getElementById('quickFocusButton');
     const gameButton = document.getElementById('gameEnterButton');
     const endGameButton = document.getElementById('closeGameSessionButton');
+
+    if (mushafOpenLink) mushafOpenLink.addEventListener('click', () => {
+        try { sessionStorage.setItem('mushafReturnFromDashboard', '1'); } catch (error) { /* The link still works without session storage. */ }
+    });
 
     if (taskList) {
         taskList.addEventListener('click', event => {
