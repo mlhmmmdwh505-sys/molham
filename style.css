@@ -2529,8 +2529,13 @@ body.focus-mode .focus-timer-ring {
     align-self: center !important;
     width: min(42vw, 36vh, 460px) !important;
 }
-body.focus-mode .focus-timer-ring #pomoDisplay { font-size: clamp(44px, min(10vw, 14vh), 112px) !important; }
-body.focus-mode .focus-timer-ring #pomoDisplay.has-hours { font-size: clamp(26px, min(6vw, 6vh), 56px) !important; }
+body.focus-mode .focus-timer-ring #pomoDisplay {
+    width: 100%;
+    font-size: clamp(34px, min(6vw, 10vh), 72px) !important;
+    text-align: center;
+    white-space: nowrap;
+}
+body.focus-mode .focus-timer-ring #pomoDisplay.has-hours { font-size: clamp(24px, min(4vw, 6vh), 46px) !important; }
 body.focus-mode .pomo-actions {
     position: static !important;
     inset: auto !important;
