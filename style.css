@@ -1887,9 +1887,34 @@ body.focus-mode .pomo-actions button { display: inline-flex !important; visibili
     .focus-session-toast { bottom: 78px; }
     body.focus-mode { padding: 8px !important; }
     body.focus-mode .glass-card { min-height: calc(100dvh - 16px) !important; height: calc(100dvh - 16px) !important; padding: 12px !important; border-radius: 22px !important; }
-    body.focus-mode .focus-card { padding: 70px 8px 18px !important; gap: 20px !important; }
+    body.focus-mode .focus-card {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: 48px minmax(0, 1fr) !important;
+        justify-content: initial !important;
+        justify-items: center !important;
+        align-items: stretch !important;
+        padding: 12px 8px 82px !important;
+        gap: 0 !important;
+    }
+    body.focus-mode .focus-mode-toggle {
+        position: static !important;
+        top: auto !important;
+        inset-inline-end: auto !important;
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        justify-self: end !important;
+        align-self: start !important;
+        margin: 0 !important;
+    }
+    body.focus-mode #pomoDisplay {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        justify-self: center !important;
+        align-self: center !important;
+        margin: 0 !important;
+    }
     body.focus-mode #pomoDisplay { font-size: clamp(88px, 25vw, 150px) !important; }
-    body.focus-mode .focus-mode-toggle { top: 14px; inset-inline-end: 12px; }
     body.focus-mode .focus-session-toast { bottom: 18px; }
 }
 
