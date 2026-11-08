@@ -2406,4 +2406,37 @@ body.focus-mode #pomoDisplay.has-hours { font-size: clamp(52px, 14vw, 126px) !im
     body.focus-mode #pomoDisplay.has-hours { font-size: clamp(42px, 12vw, 72px) !important; }
 }
 
+@media (max-width: 480px), (max-height: 680px) {
+    body.focus-mode .focus-card {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        grid-template-rows: 42px minmax(0, 1fr) !important;
+        padding: 10px 8px 78px !important;
+        gap: 0 !important;
+    }
+    body.focus-mode .focus-mode-toggle {
+        position: static !important;
+        top: auto !important;
+        inset-inline-end: auto !important;
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        justify-self: end !important;
+        align-self: start !important;
+        height: 34px !important;
+        padding-inline: 11px !important;
+        font-size: 11px !important;
+    }
+    body.focus-mode #pomoDisplay {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        justify-self: center !important;
+        align-self: center !important;
+        margin: 0 !important;
+        font-size: clamp(74px, 20vw, 112px) !important;
+    }
+    body.focus-mode #pomoDisplay.has-hours { font-size: clamp(38px, 11vw, 60px) !important; }
+    body.focus-mode .pomo-actions { bottom: clamp(18px, 5vh, 28px) !important; }
+    body.focus-mode .pomo-actions button { height: 42px !important; font-size: 13px !important; }
+}
+
 
