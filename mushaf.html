@@ -6,6 +6,7 @@
     <meta name="theme-color" content="#123a34">
     <meta name="description" content="اقرأ المصحف الشريف صفحةً صفحة، مع حفظ موضع القراءة تلقائيًا.">
     <meta name="copyright" content="Copyright © 2026 Molham Mamdouh. Original website materials reserved.">
+    <link rel="canonical" href="https://mlhmmmdwh505-sys.github.io/mushaf.html">
     <title>المصحف الشريف | لوحة ملهم</title>
     <script>
         try {
@@ -19,7 +20,7 @@
     <link rel="manifest" href="manifest.json?v=11">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="stylesheet" href="fonts.css?v=1">
-    <link rel="stylesheet" href="mushaf.css?v=21">
+    <link rel="stylesheet" href="mushaf.css?v=23">
 </head>
 <body>
     <div class="mushaf-app">
@@ -111,6 +112,47 @@
                 <p class="khatma-status" id="khatmaStatus" aria-live="polite">الصفحات التي تفتحها تُحسب مرة واحدة ضمن تقدم الخطة.</p>
             </section>
 
+            <section class="daily-surah-card" aria-labelledby="dailySurahTitle">
+                <div class="khatma-heading">
+                    <span class="khatma-mark" aria-hidden="true">۞</span>
+                    <div>
+                        <span class="khatma-eyebrow">وِرد سورة واحدة</span>
+                        <h2 id="dailySurahTitle">ختم سورة كل يوم</h2>
+                        <p>اختر سورة مختلفة أو كررها، وسجّل إنجاز سورة واحدة في كل يوم من خطتك.</p>
+                    </div>
+                </div>
+                <div class="daily-surah-content">
+                    <div class="daily-surah-metric">
+                        <div class="khatma-metric-copy"><span>الأيام المنجزة</span><strong id="dailySurahProgress">—</strong></div>
+                        <div class="khatma-progress-track" role="progressbar" aria-label="إنجاز خطة السورة اليومية" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="dailySurahFill"></span></div>
+                        <small id="dailySurahHint">اختر سورة ومدة الخطة للبدء.</small>
+                    </div>
+                    <form class="daily-surah-form" id="dailySurahForm">
+                        <div class="daily-surah-fields">
+                            <div class="daily-surah-field daily-surah-select-field">
+                                <label for="dailySurahSelect">سورة اليوم</label>
+                                <select id="dailySurahSelect" required aria-label="اختر سورة اليوم">
+                                    <option value="">جارٍ تحميل السور…</option>
+                                </select>
+                            </div>
+                            <div class="daily-surah-field daily-surah-duration-field">
+                                <label for="dailySurahDuration">مدة الخطة</label>
+                                <div class="daily-surah-duration-control">
+                                    <input id="dailySurahDuration" type="number" inputmode="numeric" min="1" max="3650" value="7" required aria-label="مدة الخطة بالأيام">
+                                    <span>يوم</span>
+                                </div>
+                            </div>
+                            <button class="daily-surah-start continue-reading-button" id="dailySurahStartButton" type="submit">ابدأ الخطة</button>
+                        </div>
+                        <div class="daily-surah-actions">
+                            <button class="continue-reading-button" id="readDailySurahButton" type="button" disabled>اقرأ سورة اليوم</button>
+                            <button class="daily-surah-complete continue-reading-button" id="completeDailySurahButton" type="button" disabled>سجّلت إتمام السورة</button>
+                        </div>
+                    </form>
+                </div>
+                <p class="khatma-status" id="dailySurahStatus" aria-live="polite">يُحفظ تقدم الخطة على هذا الجهاز.</p>
+            </section>
+
             <section class="reading-area" id="readingArea" tabindex="-1" aria-label="صفحة المصحف">
                 <div class="page-paper" id="pagePaper" tabindex="-1" aria-busy="true">
                     <div class="paper-inner">
@@ -168,6 +210,6 @@
         </footer>
     </div>
     <script src="quran-data.js" defer></script>
-    <script src="mushaf.js?v=18" defer></script>
+    <script src="mushaf.js?v=19" defer></script>
 </body>
 </html>

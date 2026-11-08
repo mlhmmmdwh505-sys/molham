@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0d2420">
+    <meta name="description" content="سبحة إلكترونية لمتابعة تسبيحك ووردك اليومي في صفحة هادئة وخفيفة.">
+    <title>السبحة | لوحة ملهم</title>
+    <link rel="manifest" href="manifest.json?v=11">
+    <link rel="icon" type="image/png" href="gnome-books.png">
+    <link rel="stylesheet" href="fonts.css?v=1">
+    <link rel="stylesheet" href="tasbeeh.css?v=15">
+</head>
+<body>
+    <div class="tasbeeh-app">
+        <header class="tasbeeh-header">
+            <a class="back-link" href="index.html" aria-label="العودة إلى لوحة التحكم">
+                <span class="back-arrow" aria-hidden="true">→</span>
+                <span class="back-copy"><small>العودة إلى</small><strong>لوحة التحكم</strong></span>
+            </a>
+            <a class="page-brand" href="#mainContent" aria-label="السبحة">
+                <span class="brand-mark" aria-hidden="true">۞</span>
+                <span><strong>السبحة</strong><small>مساحة صغيرة للذكر</small></span>
+            </a>
+            <div class="tasbeeh-header-actions">
+                <button class="zoom-button" id="zoomToggle" type="button" aria-pressed="false" aria-label="تكبير السبحة" title="تكبير السبحة"><span aria-hidden="true">⤢</span></button>
+                <button class="theme-button" id="themeToggle" type="button" aria-label="التبديل إلى الوضع الفاتح" title="التبديل إلى الوضع الفاتح">☼</button>
+            </div>
+        </header>
+
+        <main class="tasbeeh-main" id="mainContent">
+            <section class="page-intro" aria-labelledby="pageTitle">
+                <span class="eyebrow"><span aria-hidden="true">✦</span> خُذ لحظة هدوء</span>
+                <h1 id="pageTitle">اذكر الله بقلب حاضر</h1>
+                <p>اختر التسبيح واضغط على السبحة للعدّ، وتابع إنجازك اليومي.</p>
+            </section>
+
+            <div class="tasbeeh-grid">
+                <section class="counter-card" aria-labelledby="counterTitle">
+                    <div class="counter-card-head">
+                        <div>
+                            <span class="card-eyebrow">سبحتك الآن</span>
+                            <h2 id="counterTitle">السبحة الإلكترونية</h2>
+                        </div>
+                        <span class="round-badge" id="roundCount">٠ جولات</span>
+                    </div>
+
+                    <p class="active-dhikr" id="activeDhikrText">سُبْحَانَ اللَّهِ</p>
+
+                    <label class="dhikr-select-control" for="dhikrSelect">
+                        <span class="dhikr-select-mark" aria-hidden="true">✧</span>
+                        <span class="dhikr-select-label">التسبيح</span>
+                        <select id="dhikrSelect" aria-label="اختيار التسبيح">
+                            <option value="subhanAllah">سُبْحَانَ اللَّهِ</option>
+                            <option value="alhamdulillah">الْحَمْدُ لِلَّهِ</option>
+                            <option value="allahuAkbar">اللَّهُ أَكْبَرُ</option>
+                            <option value="astaghfirullah">أَسْتَغْفِرُ اللَّهَ</option>
+                            <option value="allahummaAntaAlsalam">اللَّهُمَّ أَنْتَ السَّلَامُ</option>
+                            <option value="tahlilAfterPrayer">تهليل ختام الصلاة</option>
+                            <option value="subhanAllahDaily">سُبْحَانَ اللَّهِ وَبِحَمْدِهِ</option>
+                            <option value="tahlilDaily">لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ</option>
+                            <option value="laHawla">لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ</option>
+                        </select>
+                        <span class="select-chevron" aria-hidden="true">⌄</span>
+                    </label>
+
+                    <div class="counter-orbit" id="counterOrbit" style="--progress: 0deg">
+                        <button class="counter-button" id="countButton" type="button" aria-label="زيادة عدّ التسبيح">
+                            <span class="count-value" id="countValue">٠</span>
+                            <span class="count-divider" aria-hidden="true"></span>
+                            <span class="count-target" id="targetValue">٣٣</span>
+                            <span class="counter-prompt">اضغط للتسبيح</span>
+                        </button>
+                    </div>
+
+                    <p class="counter-status" id="counterStatus" role="status" aria-live="polite">ابدأ على مهل، تقبّل الله منك.</p>
+
+                    <div class="target-picker" role="group" aria-label="اختيار عدد التسبيحات">
+                        <span>الهدف</span>
+                        <button type="button" data-target="1" aria-pressed="false">١</button>
+                        <button type="button" data-target="3" aria-pressed="false">٣</button>
+                        <button type="button" data-target="33" aria-pressed="true">٣٣</button>
+                        <button type="button" data-target="100" aria-pressed="false">١٠٠</button>
+                        <button type="button" data-target="0" aria-pressed="false">بلا حد</button>
+                    </div>
+
+                    <div class="counter-actions">
+                        <button class="secondary-button" id="undoButton" type="button" aria-label="التراجع عن آخر تسبيحة">↶ <span>تراجع</span></button>
+                        <button class="secondary-button" id="resetButton" type="button">بدء العد من جديد</button>
+                    </div>
+                </section>
+
+                <section class="daily-ward-card" aria-labelledby="dailyWardTitle">
+                    <div class="daily-ward-heading">
+                        <div>
+                            <span class="card-eyebrow">خطوة بسيطة كل يوم</span>
+                            <h2 id="dailyWardTitle">وردك اليوم</h2>
+                        </div>
+                        <span class="daily-ward-mark" aria-hidden="true">✦</span>
+                    </div>
+
+                    <div class="daily-date-row">
+                        <span>إنجازك اليوم</span>
+                        <time id="dailyDate"></time>
+                    </div>
+
+                    <div class="daily-total-row">
+                        <strong id="dailyTotal">٠</strong>
+                        <span>تسبيحة اليوم</span>
+                        <span class="daily-total-icon" aria-hidden="true">📿</span>
+                    </div>
+
+                    <div class="daily-progress-track" id="dailyProgressTrack" role="progressbar" aria-label="التقدم نحو هدف الورد اليومي" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                        <span id="dailyProgressFill"></span>
+                    </div>
+                    <div class="daily-progress-caption">
+                        <span id="dailyProgressLabel">هدفك ١٠٠ تسبيحة</span>
+                        <strong id="dailyProgressPercent">٠٪</strong>
+                    </div>
+                    <p class="daily-status" id="dailyStatus" role="status" aria-live="polite">كل تسبيحة تقرّبك من هدفك.</p>
+
+                    <div class="daily-goal-toolbar">
+                        <span class="daily-goal-label">اختر هدفك اليومي</span>
+                        <button class="daily-reset-button" id="dailyResetButton" type="button" aria-label="تصفير عداد التسبيح اليومي">
+                            <span aria-hidden="true">↺</span> تصفير العداد
+                        </button>
+                    </div>
+                    <div class="daily-goal-picker" role="group" aria-label="اختيار هدف الورد اليومي">
+                        <button type="button" data-daily-goal="33">٣٣</button>
+                        <button type="button" data-daily-goal="100" aria-pressed="true">١٠٠</button>
+                        <button type="button" data-daily-goal="300">٣٠٠</button>
+                        <button type="button" data-daily-goal="500">٥٠٠</button>
+                        <button type="button" data-daily-goal="1000">١٠٠٠</button>
+                    </div>
+                    <p class="daily-note">يتحدّث مجموع اليوم مع كل تسبيحة، ويُحفظ على هذا الجهاز.</p>
+                </section>
+            </div>
+
+            <footer class="tasbeeh-footer">
+                <span aria-hidden="true">۞</span>
+                <span>اللهم أعنّا على ذكرك وشكرك وحسن عبادتك</span>
+                <span aria-hidden="true">۞</span>
+            </footer>
+        </main>
+    </div>
+    <script src="tasbeeh.js?v=11" defer></script>
+</body>
+</html>

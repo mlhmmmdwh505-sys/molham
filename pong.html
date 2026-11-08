@@ -5,38 +5,77 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#07131e">
     <meta name="copyright" content="Copyright © 2026 Molham Mamdouh. Original website materials reserved.">
-    <title>Pong | ملهم</title>
+    <link rel="canonical" href="https://mlhmmmdwh505-sys.github.io/pong.html">
+    <title>ألعاب الاستراحة | ملهم</title>
     <link rel="stylesheet" href="fonts.css?v=1">
-    <link rel="stylesheet" href="pong.css?v=3">
+    <link rel="stylesheet" href="pong.css?v=4">
 </head>
 <body>
     <main class="game-shell">
         <header class="game-heading">
             <div>
                 <span class="game-kicker" id="gameKicker">استراحة قصيرة</span>
-                <h1>PONG</h1>
+                <h1 id="gameTitle">ألعاب الاستراحة</h1>
             </div>
             <span class="offline-badge" id="offlineBadge">تعمل دون إنترنت</span>
         </header>
-        <div class="game-controls">
-            <label class="difficulty-control" for="difficultySelect">
-                <span id="difficultyLabel">المستوى</span>
-                <select id="difficultySelect" aria-label="مستوى صعوبة اللعبة">
-                    <option value="easy">سهل</option>
-                    <option value="medium" selected>متوسط</option>
-                    <option value="hard">صعب</option>
-                </select>
-            </label>
+
+        <section class="game-picker" id="gamePicker" aria-labelledby="gamePickerTitle">
+            <div class="picker-heading">
+                <span class="game-kicker" id="pickerKicker">خمس ألعاب في استراحتك</span>
+                <h2 id="gamePickerTitle">اختار لعبتك</h2>
+            </div>
+            <div class="game-picker-grid">
+                <button class="game-choice" type="button" data-game="pong">
+                    <span class="game-choice-icon" aria-hidden="true">🏓</span>
+                    <span class="game-choice-copy"><strong>Pong</strong><small>صدّ الكرة واهزم الكمبيوتر</small></span>
+                    <span class="game-choice-arrow" aria-hidden="true">←</span>
+                </button>
+                <button class="game-choice" type="button" data-game="snake">
+                    <span class="game-choice-icon" aria-hidden="true">🐍</span>
+                    <span class="game-choice-copy"><strong>الثعبان</strong><small>اجمع الثمار وتجنب الاصطدام</small></span>
+                    <span class="game-choice-arrow" aria-hidden="true">←</span>
+                </button>
+                <button class="game-choice" type="button" data-game="breakout">
+                    <span class="game-choice-icon" aria-hidden="true">🧱</span>
+                    <span class="game-choice-copy"><strong>حطّم الطوب</strong><small>أزل الحواجز قبل أن تخسر كراتك</small></span>
+                    <span class="game-choice-arrow" aria-hidden="true">←</span>
+                </button>
+                <button class="game-choice" type="button" data-game="flappy">
+                    <span class="game-choice-icon" aria-hidden="true">🐦</span>
+                    <span class="game-choice-copy"><strong>حلّق</strong><small>اعبر الأعمدة بأكبر نتيجة</small></span>
+                    <span class="game-choice-arrow" aria-hidden="true">←</span>
+                </button>
+                <button class="game-choice" type="button" data-game="memory">
+                    <span class="game-choice-icon" aria-hidden="true">🧠</span>
+                    <span class="game-choice-copy"><strong>طابق الصور</strong><small>اعثر على الأزواج بأقل حركات</small></span>
+                    <span class="game-choice-arrow" aria-hidden="true">←</span>
+                </button>
+            </div>
+        </section>
+
+        <section class="game-stage" id="gameStage" hidden aria-label="منطقة اللعب">
+            <div class="game-controls">
+                <button id="backToGamesButton" class="back-to-games" type="button">كل الألعاب</button>
+                <label class="difficulty-control" for="difficultySelect">
+                    <span id="difficultyLabel">المستوى</span>
+                    <select id="difficultySelect" aria-label="مستوى صعوبة اللعبة">
+                        <option value="easy">سهل</option>
+                        <option value="medium" selected>متوسط</option>
+                        <option value="hard">صعب</option>
+                    </select>
+                </label>
+            </div>
+            <div class="canvas-wrap">
+                <canvas id="pongCanvas" width="960" height="540" tabindex="0" aria-label="مساحة اللعب"></canvas>
+                <button id="startButton" class="start-button" type="button">ابدأ اللعب</button>
+            </div>
+            <footer class="game-footer">
+                <span id="gameHelp">اختر لعبة للبدء</span>
+                <span id="scoreLabel"></span>
+            </footer>
         </div>
-        <div class="canvas-wrap">
-            <canvas id="pongCanvas" width="960" height="540" tabindex="0" aria-label="لعبة بونج"></canvas>
-            <button id="startButton" class="start-button" type="button">ابدأ اللعب</button>
-        </div>
-        <footer class="game-footer">
-            <span id="gameHelp">حرّك المضرب بالماوس أو بالأسهم ↑ ↓ أو W و S</span>
-            <span id="scoreLabel">أول لاعب يصل إلى ٥ نقاط يفوز</span>
-        </footer>
     </main>
-    <script src="pong.js?v=2" defer></script>
+    <script src="pong.js?v=3" defer></script>
 </body>
 </html>

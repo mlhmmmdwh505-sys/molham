@@ -86,7 +86,7 @@ button { -webkit-appearance: none; appearance: none; }
 .jump-controls input:focus-visible, .jump-controls select:focus-visible { border-color: var(--reader-gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--reader-gold) 22%, transparent); }
 .jump-controls button, .page-error button { min-width: 70px; height: 42px; padding: 0 15px; border: 1px solid color-mix(in srgb, var(--reader-gold) 60%, transparent); border-radius: 13px; background: color-mix(in srgb, var(--reader-green) 48%, var(--reader-surface)); color: #fffdf5; cursor: pointer; font-size: 11px; font-weight: 800; transition: transform .18s ease, background-color .18s ease; }
 
-.khatma-card { width: min(940px, 100%); margin: 0 auto 16px; padding: 17px 20px 13px; border: 1px solid var(--reader-border); border-radius: 20px; background: linear-gradient(135deg, color-mix(in srgb, var(--reader-green) 19%, transparent), transparent 66%), var(--reader-surface); box-shadow: 0 14px 36px rgba(0, 0, 0, .1); }
+.khatma-card, .daily-surah-card { width: min(940px, 100%); margin: 0 auto 16px; padding: 17px 20px 13px; border: 1px solid var(--reader-border); border-radius: 20px; background: linear-gradient(135deg, color-mix(in srgb, var(--reader-green) 19%, transparent), transparent 66%), var(--reader-surface); box-shadow: 0 14px 36px rgba(0, 0, 0, .1); }
 .khatma-heading { display: flex; align-items: center; gap: 12px; }
 .khatma-mark { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; border: 1px solid var(--reader-border); border-radius: 14px; color: var(--reader-gold); font: 26px/1 'Amiri', serif; }
 .khatma-eyebrow { color: var(--reader-gold); font-size: 9px; font-weight: 800; }
@@ -108,6 +108,27 @@ button { -webkit-appearance: none; appearance: none; }
 .continue-reading-button { white-space: nowrap; }
 .khatma-plan-controls button:disabled, .continue-reading-button:disabled, .jump-controls button:disabled { opacity: .5; cursor: wait; }
 .khatma-status { margin: 9px 0 0; color: var(--reader-muted); font-size: 9px; text-align: end; }
+
+.daily-surah-content { display: grid; grid-template-columns: minmax(190px, .72fr) minmax(0, 1.8fr); align-items: center; gap: 24px; margin-top: 15px; }
+.daily-surah-metric { min-width: 0; }
+.daily-surah-form { display: grid; gap: 10px; min-width: 0; }
+.daily-surah-fields { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(112px, .58fr) auto; align-items: end; gap: 10px; }
+.daily-surah-field { display: flex; min-width: 0; flex-direction: column; gap: 5px; }
+.daily-surah-field label { color: var(--reader-muted); font-size: 9px; font-weight: 700; }
+.daily-surah-field select, .daily-surah-duration-control input { width: 100%; height: 38px; border: 1px solid var(--reader-border); border-radius: 11px; outline: none; background: var(--reader-surface); color: inherit; }
+.daily-surah-field select { min-width: 0; padding: 0 10px; }
+.daily-surah-field select option { background: #17332e; color: #f3f4ed; }
+.daily-surah-duration-control { display: flex; align-items: center; gap: 7px; color: var(--reader-muted); font-size: 10px; }
+.daily-surah-duration-control input { width: 70px; padding: 0 7px; text-align: center; font-variant-numeric: tabular-nums; }
+.daily-surah-field select:focus-visible, .daily-surah-duration-control input:focus-visible { border-color: var(--reader-gold); box-shadow: 0 0 0 3px color-mix(in srgb, var(--reader-gold) 22%, transparent); }
+.daily-surah-field select:disabled, .daily-surah-duration-control input:disabled { opacity: .56; cursor: not-allowed; }
+.daily-surah-start, .daily-surah-complete { min-height: 38px; padding: 0 13px; border: 1px solid color-mix(in srgb, var(--reader-gold) 55%, transparent); border-radius: 11px; background: color-mix(in srgb, var(--reader-green) 48%, var(--reader-surface)); color: #fffdf5; cursor: pointer; font-size: 10px; font-weight: 800; white-space: nowrap; transition: transform .18s ease, background-color .18s ease, border-color .18s ease; }
+.daily-surah-complete { border-color: color-mix(in srgb, var(--reader-gold) 72%, transparent); background: color-mix(in srgb, var(--reader-gold) 18%, var(--reader-surface)); color: #f4ead2; }
+.daily-surah-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.daily-surah-actions .continue-reading-button { min-height: 36px; }
+.daily-surah-start:disabled, .daily-surah-complete:disabled { opacity: .5; cursor: not-allowed; }
+.daily-surah-start:focus-visible, .daily-surah-complete:focus-visible, .daily-surah-actions .continue-reading-button:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 2px; }
+.daily-surah-status { margin: 9px 0 0; color: var(--reader-muted); font-size: 9px; text-align: end; }
 
 .reading-area { display: flex; justify-content: center; }
 .page-paper {
@@ -185,7 +206,7 @@ html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) sc
 @media (hover: hover) and (pointer: fine) {
     .back-link:hover .back-arrow { transform: translateX(3px); background: var(--reader-surface); }
     .reader-theme-toggle:hover { transform: translateY(-2px); border-color: var(--reader-gold); }
-    .jump-controls button:hover, .page-error button:hover, .page-step:not(:disabled):hover, .khatma-plan-controls button:hover, .continue-reading-button:hover { transform: translateY(-2px); border-color: var(--reader-gold); background: color-mix(in srgb, var(--reader-green) 58%, var(--reader-surface)); }
+    .jump-controls button:hover, .page-error button:hover, .page-step:not(:disabled):hover, .khatma-plan-controls button:hover, .continue-reading-button:not(:disabled):hover, .daily-surah-start:not(:disabled):hover, .daily-surah-complete:not(:disabled):hover { transform: translateY(-2px); border-color: var(--reader-gold); background: color-mix(in srgb, var(--reader-green) 58%, var(--reader-surface)); }
 }
 
 @media (max-width: 700px) {
@@ -211,7 +232,7 @@ html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) sc
     .jump-controls input { width: 82px; height: 38px; }
     .jump-controls select { min-width: 0; height: 38px; flex: 1; }
     .jump-controls button { height: 38px; }
-    .khatma-card { margin-bottom: 13px; padding: 14px 13px 11px; border-radius: 17px; }
+    .khatma-card, .daily-surah-card { margin-bottom: 13px; padding: 14px 13px 11px; border-radius: 17px; }
     .khatma-heading { gap: 9px; }
     .khatma-mark { flex-basis: 36px; width: 36px; height: 36px; border-radius: 12px; font-size: 23px; }
     .khatma-heading h2 { font-size: 18px; }
@@ -224,6 +245,15 @@ html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) sc
     .khatma-plan-controls { flex-wrap: wrap; }
     .khatma-plan-controls button, .continue-reading-button { padding: 0 9px; }
     .khatma-status { text-align: start; }
+    .daily-surah-content { grid-template-columns: 1fr; gap: 11px; margin-top: 12px; }
+    .daily-surah-fields { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+    .daily-surah-select-field { grid-column: 1 / -1; }
+    .daily-surah-field select, .daily-surah-duration-control input { height: 36px; }
+    .daily-surah-duration-control input { width: 66px; }
+    .daily-surah-start { min-height: 36px; padding: 0 10px; }
+    .daily-surah-actions { display: grid; grid-template-columns: 1fr 1fr; }
+    .daily-surah-actions .continue-reading-button, .daily-surah-complete { min-height: 36px; padding: 0 8px; font-size: 9px; }
+    .daily-surah-status { text-align: start; }
     .page-paper { min-height: min(62dvh, 690px); padding: 7px; border-radius: 17px; }
     .page-paper::before { inset: 6px; border-radius: 12px; }
     .paper-inner { min-height: max(58dvh, 390px); padding: 14px 17px 12px; }
@@ -263,6 +293,7 @@ body.page-zoom-mode #pageZoomToggle { position: fixed; z-index: 1202; top: 12px;
 body.page-zoom-mode.zoom-controls-hidden .reader-header-actions { visibility: hidden; opacity: 0; pointer-events: none; }
 body.page-zoom-mode .reader-intro,
 body.page-zoom-mode .khatma-card,
+body.page-zoom-mode .daily-surah-card,
 body.page-zoom-mode .page-navigation,
 body.page-zoom-mode .reader-status,
 body.page-zoom-mode .reader-footer { display: none !important; }

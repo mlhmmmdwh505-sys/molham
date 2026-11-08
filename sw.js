@@ -1,20 +1,23 @@
-const CACHE_NAME = 'molham-dashboard-v81';
+const CACHE_NAME = 'molham-dashboard-v108';
 
 // الأصول والملفات المطلوبة للتخزين حتى يعمل الموقع بدون إنترنت
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './COPYRIGHT.md',
-  './style.css?v=76',
+  './style.css?v=83',
   './fonts.css?v=1',
-  './script.js?v=57',
+  './script.js?v=70',
   './mushaf.html',
-  './mushaf.css?v=21',
+  './mushaf.css?v=23',
   './quran-data.js',
-  './mushaf.js?v=18',
-  './pong.html',
-  './pong.css?v=3',
-  './pong.js?v=2',
+  './mushaf.js?v=19',
+  './tasbeeh.html',
+  './tasbeeh.css?v=15',
+  './tasbeeh.js?v=11',
+  './pong.html?v=5',
+  './pong.css?v=4',
+  './pong.js?v=3',
   './manifest.json?v=11',
   './gnome-books.png',
   './amiri-400.ttf',
@@ -78,7 +81,9 @@ self.addEventListener('fetch', (e) => {
       } catch (error) {
         const cachedResponse = await caches.match(request);
         if (cachedResponse) return cachedResponse;
-        const fallback = requestUrl.pathname.endsWith('/mushaf.html') ? './mushaf.html' : './index.html';
+        const fallback = requestUrl.pathname.endsWith('/mushaf.html')
+          ? './mushaf.html'
+          : requestUrl.pathname.endsWith('/tasbeeh.html') ? './tasbeeh.html' : './index.html';
         return (await caches.match(fallback)) || Response.error();
       }
     })());
@@ -98,7 +103,9 @@ self.addEventListener('fetch', (e) => {
       return response;
     } catch (error) {
       if (request.mode === 'navigate') {
-        const fallback = requestUrl.pathname.endsWith('/mushaf.html') ? './mushaf.html' : './index.html';
+        const fallback = requestUrl.pathname.endsWith('/mushaf.html')
+          ? './mushaf.html'
+          : requestUrl.pathname.endsWith('/tasbeeh.html') ? './tasbeeh.html' : './index.html';
         return (await caches.match(fallback)) || Response.error();
       }
       return Response.error();

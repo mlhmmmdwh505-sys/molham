@@ -1,6 +1,7 @@
 const PAGE_COUNT = 604;
 const LAST_PAGE_KEY = 'mushafLastPage';
 const KHATMA_PLAN_KEY = 'mushafKhatmaPlan';
+const DAILY_SURAH_PLAN_KEY = 'mushafDailySurahPlan';
 const pageCache = new Map();
 
 const pagePaper = document.getElementById('pagePaper');
@@ -40,6 +41,17 @@ const khatmaOverallHint = document.getElementById('khatmaOverallHint');
 const khatmaStatus = document.getElementById('khatmaStatus');
 const continueReadingButton = document.getElementById('continueReadingButton');
 const readingArea = document.getElementById('readingArea');
+const dailySurahForm = document.getElementById('dailySurahForm');
+const dailySurahSelect = document.getElementById('dailySurahSelect');
+const dailySurahDurationInput = document.getElementById('dailySurahDuration');
+const dailySurahStartButton = document.getElementById('dailySurahStartButton');
+const dailySurahProgress = document.getElementById('dailySurahProgress');
+const dailySurahFill = document.getElementById('dailySurahFill');
+const dailySurahTrack = dailySurahFill.parentElement;
+const dailySurahHint = document.getElementById('dailySurahHint');
+const dailySurahStatus = document.getElementById('dailySurahStatus');
+const readDailySurahButton = document.getElementById('readDailySurahButton');
+const completeDailySurahButton = document.getElementById('completeDailySurahButton');
 
 let currentPage = readLastPage();
 let isLoading = false;
@@ -48,6 +60,7 @@ let surahByNumber = new Map();
 let quranPages = null;
 let quranDataPromise = null;
 let khatmaPlan = readKhatmaPlan();
+let dailySurahPlan = readDailySurahPlan();
 
 function setMushafTheme(theme, persist = true) {
     const isLight = theme === 'light';
@@ -192,6 +205,34 @@ function readKhatmaPlan() {
     }
 }
 
+function readDailySurahPlan() {
+    try {
+        const plan = JSON.parse(localStorage.getItem(DAILY_SURAH_PLAN_KEY) || 'null');
+        const durationDays = Number(plan?.durationDays);
+        const selectedSurahNumber = Number(plan?.selectedSurahNumber);
+        if (!plan || !Number.isInteger(durationDays) || durationDays < 1 || durationDays > 3650
+            || !Number.isInteger(selectedSurahNumber) || selectedSurahNumber < 1 || selectedSurahNumber > 114
+            || !Number.isFinite(dateKeyOrdinal(plan.startDate))) return null;
+
+        const startDate = plan.startDate;
+        const targetDate = addDaysToDateKey(startDate, durationDays - 1);
+        const completedByDate = {};
+        if (plan.completedByDate && typeof plan.completedByDate === 'object' && !Array.isArray(plan.completedByDate)) {
+            Object.entries(plan.completedByDate).forEach(([dateKey, number]) => {
+                const surahNumber = Number(number);
+                const ordinal = dateKeyOrdinal(dateKey);
+                if (Number.isFinite(ordinal) && ordinal >= dateKeyOrdinal(startDate) && ordinal <= dateKeyOrdinal(targetDate)
+                    && Number.isInteger(surahNumber) && surahNumber >= 1 && surahNumber <= 114) {
+                    completedByDate[dateKey] = surahNumber;
+                }
+            });
+        }
+        return { startDate, targetDate, durationDays, selectedSurahNumber, completedByDate };
+    } catch (error) {
+        return null;
+    }
+}
+
 function localDateKey(date = new Date()) {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -316,6 +357,111 @@ function startKhatmaPlan(durationDays) {
     if (!saved) khatmaStatus.textContent = 'تعذّر حفظ الخطة على هذا الجهاز.';
 }
 
+function isDailySurahPlanActive(today = localDateKey()) {
+    if (!dailySurahPlan) return false;
+    const todayOrdinal = dateKeyOrdinal(today);
+    return todayOrdinal >= dateKeyOrdinal(dailySurahPlan.startDate)
+        && todayOrdinal <= dateKeyOrdinal(dailySurahPlan.targetDate);
+}
+
+function saveDailySurahPlan() {
+    try {
+        localStorage.setItem(DAILY_SURAH_PLAN_KEY, JSON.stringify(dailySurahPlan));
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+function renderDailySurah() {
+    const today = localDateKey();
+    const active = isDailySurahPlanActive(today);
+    const completedToday = Boolean(active && dailySurahPlan.completedByDate[today]);
+    const selectedSurahNumber = dailySurahPlan?.selectedSurahNumber || Number(dailySurahSelect.value);
+    const selectedSurah = surahByNumber.get(Number(selectedSurahNumber));
+    const completedDays = dailySurahPlan
+        ? Object.keys(dailySurahPlan.completedByDate).filter(dateKey => {
+            const ordinal = dateKeyOrdinal(dateKey);
+            return ordinal >= dateKeyOrdinal(dailySurahPlan.startDate) && ordinal <= dateKeyOrdinal(dailySurahPlan.targetDate);
+        }).length
+        : 0;
+
+    if (dailySurahPlan && document.activeElement !== dailySurahSelect) {
+        dailySurahSelect.value = String(dailySurahPlan.selectedSurahNumber);
+    }
+    if (dailySurahPlan?.durationDays && document.activeElement !== dailySurahDurationInput) {
+        dailySurahDurationInput.value = String(dailySurahPlan.durationDays);
+    }
+    dailySurahStartButton.textContent = active ? 'إعادة بدء الخطة' : dailySurahPlan ? 'ابدأ خطة جديدة' : 'ابدأ الخطة';
+    dailySurahSelect.disabled = !surahCatalog.length || completedToday;
+    dailySurahDurationInput.disabled = false;
+    dailySurahProgress.textContent = dailySurahPlan
+        ? `${toArabicNumber(completedDays)} / ${toArabicNumber(dailySurahPlan.durationDays)} يوم`
+        : '—';
+    const percent = dailySurahPlan ? Math.min(100, (completedDays / dailySurahPlan.durationDays) * 100) : 0;
+    dailySurahFill.style.width = `${percent}%`;
+    dailySurahTrack.setAttribute('aria-valuenow', String(Math.round(percent)));
+
+    if (!dailySurahPlan) {
+        dailySurahHint.textContent = 'اختر سورة ومدة الخطة للبدء.';
+        dailySurahStatus.textContent = 'يُحفظ تقدم الخطة على هذا الجهاز.';
+    } else if (!active) {
+        dailySurahHint.textContent = `انتهت مدة الخطة: أتممت ${toArabicNumber(completedDays)} من ${toArabicNumber(dailySurahPlan.durationDays)} يوم.`;
+        dailySurahStatus.textContent = 'يمكنك بدء خطة جديدة في أي وقت.';
+    } else if (completedToday) {
+        const completedSurah = surahByNumber.get(Number(dailySurahPlan.completedByDate[today]));
+        dailySurahHint.textContent = `أتممت سورة ${completedSurah?.name || ''} اليوم، تقبّل الله منك.`;
+        dailySurahStatus.textContent = `اليوم ${toArabicNumber(dateKeyOrdinal(today) - dateKeyOrdinal(dailySurahPlan.startDate) + 1)} من ${toArabicNumber(dailySurahPlan.durationDays)} • تم تسجيل سورة واحدة لهذا اليوم.`;
+    } else {
+        dailySurahHint.textContent = selectedSurah
+            ? `سورة اليوم: ${selectedSurah.name}. بعد قراءتها سجّل إنجازك.`
+            : 'اختر سورة اليوم من القائمة.';
+        const remainingDays = Math.max(0, dateKeyOrdinal(dailySurahPlan.targetDate) - dateKeyOrdinal(today) + 1);
+        dailySurahStatus.textContent = `باقي ${toArabicNumber(remainingDays)} يوم في الخطة • سجّل سورة واحدة فقط لكل يوم.`;
+    }
+
+    readDailySurahButton.disabled = !active || !selectedSurahNumber || isLoading;
+    completeDailySurahButton.disabled = !active || !selectedSurahNumber || completedToday;
+    completeDailySurahButton.textContent = completedToday ? 'تم إنجاز سورة اليوم' : 'سجّلت إتمام السورة';
+}
+
+function startDailySurahPlan(durationDays, surahNumber) {
+    const today = localDateKey();
+    dailySurahPlan = {
+        startDate: today,
+        targetDate: addDaysToDateKey(today, durationDays - 1),
+        durationDays,
+        selectedSurahNumber: surahNumber,
+        completedByDate: {}
+    };
+    const saved = saveDailySurahPlan();
+    renderDailySurah();
+    if (!saved) dailySurahStatus.textContent = 'تعذّر حفظ الخطة على هذا الجهاز.';
+}
+
+function completeDailySurah() {
+    const today = localDateKey();
+    if (!isDailySurahPlanActive(today)) return;
+    if (dailySurahPlan.completedByDate[today]) {
+        renderDailySurah();
+        return;
+    }
+    const surahNumber = Number(dailySurahSelect.value);
+    if (!Number.isInteger(surahNumber) || !surahByNumber.has(surahNumber)) {
+        dailySurahStatus.textContent = 'اختر سورة اليوم أولًا.';
+        dailySurahSelect.focus();
+        return;
+    }
+    dailySurahPlan = {
+        ...dailySurahPlan,
+        selectedSurahNumber: surahNumber,
+        completedByDate: { ...dailySurahPlan.completedByDate, [today]: surahNumber }
+    };
+    const saved = saveDailySurahPlan();
+    renderDailySurah();
+    if (!saved) dailySurahStatus.textContent = 'تعذّر حفظ إنجاز اليوم على هذا الجهاز.';
+}
+
 function toArabicNumber(value) {
     return new Intl.NumberFormat('ar-EG').format(value);
 }
@@ -437,7 +583,10 @@ async function loadQuranData() {
             options.push(new Option(`${toArabicNumber(surah.number)}. ${surah.name}`, String(surah.number)));
         });
         surahSelect.replaceChildren(...options);
+        dailySurahSelect.replaceChildren(...options.map(option => new Option(option.text, option.value)));
+        dailySurahSelect.disabled = false;
         surahJumpButton.textContent = 'انتقال';
+        renderDailySurah();
         return quranPages;
     });
     try {
@@ -446,6 +595,8 @@ async function loadQuranData() {
         console.error('Unable to load offline Quran data:', error);
         quranDataPromise = null;
         surahSelect.replaceChildren(new Option('تعذّر تجهيز المصحف', ''));
+        dailySurahSelect.replaceChildren(new Option('تعذّر تجهيز المصحف', ''));
+        dailySurahSelect.disabled = true;
         surahJumpButton.textContent = 'إعادة المحاولة';
         readerStatus.textContent = 'تعذّر تجهيز ملفات المصحف المخزنة على الجهاز.';
         throw error;
@@ -497,6 +648,7 @@ async function loadPage(pageNumber, forceRefresh = false, resetToPageStart = fal
         pagePaper.classList.remove('is-loading');
         updatePageControls();
         renderKhatma();
+        renderDailySurah();
         if (resetToPageStart && pageError.hidden) {
             window.requestAnimationFrame(() => {
                 if (document.body.classList.contains('page-zoom-mode')) {
@@ -581,6 +733,51 @@ khatmaForm.addEventListener('submit', event => {
         return;
     }
     startKhatmaPlan(durationDays);
+});
+
+dailySurahForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const durationDays = Number.parseInt(dailySurahDurationInput.value, 10);
+    const surahNumber = Number.parseInt(dailySurahSelect.value, 10);
+    if (!surahByNumber.has(surahNumber)) {
+        dailySurahStatus.textContent = 'اختر سورة من القائمة أولًا.';
+        dailySurahSelect.focus();
+        return;
+    }
+    if (!Number.isInteger(durationDays) || durationDays < 1 || durationDays > 3650) {
+        dailySurahStatus.textContent = 'اختر مدة بين يوم واحد و٣٦٥٠ يومًا.';
+        dailySurahDurationInput.focus();
+        return;
+    }
+    startDailySurahPlan(durationDays, surahNumber);
+});
+
+dailySurahSelect.addEventListener('change', () => {
+    const today = localDateKey();
+    const surahNumber = Number(dailySurahSelect.value);
+    if (dailySurahPlan && isDailySurahPlanActive(today) && !dailySurahPlan.completedByDate[today]
+        && Number.isInteger(surahNumber) && surahByNumber.has(surahNumber)) {
+        dailySurahPlan = { ...dailySurahPlan, selectedSurahNumber: surahNumber };
+        const saved = saveDailySurahPlan();
+        renderDailySurah();
+        if (!saved) dailySurahStatus.textContent = 'تعذّر حفظ اختيار سورة اليوم على هذا الجهاز.';
+    }
+});
+
+readDailySurahButton.addEventListener('click', () => {
+    const surahNumber = Number(dailySurahSelect.value || dailySurahPlan?.selectedSurahNumber);
+    if (!isDailySurahPlanActive() || !surahByNumber.has(surahNumber)) return;
+    try {
+        goToPage(getSurahStartPage(surahNumber));
+    } catch (error) {
+        dailySurahStatus.textContent = 'تعذّر تحديد صفحة السورة من بيانات المصحف المخزنة.';
+    }
+});
+
+completeDailySurahButton.addEventListener('click', completeDailySurah);
+
+document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) renderDailySurah();
 });
 
 continueReadingButton.addEventListener('click', () => {

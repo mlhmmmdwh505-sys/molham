@@ -578,7 +578,7 @@ input[type="color"]::-moz-color-swatch { border: none !important; border-radius:
     }
 }
 
-/* Balance the coin count and theme switch in one compact top control row. */
+/* Legacy base positioning retained for the compact dashboard action control. */
 .top-actions {
     position: absolute;
     z-index: 30;
@@ -1587,7 +1587,7 @@ header { position: relative; }
     }
 }
 
-/* Keep the theme switch beside the points pill after the legacy header rules. */
+/* Preserve the dashboard action control placement after legacy header rules. */
 .top-actions {
     position: absolute !important;
     top: 20px !important;
@@ -1628,7 +1628,12 @@ header { position: relative; }
     .top-actions {
         top: 10px !important;
         right: 12px !important;
+        left: 12px !important;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 6px;
     }
+    .tasbeeh-open-link { min-height: 32px; padding: 0 9px; font-size: 10px; }
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1024px) {
@@ -2070,6 +2075,30 @@ html[data-theme="light"] .task-priority.priority-high { color: #8f2924; backgrou
 html[data-theme="light"] .task-priority.priority-medium { color: #79550d; background: rgba(180, 130, 32, .15); }
 html[data-theme="light"] .task-priority.priority-low { color: #236b45; background: rgba(34, 130, 80, .14); }
 
+/* Keep dashboard shortcuts in the document flow on compact screens. */
+@media (max-width: 1024px) {
+    body:not(.login-visible) .glass-card > .top-actions {
+        position: relative !important;
+        inset: auto !important;
+        width: 100%;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin: 0 auto 8px !important;
+    }
+    body:not(.login-visible) .date-tag {
+        position: static !important;
+        width: 100%;
+        margin: 0 auto 6px !important;
+        text-align: center;
+    }
+    body:not(.login-visible) .glass-card > header { padding-top: 12px !important; }
+}
+
+@media (max-width: 767px) {
+    body:not(.login-visible) .glass-card > .top-actions { gap: 6px !important; }
+    body:not(.login-visible) .glass-card > header { padding-top: 6px !important; }
+}
+
 /* Keep priority as the only task option; timer actions remain on their dedicated buttons. */
 .task-toolbar {
     grid-template-columns: minmax(0, 1fr) !important;
@@ -2165,7 +2194,7 @@ html[data-theme="light"] .game-session-overlay { background: rgba(21, 27, 42, .7
 @media (max-width: 600px) {
     .game-session-overlay { padding: 8px; }
     .game-session-dialog { gap: 9px; max-height: calc(100dvh - 16px); padding: 11px; border-radius: 18px; }
-    .game-session-stage { max-height: calc(100dvh - 112px); border-radius: 13px; }
+    .game-session-stage { max-height: calc(100dvh - 112px); border-radius: 13px; aspect-ratio: 1 / 1; }
     .game-session-heading h2 { font-size: 15px; }
     .game-session-icon { flex-basis: 36px; width: 36px; height: 36px; }
 }
@@ -2244,6 +2273,104 @@ body.mushaf-session-open { overflow: hidden !important; overscroll-behavior: non
     .mushaf-session-dialog { position: fixed; inset: 0; width: 100%; height: 100dvh; max-height: 100dvh; border: 0; border-radius: 0; }
     .mushaf-overlay-header { gap: 8px; padding-inline: 10px; }
     .mushaf-break-status { padding: 5px 8px; font-size: 10px; }
+}
+
+/* Keep dashboard shortcuts together behind one compact, responsive control. */
+.top-actions { isolation: isolate; }
+.top-actions-toggle {
+    display: inline-flex !important;
+    min-width: 94px !important;
+    min-height: 40px !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 12px !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: 14px !important;
+    background: var(--glass-bg) !important;
+    color: var(--text-main) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .14) !important;
+    cursor: pointer;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1;
+}
+.top-actions-toggle:hover { border-color: color-mix(in srgb, var(--gold) 55%, var(--glass-border)) !important; }
+.top-actions-toggle:focus-visible { outline: 3px solid color-mix(in srgb, var(--primary) 55%, transparent) !important; outline-offset: 3px; }
+.top-actions-toggle-icon { font-size: 15px; }
+.top-actions-toggle-chevron { transition: transform .2s ease; }
+.top-actions-toggle[aria-expanded="true"] .top-actions-toggle-chevron { transform: rotate(180deg); }
+.dashboard-action-menu {
+    position: absolute;
+    z-index: 100;
+    top: calc(100% + 9px);
+    right: 0;
+    display: grid;
+    width: min(228px, calc(100vw - 24px));
+    gap: 8px;
+    padding: 10px;
+    border: 1px solid var(--glass-border);
+    border-radius: 17px;
+    background: color-mix(in srgb, var(--bg-dark) 94%, #07101f);
+    box-shadow: 0 18px 48px rgba(0, 0, 0, .32);
+    -webkit-backdrop-filter: blur(18px);
+    backdrop-filter: blur(18px);
+}
+.dashboard-action-menu[hidden] { display: none !important; }
+.dashboard-action-menu .mini-score {
+    position: static !important;
+    display: flex !important;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 !important;
+    padding: 7px 12px !important;
+    font-size: 14px !important;
+}
+.dashboard-action-menu .mushaf-open-link {
+    width: 100%;
+    min-height: 40px;
+    justify-content: flex-start;
+    padding-inline: 12px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+.dashboard-action-menu .theme-toggle { justify-self: center; margin: 1px 0; }
+body.login-visible .dashboard-action-menu .mini-score { display: none !important; }
+html[data-theme="light"] .mini-score {
+    color: #514000 !important;
+    background: rgba(92, 70, 0, .11) !important;
+    border-color: rgba(92, 70, 0, .32) !important;
+}
+html[data-theme="light"] .points-coin-icon { filter: brightness(.64) saturate(.82); }
+body.login-visible .top-actions { display: none !important; }
+@media (min-width: 1025px) {
+    body:not(.login-visible) .glass-card > header { padding-top: 48px !important; }
+}
+@media (max-width: 767px) {
+    .top-actions-toggle { min-width: 88px !important; min-height: 38px !important; font-size: 11px !important; }
+    body:not(.login-visible) .glass-card > .top-actions {
+        width: fit-content !important;
+        justify-content: center !important;
+    }
+    .glass-card.action-menu-open { overflow: visible !important; }
+}
+@media (max-width: 1024px) {
+    body:not(.login-visible) .glass-card.action-menu-open > .top-actions {
+        display: grid !important;
+        width: 100% !important;
+        grid-template-columns: max-content max-content;
+        justify-content: center !important;
+        justify-items: center;
+    }
+    body:not(.login-visible) .glass-card.action-menu-open .dashboard-action-menu {
+        position: relative;
+        top: auto;
+        right: auto;
+        grid-column: 1 / -1;
+        justify-self: center;
+        transform: none;
+    }
 }
 
 /* Keep long timer readings readable without changing the timer layout. */

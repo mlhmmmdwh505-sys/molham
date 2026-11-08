@@ -8,11 +8,11 @@
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="stylesheet" href="style.css?v=76">
+    <link rel="stylesheet" href="style.css?v=83">
     <link rel="stylesheet" href="fonts.css?v=1">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=11">
-    <link rel="canonical" href="https://molham-dash-borad.com/">
+    <link rel="canonical" href="https://mlhmmmdwh505-sys.github.io/">
     <meta name="keywords" content="ملهم ممدوح, molham, github pages, موقع ملهم">
     <meta name="description" content="هذا الموقع جميل و مثالي للدراسة و العمل و جميع المهام موقع ملهم هو اداة تنظيم و ترتيب و زيادة الانتاجية مصمم من قبل ملهم.">
     <meta name="copyright" content="Copyright © 2026 Molham Mamdouh. Original website materials reserved.">
@@ -45,11 +45,20 @@
     <div class="glass-card">
         <div class="top-actions">
             <div class="mini-score">
-                <span>🪙 <span id="userPoints">0</span></span>
+                <span><span class="points-coin-icon" aria-hidden="true">🪙</span> <span id="userPoints">0</span></span>
                 <button onclick="resetPoints()" class="reset-mini" title="تصفير النقاط">🗑️</button>
             </div>
+            <button id="topActionsToggle" class="top-actions-toggle" type="button" aria-expanded="false" aria-controls="dashboardActionMenu" aria-label="عرض الأدوات">
+                <span class="top-actions-toggle-icon" aria-hidden="true">☰</span>
+                <span>الأدوات</span>
+                <span class="top-actions-toggle-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="dashboard-action-menu" id="dashboardActionMenu" role="group" aria-label="أدوات لوحة التحكم" hidden>
             <a class="mushaf-open-link" id="mushafOpenLink" href="mushaf.html" aria-label="فتح المصحف الشريف" aria-haspopup="dialog" aria-controls="mushafSessionOverlay">
                 <span aria-hidden="true">📖</span><span>المصحف</span>
+            </a>
+            <a class="mushaf-open-link tasbeeh-open-link" id="tasbeehOpenLink" href="tasbeeh.html" aria-label="فتح السبحة" aria-haspopup="dialog" aria-controls="mushafSessionOverlay">
+                <span aria-hidden="true">📿</span><span>السبحة</span>
             </a>
             <button id="themeToggle" class="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="التبديل إلى الوضع الفاتح" title="التبديل إلى الوضع الفاتح">
                 <span class="theme-toggle-track" aria-hidden="true">
@@ -65,6 +74,7 @@
                     </span>
                 </span>
             </button>
+            </div>
         </div>
 
         <div id="guestAccountControl" class="account-control" hidden>
@@ -199,13 +209,13 @@
                     <div class="game-pass-heading">
                         <span class="game-pass-icon" aria-hidden="true">🎮</span>
                         <div class="game-pass-heading-copy">
-                            <h3 id="gamePassTitle">استراحة Pong بدون إنترنت</h3>
-                            <p id="gamePassSubtitle">لعبة محلية لمدة ١٠ دقائق</p>
+                            <h3 id="gamePassTitle">استراحة ألعاب بدون إنترنت</h3>
+                            <p id="gamePassSubtitle">٥ ألعاب محلية لمدة ١٠ دقائق</p>
                         </div>
                         <span class="game-pass-cost" id="gamePassCost">١٥٠ 🪙</span>
                     </div>
                     <div class="game-pass-actions">
-                        <button type="button" class="game-enter-button" id="gameEnterButton">العب Pong • ١٥٠ نقطة</button>
+                        <button type="button" class="game-enter-button" id="gameEnterButton">اختر لعبة • ١٥٠ نقطة</button>
                         <button type="button" class="game-session-close" id="closeGameSessionButton" hidden>إنهاء اللعب</button>
                     </div>
                     <p class="game-pass-status" id="gamePassStatus" aria-live="polite">جاهز للدخول</p>
@@ -265,7 +275,7 @@
                 <div class="game-session-heading">
                     <span class="game-session-icon" aria-hidden="true">🎮</span>
                     <div>
-                        <h2 id="gameSessionModalTitle">لعبة Pong</h2>
+                        <h2 id="gameSessionModalTitle">ألعاب الاستراحة</h2>
                 <p><span id="gameSessionModalHint">تبقّى من وقت اللعب</span> <strong id="gameSessionCountdown" aria-live="off">10:00</strong></p>
                     </div>
                 </div>
@@ -273,7 +283,7 @@
             </div>
             <div class="game-session-progress-track" aria-hidden="true"><span id="gameSessionProgress"></span></div>
             <div class="game-session-stage">
-                <iframe id="embeddedGameFrame" title="لعبة Pong محلية تعمل دون إنترنت" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock" allow="fullscreen; gamepad" allowfullscreen></iframe>
+                <iframe id="embeddedGameFrame" title="ألعاب محلية تعمل دون إنترنت" src="about:blank" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock" allow="fullscreen; gamepad" allowfullscreen></iframe>
             </div>
         </section>
     </div>
@@ -282,7 +292,7 @@
             <header class="mushaf-overlay-header">
                 <h2 id="mushafOverlayTitle">المصحف الشريف</h2>
                 <p class="mushaf-break-status" id="mushafBreakStatus" role="status" aria-live="off" hidden></p>
-                <button type="button" class="mushaf-overlay-close" id="closeMushafOverlayButton" aria-label="إغلاق المصحف">×</button>
+                <button type="button" class="mushaf-overlay-close" id="closeMushafOverlayButton" aria-label="إغلاق اللوحة">×</button>
             </header>
             <div class="mushaf-overlay-stage">
                 <iframe id="mushafFrame" title="المصحف الشريف" src="about:blank"></iframe>
@@ -295,6 +305,6 @@
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script src="script.js?v=57"></script>
+    <script src="script.js?v=70"></script>
 </body>
 </html>

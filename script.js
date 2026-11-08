@@ -20,12 +20,14 @@ const GAME_PASS_COST = 150;
 const GAME_PASS_DURATION_MS = 10 * 60 * 1000;
 const TASK_REWARD_POINTS = 5;
 const DAILY_TASK_REWARD_LIMIT = 30;
-const SCRATCH_GAME_EMBED_URL = './pong.html';
+const SCRATCH_GAME_EMBED_URL = './pong.html?v=5';
 let gameSessionEndsAt = 0;
 let gameSessionInterval = null;
 let gameSessionTimeout = null;
 let gameSessionActive = false;
 let mushafSessionOpen = false;
+let contentOverlayKind = null;
+let contentOverlayOpener = null;
 
 // Copy this object from Firebase Console > Project settings > Your apps > Web app.
 // Firebase config is public by design; the Firestore security rules protect each user's data.
@@ -86,13 +88,13 @@ const dashboardLabels = {
         waiting: 'مهام تنتظر إنجازك', focusHint: 'وقت تركيز فعلي', streakEmpty: 'ابدأ جلسة مذاكرة اليوم',
         noTasksToday: 'كل مهمة تمنحك ٥ نقاط، بحد أقصى ٣٠ نقطة مهام يوميًا', taskProgress: (done, total) => `أنجزت ${done} من ${total} مهام نشطة اليوم`,
         taskRewardNotice: 'أحسنت! +٥ نقاط 🪙', taskRewardLimitNotice: 'وصلت للحد اليومي لنقاط المهام (٣٠). نقاط التركيز ما زالت تُحسب.',
-        gameTitle: 'استراحة Pong بدون إنترنت', gameSubtitle: 'لعبة محلية لمدة ١٠ دقائق', gameCost: '١٥٠ 🪙',
-        enterGame: 'العب Pong • ١٥٠ نقطة', endGame: 'إنهاء اللعب', gameTimerButton: 'باقي',
+        gameTitle: 'استراحة ألعاب بدون إنترنت', gameSubtitle: '٥ ألعاب محلية لمدة ١٠ دقائق', gameCost: '١٥٠ 🪙',
+        enterGame: 'اختر لعبة • ١٥٠ نقطة', endGame: 'إنهاء اللعب', gameTimerButton: 'باقي',
         gameNeedPoints: points => `رصيدك ${points} / ١٥٠ نقطة`,
         gameReady: 'جاهز للعب', gameActive: 'اللعبة مفتوحة داخل الموقع.',
         gameNote: 'تُغلق اللعبة تلقائيًا بعد ١٠ دقائق. إنهاؤها مبكرًا لا يعيد النقاط.',
         gameExpired: 'انتهت ١٠ دقائق وأُغلقت اللعبة.', gameClosed: 'أنهيت اللعب مبكرًا. لا تُسترد النقاط.',
-        gameModalTitle: 'لعبة Pong', gameModalHint: 'تبقّى من وقت اللعب', closeGameModal: 'إنهاء وإغلاق اللعبة',
+        gameModalTitle: 'ألعاب الاستراحة', gameModalHint: 'تبقّى من وقت اللعب', closeGameModal: 'إنهاء وإغلاق اللعبة',
         priority: 'الأولوية', taskAdd: 'إضافة مهمة',
         priorityHigh: 'عالية', priorityMedium: 'متوسطة', priorityLow: 'منخفضة',
         noTasks: 'أضف أول مهمة من الحقل أعلاه.',
@@ -107,13 +109,13 @@ const dashboardLabels = {
         waiting: 'Tasks waiting for you', focusHint: 'Focused time', streakEmpty: 'Start a study session today',
         noTasksToday: 'Each task earns 5 points, up to 30 task points per day', taskProgress: (done, total) => `${done} of ${total} active tasks completed today`,
         taskRewardNotice: 'Well done! +5 points 🪙', taskRewardLimitNotice: 'Daily task reward limit reached (30). Focus points still count.',
-        gameTitle: 'Offline Pong break', gameSubtitle: 'Local game for 10 minutes', gameCost: '150 🪙',
-        enterGame: 'Play Pong • 150 points', endGame: 'End game', gameTimerButton: 'Left',
+        gameTitle: 'Offline games break', gameSubtitle: '5 local games for 10 minutes', gameCost: '150 🪙',
+        enterGame: 'Choose a game • 150 points', endGame: 'End game', gameTimerButton: 'Left',
         gameNeedPoints: points => `Balance: ${points} / 150 points`,
         gameReady: 'Ready to play', gameActive: 'The game is open inside the dashboard.',
         gameNote: 'The game closes automatically after 10 minutes. Ending early does not refund points.',
         gameExpired: 'Ten minutes are up and the game was closed.', gameClosed: 'You ended the game early. Points are not refunded.',
-        gameModalTitle: 'Pong', gameModalHint: 'Time left', closeGameModal: 'End and close game',
+        gameModalTitle: 'Break games', gameModalHint: 'Time left', closeGameModal: 'End and close game',
         priority: 'Priority', taskAdd: 'Add task',
         priorityHigh: 'High', priorityMedium: 'Medium', priorityLow: 'Low',
         noTasks: 'Add your first task above.',
@@ -385,33 +387,52 @@ function setMushafSessionBackgroundInert(inert) {
     });
 }
 
-function openMushafOverlay() {
-    if (mushafSessionOpen) return;
+function openContentOverlay(kind) {
+    if (contentOverlayKind) return;
     const overlay = document.getElementById('mushafSessionOverlay');
     const frame = document.getElementById('mushafFrame');
     if (!overlay || !frame) return;
 
-    mushafSessionOpen = true;
+    contentOverlayKind = kind;
+    contentOverlayOpener = document.activeElement;
+    mushafSessionOpen = kind === 'mushaf';
+    const isMushaf = mushafSessionOpen;
+    const title = document.getElementById('mushafOverlayTitle');
+    const closeButton = document.getElementById('closeMushafOverlayButton');
+    if (title) title.textContent = isMushaf ? 'المصحف الشريف' : 'السبحة';
+    if (closeButton) closeButton.setAttribute('aria-label', isMushaf ? 'إغلاق المصحف' : 'إغلاق السبحة');
+    frame.title = isMushaf ? 'المصحف الشريف' : 'السبحة';
     overlay.hidden = false;
     document.documentElement.classList.add('mushaf-session-open');
     document.body.classList.add('mushaf-session-open');
     setMushafSessionBackgroundInert(true);
     updateMushafBreakStatus();
     frame.addEventListener('load', () => {
-        if (!mushafSessionOpen) return;
+        if (!contentOverlayKind) return;
         try {
-            const readerPage = frame.contentDocument?.getElementById('pagePaper');
-            if (readerPage) readerPage.focus({ preventScroll: true });
+            const initialFocus = isMushaf
+                ? frame.contentDocument?.getElementById('pagePaper')
+                : frame.contentDocument?.getElementById('countButton');
+            if (initialFocus) initialFocus.focus({ preventScroll: true });
             else frame.contentWindow?.focus();
         } catch (error) {
             frame.focus({ preventScroll: true });
         }
     }, { once: true });
-    frame.src = './mushaf.html';
+    frame.src = isMushaf ? './mushaf.html?v=23' : './tasbeeh.html?v=13';
+}
+
+function openMushafOverlay() {
+    openContentOverlay('mushaf');
+}
+
+function openTasbeehOverlay() {
+    openContentOverlay('tasbeeh');
 }
 
 function closeMushafOverlay() {
-    if (!mushafSessionOpen) return;
+    if (!contentOverlayKind) return;
+    contentOverlayKind = null;
     mushafSessionOpen = false;
     const overlay = document.getElementById('mushafSessionOverlay');
     const frame = document.getElementById('mushafFrame');
@@ -420,7 +441,9 @@ function closeMushafOverlay() {
     if (overlay) overlay.hidden = true;
     if (frame) frame.src = 'about:blank';
     setMushafSessionBackgroundInert(false);
-    document.getElementById('mushafOpenLink')?.focus({ preventScroll: true });
+    const opener = contentOverlayOpener;
+    contentOverlayOpener = null;
+    if (opener instanceof HTMLElement && opener.isConnected) opener.focus({ preventScroll: true });
 }
 
 function endEmbeddedGameSession(expired = false) {
@@ -565,15 +588,44 @@ function initializeDashboardFeatures() {
     const taskList = document.getElementById('taskList');
     const taskInput = document.getElementById('taskInput');
     const mushafOpenLink = document.getElementById('mushafOpenLink');
+    const tasbeehOpenLink = document.getElementById('tasbeehOpenLink');
+    const topActions = document.querySelector('.top-actions');
+    const topActionsToggle = document.getElementById('topActionsToggle');
+    const dashboardActionMenu = document.getElementById('dashboardActionMenu');
     const focusButton = document.getElementById('focusModeToggle');
     const quickAddButton = document.getElementById('quickAddTaskButton');
     const quickFocusButton = document.getElementById('quickFocusButton');
     const gameButton = document.getElementById('gameEnterButton');
     const endGameButton = document.getElementById('closeGameSessionButton');
 
+    const setDashboardActionMenuOpen = (open, restoreFocus = false) => {
+        if (!topActionsToggle || !dashboardActionMenu) return;
+        dashboardActionMenu.hidden = !open;
+        topActionsToggle.setAttribute('aria-expanded', String(open));
+        topActions?.closest('.glass-card')?.classList.toggle('action-menu-open', open);
+        if (restoreFocus) topActionsToggle.focus({ preventScroll: true });
+    };
+
+    if (topActionsToggle && dashboardActionMenu) topActionsToggle.addEventListener('click', () => {
+        setDashboardActionMenuOpen(dashboardActionMenu.hidden);
+    });
+    document.addEventListener('click', event => {
+        if (dashboardActionMenu && !dashboardActionMenu.hidden && !topActions?.contains(event.target)) {
+            setDashboardActionMenuOpen(false);
+        }
+    });
+
     if (mushafOpenLink) mushafOpenLink.addEventListener('click', event => {
         event.preventDefault();
+        setDashboardActionMenuOpen(false);
+        topActionsToggle?.focus({ preventScroll: true });
         openMushafOverlay();
+    });
+    if (tasbeehOpenLink) tasbeehOpenLink.addEventListener('click', event => {
+        event.preventDefault();
+        setDashboardActionMenuOpen(false);
+        topActionsToggle?.focus({ preventScroll: true });
+        openTasbeehOverlay();
     });
 
     if (taskList) {
@@ -606,7 +658,7 @@ function initializeDashboardFeatures() {
     const mushafFrame = document.getElementById('mushafFrame');
     window.addEventListener('message', event => {
         if (event.origin !== window.location.origin || event.source !== mushafFrame?.contentWindow) return;
-        if (event.data?.type === 'molham:close-mushaf') closeMushafOverlay();
+        if (event.data?.type === 'molham:close-mushaf' || event.data?.type === 'molham:close-tasbeeh') closeMushafOverlay();
     });
     document.addEventListener('keydown', event => {
         if (!mushafSessionOpen) return;
@@ -616,8 +668,12 @@ function initializeDashboardFeatures() {
         }
     }, true);
     document.addEventListener('keydown', event => {
-        if (event.key === 'Escape' && mushafSessionOpen) {
+        if (event.key === 'Escape' && contentOverlayKind) {
             closeMushafOverlay();
+            return;
+        }
+        if (event.key === 'Escape' && dashboardActionMenu && !dashboardActionMenu.hidden) {
+            setDashboardActionMenuOpen(false, true);
             return;
         }
         if (event.key === 'Escape' && gameSessionActive) {
