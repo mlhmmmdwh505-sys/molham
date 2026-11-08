@@ -1761,7 +1761,7 @@ header { position: relative; }
     line-height: 1;
 }
 #taskList .task-empty { display: block !important; height: auto !important; min-height: 0 !important; max-height: none !important; flex: 0 0 auto !important; padding: 24px 10px !important; border: 1px dashed var(--glass-border) !important; border-radius: 15px !important; background: transparent !important; color: var(--text-muted); font-size: 12px; text-align: center; }
-.focus-mode-toggle { position: absolute; z-index: 2; top: 18px; inset-inline-end: 18px; min-width: 0 !important; height: 38px; padding: 0 14px !important; border: 1px solid var(--glass-border) !important; background: var(--glass-bg) !important; color: var(--text-main) !important; font-size: 12px; }
+.focus-mode-toggle { position: absolute; z-index: 2; top: 18px; inset-inline-end: 18px; min-width: 0 !important; height: 32px; padding: 0 10px !important; border: 1px solid var(--glass-border) !important; background: var(--glass-bg) !important; color: var(--text-main) !important; font-size: 11px; }
 @media (hover: hover) and (pointer: fine) { .focus-mode-toggle:hover { background: var(--primary) !important; color: #fff !important; } }
 .focus-verse { display: none; }
 
@@ -1806,6 +1806,46 @@ body.focus-mode .mobile-quick-actions { display: none !important; }
 body.focus-mode .dashboard-grid { display: flex !important; flex: 1 !important; width: 100% !important; min-height: 0 !important; }
 body.focus-mode .main-col { display: flex !important; width: 100% !important; max-width: none !important; min-height: 0 !important; }
 body.focus-mode .focus-card { position: relative !important; flex: 1 !important; min-height: 0 !important; border-color: color-mix(in srgb, var(--primary) 38%, var(--glass-border)) !important; background: color-mix(in srgb, var(--primary) 9%, var(--glass-bg)) !important; }
+.focus-timer-ring { display: contents; --timer-progress: 0deg; }
+@property --timer-progress { syntax: '<angle>'; inherits: true; initial-value: 0deg; }
+body.focus-mode .focus-timer-ring {
+    position: relative;
+    display: grid !important;
+    width: min(42vw, 52vh, 460px);
+    aspect-ratio: 1;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--glass-border));
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--primary) 8%, var(--glass-bg)), color-mix(in srgb, var(--glass-bg) 72%, transparent) 70%, transparent 71%);
+    box-shadow: 0 0 42px color-mix(in srgb, var(--primary) 15%, transparent), inset 0 0 28px color-mix(in srgb, var(--primary) 7%, transparent);
+}
+body.focus-mode .focus-timer-ring::before {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from -90deg, var(--primary) var(--timer-progress), color-mix(in srgb, var(--glass-border) 55%, transparent) 0deg);
+    content: '';
+    pointer-events: none;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 7px), #000 calc(100% - 6px));
+    transition: --timer-progress .9s linear;
+}
+body.focus-mode .focus-timer-ring::after {
+    position: absolute;
+    inset: 15px;
+    border: 1px solid color-mix(in srgb, var(--primary) 18%, var(--glass-border));
+    border-radius: 50%;
+    content: '';
+    pointer-events: none;
+}
+body.focus-mode .focus-timer-ring #pomoDisplay {
+    position: relative;
+    z-index: 1;
+    margin: 0 !important;
+    font-size: clamp(44px, min(10vw, 14vh), 112px) !important;
+}
+body.focus-mode .focus-timer-ring #pomoDisplay.has-hours { font-size: clamp(26px, min(6vw, 7vh), 60px) !important; }
 body.focus-mode #pomoDisplay { font-size: clamp(112px, 24vw, 220px) !important; }
 body.focus-mode .focus-mode-toggle { top: 20px; inset-inline-end: 20px; }
 body.focus-mode .focus-verse {
@@ -1907,11 +1947,13 @@ body.focus-mode .pomo-actions button { display: inline-flex !important; visibili
         align-self: start !important;
         margin: 0 !important;
     }
-    body.focus-mode #pomoDisplay {
+    body.focus-mode .focus-timer-ring {
         grid-column: 1 !important;
         grid-row: 2 !important;
         justify-self: center !important;
         align-self: center !important;
+    }
+    body.focus-mode #pomoDisplay {
         margin: 0 !important;
     }
     body.focus-mode #pomoDisplay { font-size: clamp(88px, 25vw, 150px) !important; }
@@ -2406,7 +2448,7 @@ body.focus-mode #pomoDisplay.has-hours { font-size: clamp(52px, 14vw, 126px) !im
     body.focus-mode #pomoDisplay.has-hours { font-size: clamp(42px, 12vw, 72px) !important; }
 }
 
-@media (max-width: 480px), (max-height: 680px) {
+@media (max-width: 480px), (max-width: 767px) and (max-height: 680px) {
     body.focus-mode .focus-card {
         display: grid !important;
         grid-template-columns: minmax(0, 1fr) !important;
@@ -2426,17 +2468,99 @@ body.focus-mode #pomoDisplay.has-hours { font-size: clamp(52px, 14vw, 126px) !im
         padding-inline: 11px !important;
         font-size: 11px !important;
     }
-    body.focus-mode #pomoDisplay {
+    body.focus-mode .focus-timer-ring {
         grid-column: 1 !important;
         grid-row: 2 !important;
         justify-self: center !important;
         align-self: center !important;
-        margin: 0 !important;
-        font-size: clamp(74px, 20vw, 112px) !important;
     }
-    body.focus-mode #pomoDisplay.has-hours { font-size: clamp(38px, 11vw, 60px) !important; }
+    body.focus-mode .focus-timer-ring #pomoDisplay {
+        margin: 0 !important;
+        font-size: clamp(44px, min(20vw, 10vh), 98px) !important;
+    }
+    body.focus-mode .focus-timer-ring #pomoDisplay.has-hours { font-size: clamp(34px, min(12vw, 5.8vh), 58px) !important; }
     body.focus-mode .pomo-actions { bottom: clamp(18px, 5vh, 28px) !important; }
     body.focus-mode .pomo-actions button { height: 42px !important; font-size: 13px !important; }
+}
+
+@media (max-width: 767px) {
+    body.focus-mode .focus-timer-ring { width: min(76vw, 38vh, 300px); }
+    body.focus-mode .focus-timer-ring #pomoDisplay { font-size: clamp(44px, min(20vw, 10vh), 98px) !important; }
+    body.focus-mode .focus-timer-ring #pomoDisplay.has-hours { font-size: clamp(34px, min(12vw, 5.8vh), 58px) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    body.focus-mode .focus-timer-ring::before { transition: none !important; }
+}
+
+/* Keep the focus quote, circular timer, and controls in separate rows. */
+body.focus-mode .focus-card {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: 38px auto minmax(0, 1fr) auto !important;
+    justify-content: stretch !important;
+    justify-items: center !important;
+    align-items: center !important;
+    gap: clamp(8px, 1.6vh, 14px) !important;
+    padding: 18px !important;
+}
+body.focus-mode .focus-mode-toggle {
+    position: static !important;
+    inset: auto !important;
+    grid-column: 1 !important;
+    grid-row: 1 !important;
+    justify-self: end !important;
+    align-self: start !important;
+    margin: 0 !important;
+}
+body.focus-mode .focus-verse {
+    position: static !important;
+    inset: auto !important;
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+    width: min(900px, 100%) !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+body.focus-mode .focus-timer-ring {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+    justify-self: center !important;
+    align-self: center !important;
+    width: min(42vw, 36vh, 460px) !important;
+}
+body.focus-mode .focus-timer-ring #pomoDisplay { font-size: clamp(44px, min(10vw, 14vh), 112px) !important; }
+body.focus-mode .focus-timer-ring #pomoDisplay.has-hours { font-size: clamp(26px, min(6vw, 6vh), 56px) !important; }
+body.focus-mode .pomo-actions {
+    position: static !important;
+    inset: auto !important;
+    grid-column: 1 !important;
+    grid-row: 4 !important;
+    width: min(520px, 100%) !important;
+    max-width: 520px !important;
+    margin: 0 !important;
+    transform: none !important;
+}
+
+@media (max-width: 767px) {
+    body.focus-mode .focus-card {
+        grid-template-rows: 36px auto minmax(0, 1fr) auto !important;
+        gap: clamp(6px, 1.5vh, 12px) !important;
+        padding: 10px 8px 12px !important;
+    }
+    body.focus-mode .focus-mode-toggle { height: 28px !important; padding-inline: 8px !important; font-size: 10px !important; }
+    body.focus-mode .focus-verse { font-size: clamp(12px, 3.6vw, 17px) !important; line-height: 1.5 !important; }
+    body.focus-mode .focus-timer-ring { width: min(72vw, 36vh, 300px) !important; }
+    body.focus-mode .focus-timer-ring #pomoDisplay { font-size: clamp(42px, min(20vw, 10vh), 98px) !important; }
+    body.focus-mode .focus-timer-ring #pomoDisplay.has-hours { font-size: clamp(34px, min(12vw, 5.8vh), 58px) !important; }
+    body.focus-mode .pomo-actions button { height: 42px !important; font-size: 13px !important; }
+}
+
+@media (max-width: 480px), (max-width: 767px) and (max-height: 680px) {
+    body.focus-mode .focus-card { grid-template-rows: 34px auto minmax(0, 1fr) auto !important; gap: 6px !important; }
+    body.focus-mode .focus-timer-ring { width: min(66vw, 32vh, 260px) !important; }
+    body.focus-mode .focus-timer-ring #pomoDisplay { font-size: clamp(36px, min(18vw, 8vh), 84px) !important; }
+    body.focus-mode .focus-timer-ring #pomoDisplay.has-hours { font-size: clamp(30px, min(11vw, 5.4vh), 54px) !important; }
 }
 
 

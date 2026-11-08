@@ -5,6 +5,7 @@
 const localStorage = window.localStorage;
 let timer = null;
 let timeLeft = null;
+let timerDurationSeconds = 25 * 60;
 let timerUsesHoursFormat = false;
 let isBreak = false;
 let points = Number.parseInt(localStorage.getItem('userPoints') || '0', 10);
@@ -1322,7 +1323,8 @@ function resetTimer() {
 }
 
 function setTimerDuration(minutes) {
-    timeLeft = Math.floor(minutes * 60);
+    timerDurationSeconds = Math.max(1, Math.floor((Number(minutes) || 25) * 60));
+    timeLeft = timerDurationSeconds;
     timerUsesHoursFormat = minutes >= 60;
 }
 
@@ -1339,6 +1341,11 @@ function updateTimerDisplay() {
             ? `${hours}:${pad(minutes)}:${pad(seconds)}`
             : `${pad(Math.floor(totalSeconds / 60))}:${pad(seconds)}`;
         displayElem.classList.toggle('has-hours', showHours);
+    }
+    const focusTimerRing = document.getElementById('focusTimerRing');
+    if (focusTimerRing) {
+        const progress = timerDurationSeconds > 0 ? 1 - Math.min(1, totalSeconds / timerDurationSeconds) : 0;
+        focusTimerRing.style.setProperty('--timer-progress', `${Math.max(0, Math.min(1, progress)) * 360}deg`);
     }
     updateMushafBreakStatus();
     renderDailyOverview();
