@@ -1,4 +1,20 @@
 @font-face {
+    font-family: 'Uthmani-Hafs-KFGQPC';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('./Uthmani Hafs @Am9li9.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'LPMQ-Misbah';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('./Elgharib-LPMQ Misbah-Taweel.ttf') format('truetype');
+}
+
+@font-face {
     font-family: 'Cairo';
     font-style: normal;
     font-weight: 400;
@@ -52,6 +68,15 @@
     font-weight: 400;
     font-display: swap;
     src: url('./amiri-quran-400.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Amiri Quran Annotation Marks';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('./amiri-quran-400.ttf') format('truetype');
+    unicode-range: U+06E2, U+06ED;
 }
 
 @font-face {

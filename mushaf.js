@@ -86,6 +86,10 @@ function setPageZoomMode(enabled) {
     pagePaper.getAnimations().forEach(animation => animation.cancel());
     const fromRect = pagePaper.getBoundingClientRect();
     document.body.classList.toggle('page-zoom-mode', enabled);
+    if (enabled) {
+        readingArea.scrollTop = 0;
+        readingArea.scrollLeft = 0;
+    }
     const toRect = pagePaper.getBoundingClientRect();
     pageZoomToggle.setAttribute('aria-pressed', String(enabled));
     const label = enabled ? 'إغلاق تكبير صفحة المصحف' : 'تكبير صفحة المصحف';
@@ -94,7 +98,7 @@ function setPageZoomMode(enabled) {
     document.body.classList.remove('zoom-controls-hidden');
     lastZoomScrollTop = 0;
 
-    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && toRect.width && toRect.height) {
+    if (!enabled && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && toRect.width && toRect.height) {
         const translateX = fromRect.left - toRect.left;
         const translateY = fromRect.top - toRect.top;
         const scaleX = fromRect.width / toRect.width;
@@ -507,19 +511,47 @@ function removeOpeningBasmala(text) {
     return withoutBom.slice(opening[1].length).trimStart();
 }
 
-function appendQuranText(container, text) {
-    const parts = String(text || '').split(/([\u06D6-\u06ED])/u);
-    parts.forEach(part => {
+function appendQuranWords(container, text) {
+    String(text || '').split(/(\s+)/u).forEach(part => {
         if (!part) return;
-        if (/^[\u06D6-\u06ED]$/u.test(part)) {
-            const stopMark = document.createElement('span');
-            stopMark.className = 'quran-stop-mark';
-            stopMark.textContent = part;
-            container.append(stopMark);
-        } else {
+        if (/^\s+$/u.test(part)) {
             container.append(document.createTextNode(part));
+            return;
         }
+
+        const word = document.createElement('span');
+        word.className = 'quran-word';
+        if (part.includes('\u06DF')) word.classList.add('quran-word--round-zero');
+        // Keep the source Quran text intact, but omit the two small-meem
+        // annotation glyphs that this display font renders as hollow circles.
+        word.textContent = part.replace(/[\u06E2\u06ED]/gu, '');
+        container.append(word);
     });
+}
+
+function appendQuranText(container, text) {
+    // Keep vowel/combining marks attached to their letters. Only isolate the
+    // seven standalone waqf signs when whitespace on both sides proves they
+    // are annotation signs, so their visual position can be tuned safely.
+    const source = String(text || '');
+    const signs = /[\u06D6-\u06DC]/gu;
+    let lastIndex = 0;
+
+    for (const match of source.matchAll(signs)) {
+        const index = match.index;
+        const hasSpaceBefore = index > 0 && /\s/u.test(source[index - 1]);
+        const hasSpaceAfter = index + 1 < source.length && /\s/u.test(source[index + 1]);
+        if (!hasSpaceBefore || !hasSpaceAfter) continue;
+
+        if (index > lastIndex) appendQuranWords(container, source.slice(lastIndex, index));
+        const stopMark = document.createElement('span');
+        stopMark.className = 'quran-stop-mark';
+        stopMark.textContent = match[0];
+        container.append(stopMark);
+        lastIndex = index + match[0].length;
+    }
+
+    if (lastIndex < source.length) appendQuranWords(container, source.slice(lastIndex));
 }
 
 function renderPage(pageData) {
