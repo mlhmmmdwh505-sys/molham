@@ -20,7 +20,7 @@
     <link rel="manifest" href="manifest.json?v=11">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="stylesheet" href="fonts.css?v=1">
-    <link rel="stylesheet" href="mushaf.css?v=23">
+    <link rel="stylesheet" href="mushaf.css?v=29">
 </head>
 <body>
     <div class="mushaf-app">
@@ -41,6 +41,11 @@
                     <span class="reader-mode-icon reader-mode-sun" aria-hidden="true">☼</span>
                     <span class="reader-mode-icon reader-mode-moon" aria-hidden="true">☾</span>
                 </button>
+                <button class="reader-plans-toggle" id="readerPlansToggle" type="button" aria-expanded="false" aria-controls="readerPlans" aria-label="إظهار متابع الختمة وختم سورة كل يوم" title="إظهار متابع الختمة وختم سورة كل يوم">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+                        <path d="M4 19.5h16M6.5 16v-4M11.75 16V8M17 16V4.5" />
+                    </svg>
+                </button>
                 <div class="saved-position" id="savedPosition" hidden>
                     <span class="saved-dot" aria-hidden="true"></span>
                     <span id="savedPositionText">موضعك محفوظ</span>
@@ -57,14 +62,17 @@
                 </div>
                 <div class="reader-jump-tools">
                     <form class="page-jump" id="pageJumpForm">
-                        <label for="pageNumberInput">اذهب إلى صفحة</label>
+                        <label class="page-jump-label" for="pageNumberInput">
+                            <span>اذهب إلى صفحة</span>
+                            <small class="current-page-surah" id="currentPageSurah" aria-live="polite">السورة الحالية</small>
+                        </label>
                         <div class="jump-controls">
                             <input id="pageNumberInput" type="number" inputmode="numeric" min="1" max="604" value="1" aria-label="رقم الصفحة من ١ إلى ٦٠٤">
                             <button type="submit">انتقال</button>
                         </div>
                     </form>
                     <form class="surah-jump" id="surahJumpForm">
-                        <label for="surahSelect">اذهب إلى سورة</label>
+                        <label for="surahSelect">اختر سورة للانتقال</label>
                         <div class="jump-controls">
                             <select id="surahSelect" aria-label="اختر سورة للانتقال إليها">
                                 <option value="">جارٍ تحميل السور…</option>
@@ -75,6 +83,7 @@
                 </div>
             </section>
 
+            <div class="reader-plans" id="readerPlans" hidden>
             <section class="khatma-card" aria-labelledby="khatmaTitle">
                 <div class="khatma-heading">
                     <span class="khatma-mark" aria-hidden="true">۞</span>
@@ -152,6 +161,7 @@
                 </div>
                 <p class="khatma-status" id="dailySurahStatus" aria-live="polite">يُحفظ تقدم الخطة على هذا الجهاز.</p>
             </section>
+            </div>
 
             <section class="reading-area" id="readingArea" tabindex="-1" aria-label="صفحة المصحف">
                 <div class="page-paper" id="pagePaper" tabindex="-1" aria-busy="true">
@@ -186,21 +196,7 @@
                 </div>
             </section>
 
-            <nav class="page-navigation" aria-label="التنقل بين صفحات المصحف">
-                <button class="page-step" id="previousPageButton" type="button" aria-label="الصفحة السابقة" disabled>
-                    <span class="step-arrow" aria-hidden="true">→</span><span>السابقة</span>
-                </button>
-                <div class="reading-progress">
-                    <div class="progress-copy"><span>تقدّم القراءة</span><strong id="pageCounter">١ / ٦٠٤</strong></div>
-                    <div class="progress-track" role="progressbar" aria-label="التقدم في صفحات المصحف" aria-valuemin="1" aria-valuemax="604" aria-valuenow="1">
-                        <span id="progressFill"></span>
-                    </div>
-                </div>
-                <button class="page-step" id="nextPageButton" type="button" aria-label="الصفحة التالية">
-                    <span>التالية</span><span class="step-arrow" aria-hidden="true">←</span>
-                </button>
-            </nav>
-            <p class="reader-status" id="readerStatus" aria-live="polite">اسحب الصفحة من اليسار إلى اليمين للتالية، أو من اليمين إلى اليسار للسابقة.</p>
+            <p class="reader-status" id="readerStatus" aria-live="polite">اسحب الصفحة يمينًا أو يسارًا للتنقل بين الصفحات.</p>
         </main>
 
         <footer class="reader-footer">
@@ -210,6 +206,6 @@
         </footer>
     </div>
     <script src="quran-data.js" defer></script>
-    <script src="mushaf.js?v=19" defer></script>
+    <script src="mushaf.js?v=22" defer></script>
 </body>
 </html>

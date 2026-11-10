@@ -8,18 +8,14 @@ const pagePaper = document.getElementById('pagePaper');
 const pageContent = document.getElementById('pageContent');
 const pageLoading = document.getElementById('pageLoading');
 const pageError = document.getElementById('pageError');
-const previousButton = document.getElementById('previousPageButton');
-const nextButton = document.getElementById('nextPageButton');
 const pageInput = document.getElementById('pageNumberInput');
+const currentPageSurah = document.getElementById('currentPageSurah');
 const surahSelect = document.getElementById('surahSelect');
 const surahJumpButton = document.getElementById('surahJumpButton');
-const pageCounter = document.getElementById('pageCounter');
 const pageHeaderNumber = document.getElementById('pageHeaderNumber');
 const pageFooterNumber = document.getElementById('pageFooterNumber');
 const pageJuzNumber = document.getElementById('pageJuzNumber');
 const pageHizbNumber = document.getElementById('pageHizbNumber');
-const progressTrack = document.querySelector('.progress-track');
-const progressFill = document.getElementById('progressFill');
 const readerStatus = document.getElementById('readerStatus');
 const savedPosition = document.getElementById('savedPosition');
 const savedPositionText = document.getElementById('savedPositionText');
@@ -41,6 +37,8 @@ const khatmaOverallHint = document.getElementById('khatmaOverallHint');
 const khatmaStatus = document.getElementById('khatmaStatus');
 const continueReadingButton = document.getElementById('continueReadingButton');
 const readingArea = document.getElementById('readingArea');
+const readerPlansToggle = document.getElementById('readerPlansToggle');
+const readerPlans = document.getElementById('readerPlans');
 const dailySurahForm = document.getElementById('dailySurahForm');
 const dailySurahSelect = document.getElementById('dailySurahSelect');
 const dailySurahDurationInput = document.getElementById('dailySurahDuration');
@@ -467,14 +465,9 @@ function toArabicNumber(value) {
 }
 
 function updatePageControls() {
-    previousButton.disabled = isLoading || currentPage <= 1;
-    nextButton.disabled = isLoading || currentPage >= PAGE_COUNT;
     pageInput.value = String(currentPage);
-    pageCounter.textContent = `${toArabicNumber(currentPage)} / ${toArabicNumber(PAGE_COUNT)}`;
     pageHeaderNumber.textContent = toArabicNumber(currentPage);
     pageFooterNumber.textContent = toArabicNumber(currentPage);
-    progressTrack.setAttribute('aria-valuenow', String(currentPage));
-    progressFill.style.width = `${(currentPage / PAGE_COUNT) * 100}%`;
 }
 
 function appendSurahHeading(container, surah) {
@@ -521,6 +514,13 @@ function renderPage(pageData) {
     pageJuzNumber.textContent = formatPageLocations(ayahs, ayah => ayah.juz);
     pageHizbNumber.textContent = formatPageLocations(ayahs, ayah => Math.ceil(Number(ayah.hizbQuarter) / 4));
 
+    const currentSurahNumber = Number(ayahs[0]?.surahNumber ?? ayahs[0]?.surah?.number);
+    const currentSurah = surahByNumber.get(currentSurahNumber) || ayahs[0]?.surah;
+    if (Number.isInteger(currentSurahNumber) && currentSurah) {
+        currentPageSurah.textContent = currentSurah.name || `سورة ${currentSurahNumber}`;
+        surahSelect.value = String(currentSurahNumber);
+    }
+
     pageContent.replaceChildren();
     const seenSurahs = new Map();
     let previousSurahNumber = null;
@@ -540,9 +540,12 @@ function renderPage(pageData) {
         verse.textContent = hasSeparateBasmala ? removeOpeningBasmala(ayah.text) : (ayah.text || '');
 
         const marker = document.createElement('span');
-        marker.className = 'ayah-marker';
-        marker.setAttribute('aria-label', `الآية ${toArabicNumber(ayah.numberInSurah)}`);
-        marker.textContent = toArabicNumber(ayah.numberInSurah);
+        const ayahNumber = toArabicNumber(ayah.numberInSurah);
+        marker.className = Number(ayah.numberInSurah) >= 100
+            ? 'ayah-marker ayah-marker--three-digit'
+            : 'ayah-marker';
+        marker.setAttribute('aria-label', `الآية ${ayahNumber}`);
+        marker.textContent = ayahNumber;
         verse.append(marker, document.createTextNode(' '));
         pageContent.append(verse);
 
@@ -669,8 +672,6 @@ function goToPage(pageNumber) {
     loadPage(pageNumber, false, true);
 }
 
-document.getElementById('previousPageButton').addEventListener('click', () => goToPage(currentPage - 1));
-document.getElementById('nextPageButton').addEventListener('click', () => goToPage(currentPage + 1));
 document.getElementById('retryPageButton').addEventListener('click', () => loadPage(currentPage, true));
 document.getElementById('pageJumpForm').addEventListener('submit', event => {
     event.preventDefault();
@@ -783,6 +784,17 @@ document.addEventListener('visibilitychange', () => {
 continueReadingButton.addEventListener('click', () => {
     readingArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
     readerStatus.textContent = `تابع القراءة من الصفحة ${toArabicNumber(currentPage)}.`;
+});
+
+readerPlansToggle.addEventListener('click', () => {
+    const isOpen = readerPlansToggle.getAttribute('aria-expanded') === 'true';
+    readerPlans.hidden = isOpen;
+    readerPlansToggle.setAttribute('aria-expanded', String(!isOpen));
+    const label = isOpen
+        ? 'إظهار متابع الختمة وختم سورة كل يوم'
+        : 'إخفاء متابع الختمة وختم سورة كل يوم';
+    readerPlansToggle.setAttribute('aria-label', label);
+    readerPlansToggle.title = label;
 });
 
 document.addEventListener('keydown', event => {
