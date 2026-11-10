@@ -546,7 +546,13 @@ function renderPage(pageData) {
             ? 'ayah-marker ayah-marker--three-digit'
             : numberInSurah >= 10 ? 'ayah-marker ayah-marker--two-digit' : 'ayah-marker';
         marker.setAttribute('aria-label', `الآية ${ayahNumber}`);
-        marker.textContent = ayahNumber;
+        const markerNumber = document.createElement('span');
+        const tensDigit = Math.floor(numberInSurah / 10) % 10;
+        markerNumber.className = tensDigit === 1
+            ? 'ayah-marker-number ayah-marker-number--left-adjusted'
+            : 'ayah-marker-number';
+        markerNumber.textContent = ayahNumber;
+        marker.append(markerNumber);
         verse.append(marker, document.createTextNode(' '));
         pageContent.append(verse);
 

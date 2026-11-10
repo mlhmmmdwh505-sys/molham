@@ -189,6 +189,8 @@ button { -webkit-appearance: none; appearance: none; }
 .ayah-marker { position: relative; isolation: isolate; display: inline-grid; width: 2.15em; height: 2.15em; margin: 0 .1em; place-items: center; border: 0; border-radius: 0; background: transparent; color: var(--paper-secondary); font: 700 .43em/1 'Amiri', serif; vertical-align: .24em; }
 .ayah-marker::before { position: absolute; z-index: -1; inset: 0; background: color-mix(in srgb, var(--paper) 84%, var(--paper-secondary) 16%); clip-path: polygon(50% 0%, 56% 10%, 68% 4%, 71% 17%, 84% 13%, 83% 27%, 97% 34%, 88% 45%, 100% 53%, 88% 61%, 95% 74%, 81% 78%, 78% 92%, 65% 87%, 55% 100%, 46% 89%, 33% 96%, 29% 82%, 16% 85%, 18% 71%, 4% 64%, 12% 53%, 0% 45%, 12% 37%, 5% 24%, 19% 21%, 23% 8%, 36% 13%, 45% 1%); content: ''; filter: drop-shadow(0 0 1px var(--paper-secondary)); }
 .ayah-marker::after { position: absolute; z-index: -1; inset: 8%; border: 1px solid color-mix(in srgb, var(--paper-secondary) 82%, transparent); border-radius: 50%; content: ''; }
+.ayah-marker-number { position: relative; z-index: 1; display: block; white-space: nowrap; }
+.ayah-marker-number--left-adjusted { transform: translateX(-.12em); }
 .ayah-marker--two-digit { font-size: .5em; }
 .ayah-marker--three-digit { width: 2.65em; height: 2.65em; margin-inline: .12em; font-size: .5em; }
 .page-loading { display: flex; min-height: 290px; align-items: center; justify-content: center; gap: 10px; color: var(--paper-muted); font-size: 12px; }
