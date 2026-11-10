@@ -167,9 +167,10 @@ button { -webkit-appearance: none; appearance: none; }
 .reading-area:focus-visible { outline: none !important; }
 .page-paper::before { position: absolute; z-index: 0; inset: 8px; border: 1px solid rgba(183, 156, 91, .32); border-radius: 14px; content: ''; pointer-events: none; }
 .paper-inner { position: relative; z-index: 1; display: flex; min-height: max(62dvh, 500px); flex-direction: column; padding: 20px clamp(20px, 5.4vw, 54px) 16px; }
-.paper-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 34px; color: var(--paper-heading); font: 700 15px/1.4 'Amiri', serif; }
-.paper-side-mark { color: var(--reader-gold); font: 22px/1 'Amiri', serif; }
-.paper-page-label { color: var(--paper-muted); font: 600 10px/1.5 'Cairo', sans-serif; white-space: nowrap; }
+.paper-header { display: grid; grid-template-columns: minmax(0, 1fr) max-content minmax(0, 1fr); align-items: center; gap: 10px; min-height: 34px; color: var(--paper-heading); font: 700 15px/1.4 'Amiri', serif; }
+.paper-header #surahHeader { min-width: 0; text-align: center; }
+.paper-side-mark { justify-self: start; color: var(--reader-gold); font: 22px/1 'Amiri', serif; }
+.paper-page-label { justify-self: end; color: var(--paper-muted); font: 600 10px/1.5 'Cairo', sans-serif; white-space: nowrap; }
 .paper-page-label b { display: inline-block; min-width: 20px; color: var(--paper-heading); font-size: 12px; text-align: center; }
 .paper-rule { position: relative; display: flex; align-items: center; gap: 10px; height: 24px; margin-bottom: 5px; color: var(--reader-gold); font-size: 10px; }
 .paper-rule::before, .paper-rule::after { height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(173,141,76,.48)); content: ''; }
@@ -179,6 +180,7 @@ button { -webkit-appearance: none; appearance: none; }
 .page-meta b { color: var(--paper-heading); font-size: 11px; font-variant-numeric: tabular-nums; }
 .meta-divider { color: var(--reader-gold); font: 14px/1 'Amiri', serif; }
 .page-content { min-height: 330px; flex: 1; padding: 5px 0 15px; color: var(--paper-ink); text-align: center; font-family: 'Amiri Quran', 'Amiri', serif; font-size: clamp(25px, 3vw, 34px); font-weight: 400; line-height: 2.12; text-rendering: optimizeLegibility; transition: opacity .18s ease, color .32s ease; }
+.quran-stop-mark { position: relative; top: .3em; display: inline-block; line-height: 1; }
 .page-content[hidden] { display: none; }
 .page-paper.is-loading { opacity: .88; transform: scale(.995); }
 .surah-heading { display: flex; align-items: center; justify-content: center; gap: 11px; margin: 9px 0 4px; color: var(--paper-heading); font: 700 22px/1.4 'Amiri', serif; }

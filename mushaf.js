@@ -507,6 +507,21 @@ function removeOpeningBasmala(text) {
     return withoutBom.slice(opening[1].length).trimStart();
 }
 
+function appendQuranText(container, text) {
+    const parts = String(text || '').split(/([\u06D6-\u06ED])/u);
+    parts.forEach(part => {
+        if (!part) return;
+        if (/^[\u06D6-\u06ED]$/u.test(part)) {
+            const stopMark = document.createElement('span');
+            stopMark.className = 'quran-stop-mark';
+            stopMark.textContent = part;
+            container.append(stopMark);
+        } else {
+            container.append(document.createTextNode(part));
+        }
+    });
+}
+
 function renderPage(pageData) {
     const ayahs = Array.isArray(pageData?.ayahs) ? pageData.ayahs : [];
     if (ayahs.length === 0) throw new Error('No verses returned for this page.');
@@ -537,7 +552,8 @@ function renderPage(pageData) {
         verse.className = 'quran-ayah';
         const isOpeningVerse = Number(ayah.numberInSurah) === 1;
         const hasSeparateBasmala = isOpeningVerse && surahNumber !== 1 && surahNumber !== 9;
-        verse.textContent = hasSeparateBasmala ? removeOpeningBasmala(ayah.text) : (ayah.text || '');
+        const ayahText = hasSeparateBasmala ? removeOpeningBasmala(ayah.text) : (ayah.text || '');
+        appendQuranText(verse, ayahText);
 
         const marker = document.createElement('span');
         const numberInSurah = Number(ayah.numberInSurah);
