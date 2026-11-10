@@ -540,10 +540,11 @@ function renderPage(pageData) {
         verse.textContent = hasSeparateBasmala ? removeOpeningBasmala(ayah.text) : (ayah.text || '');
 
         const marker = document.createElement('span');
-        const ayahNumber = toArabicNumber(ayah.numberInSurah);
-        marker.className = Number(ayah.numberInSurah) >= 100
+        const numberInSurah = Number(ayah.numberInSurah);
+        const ayahNumber = toArabicNumber(numberInSurah);
+        marker.className = numberInSurah >= 100
             ? 'ayah-marker ayah-marker--three-digit'
-            : 'ayah-marker';
+            : numberInSurah >= 10 ? 'ayah-marker ayah-marker--two-digit' : 'ayah-marker';
         marker.setAttribute('aria-label', `الآية ${ayahNumber}`);
         marker.textContent = ayahNumber;
         verse.append(marker, document.createTextNode(' '));
