@@ -107,6 +107,10 @@ function setPageZoomMode(enabled, syncFullscreen = true) {
     const fromRect = pagePaper.getBoundingClientRect();
     document.documentElement.classList.toggle('page-zoom-mode', enabled);
     document.body.classList.toggle('page-zoom-mode', enabled);
+    if (window.parent !== window) {
+        const parentOrigin = window.location.origin === 'null' ? '*' : window.location.origin;
+        window.parent.postMessage({ type: 'molham:mushaf-zoom-mode', enabled }, parentOrigin);
+    }
     if (!enabled) showPageByPageView();
     if (enabled) {
         readingArea.scrollTop = 0;

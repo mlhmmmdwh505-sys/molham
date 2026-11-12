@@ -398,6 +398,7 @@ function openContentOverlay(kind) {
     contentOverlayOpener = document.activeElement;
     mushafSessionOpen = kind === 'mushaf';
     const isMushaf = mushafSessionOpen;
+    overlay.classList.remove('is-mushaf-zoomed');
     const title = document.getElementById('mushafOverlayTitle');
     const closeButton = document.getElementById('closeMushafOverlayButton');
     if (title) title.textContent = isMushaf ? 'المصحف الشريف' : 'السبحة';
@@ -420,7 +421,7 @@ function openContentOverlay(kind) {
             frame.focus({ preventScroll: true });
         }
     }, { once: true });
-    frame.src = isMushaf ? './mushaf.html?v=58' : './tasbeeh.html?v=14';
+    frame.src = isMushaf ? './mushaf.html?v=59' : './tasbeeh.html?v=14';
 }
 
 function openMushafOverlay() {
@@ -437,6 +438,7 @@ function closeMushafOverlay() {
     mushafSessionOpen = false;
     const overlay = document.getElementById('mushafSessionOverlay');
     const frame = document.getElementById('mushafFrame');
+    if (overlay) overlay.classList.remove('is-mushaf-zoomed');
     document.documentElement.classList.remove('mushaf-session-open');
     document.body.classList.remove('mushaf-session-open');
     if (overlay) overlay.hidden = true;
@@ -689,6 +691,9 @@ function initializeDashboardFeatures() {
     window.addEventListener('message', event => {
         if (event.origin !== window.location.origin || event.source !== mushafFrame?.contentWindow) return;
         if (event.data?.type === 'molham:close-mushaf' || event.data?.type === 'molham:close-tasbeeh') closeMushafOverlay();
+        if (event.data?.type === 'molham:mushaf-zoom-mode') {
+            document.getElementById('mushafSessionOverlay')?.classList.toggle('is-mushaf-zoomed', Boolean(event.data.enabled));
+        }
     });
     document.addEventListener('keydown', event => {
         if (!mushafSessionOpen) return;
