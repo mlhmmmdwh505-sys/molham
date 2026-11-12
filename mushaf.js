@@ -118,7 +118,6 @@ function setPageZoomMode(enabled, syncFullscreen = true) {
     pageZoomToggle.setAttribute('aria-label', label);
     pageZoomToggle.title = label;
     document.body.classList.remove('zoom-controls-hidden');
-    lastZoomScrollTop = 0;
 
     if (syncFullscreen && enabled && !document.fullscreenElement) {
         const requestFullscreen = document.documentElement.requestFullscreen?.bind(document.documentElement)
@@ -162,18 +161,10 @@ function syncPageZoomAfterFullscreenExit() {
 document.addEventListener('fullscreenchange', syncPageZoomAfterFullscreenExit);
 document.addEventListener('webkitfullscreenchange', syncPageZoomAfterFullscreenExit);
 
-let lastZoomScrollTop = 0;
 readingArea.addEventListener('scroll', () => {
     if (!document.body.classList.contains('page-zoom-mode')) return;
     const currentTop = readingArea.scrollTop;
-    if (currentTop <= 8) {
-        document.body.classList.remove('zoom-controls-hidden');
-    } else if (currentTop > lastZoomScrollTop + 2) {
-        document.body.classList.add('zoom-controls-hidden');
-    } else if (currentTop < lastZoomScrollTop - 2) {
-        document.body.classList.remove('zoom-controls-hidden');
-    }
-    lastZoomScrollTop = currentTop;
+    document.body.classList.toggle('zoom-controls-hidden', currentTop > 8);
 }, { passive: true });
 
 pageZoomToggle.addEventListener('click', () => {
@@ -871,7 +862,6 @@ async function loadPage(pageNumber, forceRefresh = false, resetToPageStart = fal
                     readingArea.scrollTop = 0;
                     readingArea.scrollLeft = 0;
                     document.body.classList.remove('zoom-controls-hidden');
-                    lastZoomScrollTop = 0;
                 } else {
                     readingArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }

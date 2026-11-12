@@ -308,12 +308,17 @@ html.page-zoom-mode { width: 100%; height: 100%; overflow: hidden; }
 body.page-zoom-mode { position: fixed; inset: 0; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; }
 body.page-zoom-mode .reader-header { position: fixed; z-index: 1200; inset: 0; min-height: 0; pointer-events: none; }
 body.page-zoom-mode .reader-header > :not(.reader-header-actions) { display: none !important; }
-body.page-zoom-mode .reader-header-actions { position: fixed; z-index: 1201; top: 8px; right: 12px; left: auto; display: flex; align-items: center; gap: 8px; padding: 4px; border: 1px solid color-mix(in srgb, var(--reader-gold) 38%, var(--paper-edge)); border-radius: 999px; background: color-mix(in srgb, var(--paper) 92%, transparent); box-shadow: 0 6px 22px rgba(0, 0, 0, .2); backdrop-filter: blur(12px); pointer-events: auto; }
+body.page-zoom-mode .reader-header-actions { position: fixed; z-index: 1201; top: calc(12px + env(safe-area-inset-top)); right: calc(12px + env(safe-area-inset-right)); left: auto; display: flex; flex-direction: column; align-items: center; gap: 7px; padding: 6px; border: 1px solid color-mix(in srgb, var(--reader-gold) 48%, var(--paper-edge)); border-radius: 28px; background: color-mix(in srgb, var(--paper) 90%, transparent); box-shadow: 0 9px 28px rgba(0, 0, 0, .2), inset 0 1px 0 color-mix(in srgb, var(--paper-ink) 12%, transparent); backdrop-filter: blur(14px) saturate(1.15); pointer-events: auto; }
 body.page-zoom-mode .reader-header-actions > :not(.reader-zoom-toggle):not(.reader-font-size-button) { display: none !important; }
-body.page-zoom-mode .reader-header-actions { transition: opacity .22s ease, visibility 0s linear .22s; }
+body.page-zoom-mode .reader-header-actions { transition: opacity .24s ease, transform .24s ease, visibility 0s linear; }
 body.page-zoom-mode #pageZoomToggle { position: relative; z-index: 1202; top: auto; right: auto; }
+body.page-zoom-mode .reader-header-actions .reader-zoom-toggle,
+body.page-zoom-mode .reader-header-actions .reader-font-size-button { flex-basis: 40px; width: 40px; height: 40px; border-color: color-mix(in srgb, var(--reader-gold) 42%, var(--paper-edge)); background: color-mix(in srgb, var(--paper-highlight) 88%, transparent); color: var(--paper-secondary); }
 body.page-zoom-mode .reader-font-size-button { display: grid; }
-body.page-zoom-mode.zoom-controls-hidden .reader-header-actions { visibility: hidden; opacity: 0; pointer-events: none; }
+body.page-zoom-mode .reader-header-actions .reader-zoom-toggle { border-color: color-mix(in srgb, var(--reader-gold) 60%, var(--reader-green)); background: linear-gradient(145deg, color-mix(in srgb, var(--reader-green) 86%, var(--paper)), var(--reader-green)); color: var(--reader-gold); box-shadow: inset 0 1px 0 rgba(255, 255, 255, .16), 0 3px 9px rgba(0, 0, 0, .16); }
+body.page-zoom-mode .reader-header-actions .reader-zoom-toggle:hover,
+body.page-zoom-mode .reader-header-actions .reader-font-size-button:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--reader-gold); }
+body.page-zoom-mode.zoom-controls-hidden .reader-header-actions { visibility: hidden; opacity: 0; transform: translateY(-8px); pointer-events: none; transition: opacity .24s ease, transform .24s ease, visibility 0s linear .24s; }
 body.page-zoom-mode .reader-intro,
 body.page-zoom-mode .khatma-card,
 body.page-zoom-mode .daily-surah-card,
@@ -334,7 +339,7 @@ body.full-surah-view .paper-page-label { display: inline-block !important; color
 body.full-surah-view .paper-page-label b { display: none; }
 body.full-surah-view .paper-page-label::before { content: '۞'; color: var(--reader-gold); font: 22px/1 'Amiri', serif; }
 @media (max-width: 700px) {
-    body.page-zoom-mode .reader-header-actions { top: 8px; right: 8px; left: auto; gap: 6px; padding: 3px; }
+    body.page-zoom-mode .reader-header-actions { top: calc(8px + env(safe-area-inset-top)); right: calc(8px + env(safe-area-inset-right)); left: auto; gap: 6px; padding: 3px; }
     body.page-zoom-mode #pageZoomToggle { top: auto; right: auto; }
     body.page-zoom-mode .reading-area { inset: 0; padding: 0; }
     body.page-zoom-mode .page-paper::before { inset: 6px; border-radius: 12px; }

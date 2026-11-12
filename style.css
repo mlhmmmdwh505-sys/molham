@@ -2597,4 +2597,30 @@ body.focus-mode .glass-card {
     border-radius: 0 !important;
 }
 
+/* Let the regular dashboard page use the full browser viewport. */
+html, body { width: 100%; min-height: 100%; }
+body:not(.focus-mode) {
+    display: block !important;
+    min-height: 100dvh !important;
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+body:not(.focus-mode) .glass-card {
+    width: 100% !important;
+    max-width: none !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: clamp(16px, 2.5vw, 32px) !important;
+    overflow: visible !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+}
+@media (max-width: 767px) {
+    body:not(.focus-mode) .glass-card { padding: 18px 12px 96px !important; }
+}
+
 
