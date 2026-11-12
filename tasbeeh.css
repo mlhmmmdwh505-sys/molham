@@ -860,3 +860,79 @@ body.tasbeeh-zoom-mode .counter-card { gap: clamp(3px, 1.2vh, 12px); }
     body.tasbeeh-zoom-mode .counter-orbit { width: min(100%, 720px); }
     body.tasbeeh-zoom-mode .counter-button { width: 70px; height: 70px; flex-basis: 70px; }
 }
+
+/* Phone layout: larger tap targets, compact header, and a real full-screen counter. */
+@media (max-width: 680px) {
+    .tasbeeh-app {
+        width: 100%;
+        padding: max(10px, env(safe-area-inset-top)) 12px calc(20px + env(safe-area-inset-bottom));
+    }
+    .tasbeeh-header {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 5px;
+        min-height: 46px;
+    }
+    .back-link { justify-self: start; min-width: 38px; }
+    .back-copy, .page-brand small { display: none; }
+    .page-brand { justify-self: center; gap: 7px; }
+    .tasbeeh-header-actions { justify-self: end; gap: 6px; }
+    .back-arrow, .theme-button, .zoom-button { width: 40px; height: 40px; }
+    .tasbeeh-main { margin: 14px auto 0; }
+    .page-intro { margin-bottom: 14px; }
+    .page-intro h1 { margin-top: 5px; font-size: clamp(26px, 7vw, 32px); }
+    .page-intro p { max-width: 360px; margin: 5px auto 0; font-size: 12px; line-height: 1.7; }
+    .tasbeeh-grid { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+    .counter-card { padding: 17px 12px 15px; border-radius: 22px; }
+    .counter-card h2, .daily-ward-heading h2 { font-size: 19px; }
+    .round-badge { padding-inline: 9px; }
+    .active-dhikr { min-height: 0; margin: 10px 0 8px; font-size: clamp(21px, 6vw, 27px); line-height: 1.55; }
+    .dhikr-shortcuts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+    .dhikr-shortcuts button { min-width: 0; min-height: 42px; padding: 4px 5px; font-size: clamp(9px, 2.8vw, 11px); line-height: 1.35; }
+    .dhikr-select-control { width: 100%; min-height: 48px; gap: 6px; margin: 0 auto 11px; padding-inline: 8px; }
+    .dhikr-select-label { font-size: 10px; }
+    .dhikr-select-control select { min-height: 36px; padding-inline: 7px 22px; font-size: 12px; }
+    .counter-orbit { width: min(76vw, 290px); height: min(76vw, 290px); flex: 0 0 min(76vw, 290px); margin: 3px auto 0; }
+    .counter-button { width: min(calc(100% - 42px), 230px); height: min(calc(100% - 42px), 230px); max-width: none; max-height: none; flex: 0 0 min(calc(100% - 42px), 230px); }
+    .count-value { font-size: clamp(42px, 13vw, 54px); }
+    .counter-status { min-height: 0; margin: 8px 0 10px; font-size: 11px; line-height: 1.6; }
+    .target-picker { flex-wrap: wrap; gap: 6px; margin: 2px 0 10px; }
+    .target-picker > span { font-size: 11px; }
+    .target-picker button { min-height: 40px; padding-inline: 12px; font-size: 11px; }
+    .counter-actions { flex-wrap: wrap; gap: 8px; }
+    .secondary-button { min-height: 44px; padding-inline: 14px; font-size: 11px; }
+    .daily-ward-card { padding: 17px 14px 15px; border-radius: 22px; }
+    .daily-ward-heading { margin-bottom: 14px; }
+    .daily-ward-mark { width: 42px; height: 42px; flex-basis: 42px; }
+    .daily-date-row { flex-wrap: wrap; font-size: 11px; }
+    .daily-total-row { min-height: 102px; margin: 11px 0 14px; padding: 13px; }
+    .daily-total-row strong { font-size: clamp(48px, 14vw, 58px); }
+    .daily-total-row > span:nth-child(2) { font-size: 11px; }
+    .daily-progress-track { height: 10px; }
+    .daily-progress-caption { font-size: 10px; }
+    .daily-status { min-height: 0; margin: 9px 0 13px; font-size: 11px; }
+    .daily-goal-picker { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+    .daily-goal-picker button { min-width: 0; min-height: 42px; padding-inline: 2px; font-size: 11px; }
+    .daily-note { padding-top: 14px; font-size: 9px; }
+    .privacy-note { gap: 10px; padding: 13px; }
+    .clear-local-data-button { min-height: 42px; }
+
+    body.tasbeeh-zoom-mode .tasbeeh-main {
+        height: 100dvh;
+        padding: max(12px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    }
+    body.tasbeeh-zoom-mode .counter-card { left: 50%; width: 100%; height: 100dvh; transform: translateX(-50%); gap: clamp(8px, 2vh, 18px); padding: 58px 10px max(12px, env(safe-area-inset-bottom)); }
+    body.tasbeeh-zoom-mode .active-dhikr { width: 100%; max-width: 420px; font-size: clamp(20px, 6vw, 30px); line-height: 1.45; text-align: center; }
+    body.tasbeeh-zoom-mode .counter-orbit { width: min(88vw, 42dvh, 360px); height: min(88vw, 42dvh, 360px); flex: 0 0 min(88vw, 42dvh, 360px); }
+    body.tasbeeh-zoom-mode .counter-button { width: min(64vw, 30dvh, 230px); height: min(64vw, 30dvh, 230px); flex: 0 0 min(64vw, 30dvh, 230px); margin: 0; }
+    body.tasbeeh-zoom-mode .count-value { font-size: clamp(42px, 14vw, 60px); }
+    body.tasbeeh-zoom-mode .counter-status { display: block; max-width: 360px; font-size: 11px; line-height: 1.5; text-align: center; }
+    body.tasbeeh-zoom-mode .zoom-button { width: 44px; height: 44px; }
+}
+
+@media (max-width: 680px) and (orientation: landscape) {
+    body.tasbeeh-zoom-mode .counter-card { gap: 4px; padding-top: 50px; }
+    body.tasbeeh-zoom-mode .active-dhikr { font-size: clamp(16px, 4vw, 22px); }
+    body.tasbeeh-zoom-mode .counter-orbit { width: min(54vw, 55dvh, 280px); height: min(54vw, 55dvh, 280px); flex-basis: min(54vw, 55dvh, 280px); }
+    body.tasbeeh-zoom-mode .counter-button { width: min(36vw, 36dvh, 170px); height: min(36vw, 36dvh, 170px); flex-basis: min(36vw, 36dvh, 170px); }
+}

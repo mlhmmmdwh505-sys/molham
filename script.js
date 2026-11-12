@@ -398,7 +398,7 @@ function openContentOverlay(kind) {
     contentOverlayOpener = document.activeElement;
     mushafSessionOpen = kind === 'mushaf';
     const isMushaf = mushafSessionOpen;
-    overlay.classList.remove('is-mushaf-zoomed');
+    overlay.classList.remove('is-mushaf-zoomed', 'is-tasbeeh-zoomed');
     const title = document.getElementById('mushafOverlayTitle');
     const closeButton = document.getElementById('closeMushafOverlayButton');
     if (title) title.textContent = isMushaf ? 'المصحف الشريف' : 'السبحة';
@@ -421,7 +421,7 @@ function openContentOverlay(kind) {
             frame.focus({ preventScroll: true });
         }
     }, { once: true });
-    frame.src = isMushaf ? './mushaf.html?v=60' : './tasbeeh.html?v=14';
+    frame.src = isMushaf ? './mushaf.html?v=60' : './tasbeeh.html?v=15';
 }
 
 function openMushafOverlay() {
@@ -438,7 +438,7 @@ function closeMushafOverlay() {
     mushafSessionOpen = false;
     const overlay = document.getElementById('mushafSessionOverlay');
     const frame = document.getElementById('mushafFrame');
-    if (overlay) overlay.classList.remove('is-mushaf-zoomed');
+    if (overlay) overlay.classList.remove('is-mushaf-zoomed', 'is-tasbeeh-zoomed');
     document.documentElement.classList.remove('mushaf-session-open');
     document.body.classList.remove('mushaf-session-open');
     if (overlay) overlay.hidden = true;
@@ -693,6 +693,9 @@ function initializeDashboardFeatures() {
         if (event.data?.type === 'molham:close-mushaf' || event.data?.type === 'molham:close-tasbeeh') closeMushafOverlay();
         if (event.data?.type === 'molham:mushaf-zoom-mode') {
             document.getElementById('mushafSessionOverlay')?.classList.toggle('is-mushaf-zoomed', Boolean(event.data.enabled));
+        }
+        if (event.data?.type === 'molham:tasbeeh-zoom-mode') {
+            document.getElementById('mushafSessionOverlay')?.classList.toggle('is-tasbeeh-zoomed', Boolean(event.data.enabled));
         }
     });
     document.addEventListener('keydown', event => {

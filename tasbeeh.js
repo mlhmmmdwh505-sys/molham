@@ -393,13 +393,17 @@ themeToggle.addEventListener('click', () => {
 function setZoomMode(enabled, syncFullscreen = true) {
     document.documentElement.classList.toggle('tasbeeh-zoom-mode', enabled);
     document.body.classList.toggle('tasbeeh-zoom-mode', enabled);
+    if (window.parent !== window) {
+        const parentOrigin = window.location.origin === 'null' ? '*' : window.location.origin;
+        window.parent.postMessage({ type: 'molham:tasbeeh-zoom-mode', enabled }, parentOrigin);
+    }
     zoomToggle.setAttribute('aria-pressed', String(enabled));
     zoomToggle.querySelector('span').textContent = enabled ? '⤡' : '⤢';
     const label = enabled ? 'إغلاق تكبير السبحة' : 'تكبير السبحة';
     zoomToggle.setAttribute('aria-label', label);
     zoomToggle.title = label;
     if (enabled) {
-        if (syncFullscreen && !document.fullscreenElement) {
+        if (syncFullscreen && !document.fullscreenElement && !document.webkitFullscreenElement) {
             const requestFullscreen = document.documentElement.requestFullscreen?.bind(document.documentElement)
                 || document.documentElement.webkitRequestFullscreen?.bind(document.documentElement);
             try {
@@ -409,7 +413,7 @@ function setZoomMode(enabled, syncFullscreen = true) {
         }
         window.requestAnimationFrame(() => countButton.focus({ preventScroll: true }));
     } else {
-        if (syncFullscreen && document.fullscreenElement) {
+        if (syncFullscreen && (document.fullscreenElement || document.webkitFullscreenElement)) {
             const exitFullscreen = document.exitFullscreen?.bind(document)
                 || document.webkitExitFullscreen?.bind(document);
             try {
