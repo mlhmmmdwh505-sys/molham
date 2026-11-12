@@ -20,7 +20,7 @@
     <link rel="manifest" href="manifest.json?v=11">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="stylesheet" href="fonts.css?v=11">
-    <link rel="stylesheet" href="mushaf.css?v=71">
+    <link rel="stylesheet" href="mushaf.css?v=76">
 </head>
 <body>
     <div class="mushaf-app">
@@ -37,6 +37,8 @@
                 <button class="reader-zoom-toggle" id="pageZoomToggle" type="button" aria-pressed="false" aria-label="تكبير المصحف" title="تكبير المصحف">
                     <span aria-hidden="true">⤢</span>
                 </button>
+                <button class="reader-font-size-button" id="mushafZoomOut" type="button" aria-label="تصغير خط القرآن" title="تصغير خط القرآن" aria-controls="pageContent">−</button>
+                <button class="reader-font-size-button" id="mushafZoomIn" type="button" aria-label="تكبير خط القرآن" title="تكبير خط القرآن" aria-controls="pageContent">+</button>
                 <button class="reader-theme-toggle" id="readerThemeToggle" type="button" role="switch" aria-checked="false" aria-label="التبديل إلى الوضع الفاتح" title="التبديل إلى الوضع الفاتح">
                     <span class="reader-mode-icon reader-mode-sun" aria-hidden="true">☼</span>
                     <span class="reader-mode-icon reader-mode-moon" aria-hidden="true">☾</span>
@@ -207,6 +209,6 @@
         <p class="reader-source">للتدقيق في النص: <a href="https://qurancomplex.gov.sa/quran-dev/" target="_blank" rel="noopener noreferrer">بيانات المصحف المعتمدة من مجمع الملك فهد</a> · <a href="https://quran.ksu.edu.sa/tafseer/saadi/sura6-aya151.html" target="_blank" rel="noopener noreferrer">مشروع آيات بجامعة الملك سعود</a></p>
     </div>
     <script src="quran-data.js?v=2" defer></script>
-    <script src="mushaf.js?v=50" defer></script>
+    <script src="mushaf.js?v=52" defer></script>
 </body>
 </html>

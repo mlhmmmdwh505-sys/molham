@@ -22,6 +22,8 @@ const savedPositionText = document.getElementById('savedPositionText');
 const surahHeader = document.getElementById('surahHeader');
 const themeToggle = document.getElementById('readerThemeToggle');
 const pageZoomToggle = document.getElementById('pageZoomToggle');
+const mushafZoomOutButton = document.getElementById('mushafZoomOut');
+const mushafZoomInButton = document.getElementById('mushafZoomIn');
 const backLink = document.querySelector('.back-link');
 const khatmaForm = document.getElementById('khatmaForm');
 const khatmaDurationInput = document.getElementById('khatmaDuration');
@@ -53,6 +55,7 @@ const completeDailySurahButton = document.getElementById('completeDailySurahButt
 
 let currentPage = readLastPage();
 let isLoading = false;
+let mushafTextScale = 1;
 let surahCatalog = [];
 let surahByNumber = new Map();
 let quranAyahsBySurah = new Map();
@@ -83,6 +86,17 @@ function setMushafTheme(theme, persist = true) {
 themeToggle.addEventListener('click', () => {
     setMushafTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
 });
+
+function setMushafTextScale(nextScale) {
+    mushafTextScale = Math.min(2, Math.max(0.7, Math.round(nextScale * 10) / 10));
+    document.body.style.setProperty('--mushaf-text-scale', String(mushafTextScale));
+    mushafZoomOutButton.disabled = mushafTextScale <= 0.7;
+    mushafZoomInButton.disabled = mushafTextScale >= 2;
+    readerStatus.textContent = `حجم خط القرآن ${toArabicNumber(Math.round(mushafTextScale * 100))}٪.`;
+}
+
+mushafZoomOutButton.addEventListener('click', () => setMushafTextScale(mushafTextScale - 0.1));
+mushafZoomInButton.addEventListener('click', () => setMushafTextScale(mushafTextScale + 0.1));
 
 function setPageZoomMode(enabled, syncFullscreen = true) {
     const wasEnabled = document.body.classList.contains('page-zoom-mode');

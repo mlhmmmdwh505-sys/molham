@@ -60,8 +60,11 @@ button { -webkit-appearance: none; appearance: none; }
 .reader-header-actions { display: flex; align-items: center; gap: 13px; }
 .reader-theme-toggle { position: relative; display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid var(--reader-border); border-radius: 50%; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; transition: background-color .28s ease, border-color .28s ease, transform .28s ease; }
 .reader-zoom-toggle { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid var(--reader-border); border-radius: 50%; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; font-size: 21px; line-height: 1; transition: background-color .28s ease, border-color .28s ease, transform .28s ease; }
+.reader-font-size-button { display: none; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid var(--reader-border); border-radius: 50%; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; font: 700 24px/1 'Cairo', sans-serif; transition: background-color .2s ease, border-color .2s ease, transform .2s ease; }
 .reader-theme-toggle:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 3px; }
 .reader-zoom-toggle:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 3px; }
+.reader-font-size-button:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 3px; }
+.reader-font-size-button:disabled { opacity: .45; cursor: default; }
 .reader-mode-icon { position: absolute; inset: 0; display: grid; place-items: center; font-size: 21px; line-height: 1; transition: opacity .24s ease, transform .36s cubic-bezier(.22, 1, .36, 1); }
 .reader-mode-sun { opacity: 1; transform: rotate(0) scale(1); }
 .reader-mode-moon { opacity: 0; transform: rotate(-55deg) scale(.6); }
@@ -305,10 +308,11 @@ html.page-zoom-mode { width: 100%; height: 100%; overflow: hidden; }
 body.page-zoom-mode { position: fixed; inset: 0; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; }
 body.page-zoom-mode .reader-header { position: fixed; z-index: 1200; inset: 0; min-height: 0; pointer-events: none; }
 body.page-zoom-mode .reader-header > :not(.reader-header-actions) { display: none !important; }
-body.page-zoom-mode .reader-header-actions { position: fixed; z-index: 1201; top: 12px; right: 16px; pointer-events: auto; }
-body.page-zoom-mode .reader-header-actions > :not(.reader-zoom-toggle) { display: none !important; }
+body.page-zoom-mode .reader-header-actions { position: fixed; z-index: 1201; top: 8px; right: 12px; left: auto; display: flex; align-items: center; gap: 8px; padding: 4px; border: 1px solid color-mix(in srgb, var(--reader-gold) 38%, var(--paper-edge)); border-radius: 999px; background: color-mix(in srgb, var(--paper) 92%, transparent); box-shadow: 0 6px 22px rgba(0, 0, 0, .2); backdrop-filter: blur(12px); pointer-events: auto; }
+body.page-zoom-mode .reader-header-actions > :not(.reader-zoom-toggle):not(.reader-font-size-button) { display: none !important; }
 body.page-zoom-mode .reader-header-actions { transition: opacity .22s ease, visibility 0s linear .22s; }
 body.page-zoom-mode #pageZoomToggle { position: relative; z-index: 1202; top: auto; right: auto; }
+body.page-zoom-mode .reader-font-size-button { display: grid; }
 body.page-zoom-mode.zoom-controls-hidden .reader-header-actions { visibility: hidden; opacity: 0; pointer-events: none; }
 body.page-zoom-mode .reader-intro,
 body.page-zoom-mode .khatma-card,
@@ -322,18 +326,20 @@ body.page-zoom-mode .reading-area::-webkit-scrollbar { display: none; }
 body.page-zoom-mode .page-paper { align-self: flex-start; flex: 0 0 100%; width: 100%; height: auto; max-width: none; min-height: 100dvh; margin: 0; padding: 22px clamp(16px, 3vw, 42px); border: 0; border-radius: 0; background: var(--paper); box-shadow: none; }
 body.page-zoom-mode .page-paper::before { position: absolute; z-index: 0; inset: 8px; display: block; border: 1px solid rgba(183, 156, 91, .48); border-radius: 14px; content: ''; pointer-events: none; }
 body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 44px); }
-body.page-zoom-mode .page-content { font-size: clamp(32px, 4vw, 46px); line-height: 2.1; }
-body.page-zoom-mode.full-surah-view .page-content { font-size: clamp(22px, 2.8vw, 36px); line-height: 1.9; }
-body.full-surah-view .paper-page-label,
+body.page-zoom-mode .page-content { font-size: calc(clamp(32px, 4vw, 46px) * var(--mushaf-text-scale, 1)); line-height: 2.1; }
+body.page-zoom-mode.full-surah-view .page-content { font-size: calc(clamp(22px, 2.8vw, 36px) * var(--mushaf-text-scale, 1)); line-height: 1.9; }
 body.full-surah-view .page-meta,
 body.full-surah-view .paper-footer { display: none !important; }
+body.full-surah-view .paper-page-label { display: inline-block !important; color: transparent; font-size: 0; }
+body.full-surah-view .paper-page-label b { display: none; }
+body.full-surah-view .paper-page-label::before { content: '۞'; color: var(--reader-gold); font: 22px/1 'Amiri', serif; }
 @media (max-width: 700px) {
-    body.page-zoom-mode .reader-header-actions { top: 8px; right: 10px; gap: 10px; }
+    body.page-zoom-mode .reader-header-actions { top: 8px; right: 8px; left: auto; gap: 6px; padding: 3px; }
     body.page-zoom-mode #pageZoomToggle { top: auto; right: auto; }
     body.page-zoom-mode .reading-area { inset: 0; padding: 0; }
     body.page-zoom-mode .page-paper::before { inset: 6px; border-radius: 12px; }
     body.page-zoom-mode .page-paper { width: 100%; min-height: 100dvh; padding: 18px 12px; border-radius: 0; }
     body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 36px); padding: 14px 10px 12px; }
-    body.page-zoom-mode .page-content { font-size: clamp(30px, 8vw, 38px); line-height: 2.1; }
-    body.page-zoom-mode.full-surah-view .page-content { font-size: clamp(21px, 6vw, 30px); line-height: 1.9; }
+    body.page-zoom-mode .page-content { font-size: calc(clamp(30px, 8vw, 38px) * var(--mushaf-text-scale, 1)); line-height: 2.1; }
+    body.page-zoom-mode.full-surah-view .page-content { font-size: calc(clamp(21px, 6vw, 30px) * var(--mushaf-text-scale, 1)); line-height: 1.9; }
 }

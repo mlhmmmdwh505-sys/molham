@@ -2568,4 +2568,33 @@ body.focus-mode .pomo-actions {
     body.focus-mode .focus-timer-ring #pomoDisplay.has-hours { font-size: clamp(30px, min(11vw, 5.4vh), 54px) !important; }
 }
 
+/* Focus mode occupies the full screen, with native fullscreen when available. */
+html.focus-mode-active,
+body.focus-mode {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    overflow: hidden !important;
+}
+body.focus-mode { padding: 0 !important; border-radius: 0 !important; }
+body.focus-mode .glass-card {
+    position: fixed !important;
+    z-index: 1 !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-height: 100vh !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: clamp(12px, 2.5vh, 30px) !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+}
+
 

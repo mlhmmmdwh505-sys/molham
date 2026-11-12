@@ -522,15 +522,44 @@ function updateFocusModeButton() {
 }
 
 function setFocusMode(enabled) {
-    document.body.classList.toggle('focus-mode', Boolean(enabled));
+    const isEnabled = Boolean(enabled);
+    document.body.classList.toggle('focus-mode', isEnabled);
+    document.documentElement.classList.toggle('focus-mode-active', isEnabled);
     updateFocusModeButton();
-    if (enabled) changeFocusVerse();
+    if (isEnabled) {
+        changeFocusVerse();
+        const root = document.documentElement;
+        const requestFullscreen = root.requestFullscreen?.bind(root)
+            || root.webkitRequestFullscreen?.bind(root);
+        try {
+            const request = requestFullscreen?.();
+            request?.catch(() => {});
+        } catch (error) { /* The full-window focus layout remains available. */ }
+    } else if (document.fullscreenElement || document.webkitFullscreenElement) {
+        const exitFullscreen = document.exitFullscreen?.bind(document)
+            || document.webkitExitFullscreen?.bind(document);
+        try {
+            const exit = exitFullscreen?.();
+            exit?.catch(() => {});
+        } catch (error) { /* Focus mode is already closed in the dashboard. */ }
+    }
     const quickFocusButton = document.getElementById('quickFocusButton');
     if (quickFocusButton) {
         const label = quickFocusButton.querySelector('span:last-child');
         if (label) label.textContent = timer === null ? (isBreak ? getDashboardLabels().quickBreak : getDashboardLabels().quickFocus) : getDashboardLabels().quickResume;
     }
 }
+
+function syncFocusModeAfterFullscreenExit() {
+    if (document.fullscreenElement || document.webkitFullscreenElement) return;
+    if (!document.body.classList.contains('focus-mode')) return;
+    document.body.classList.remove('focus-mode');
+    document.documentElement.classList.remove('focus-mode-active');
+    updateFocusModeButton();
+}
+
+document.addEventListener('fullscreenchange', syncFocusModeAfterFullscreenExit);
+document.addEventListener('webkitfullscreenchange', syncFocusModeAfterFullscreenExit);
 
 function applyDashboardLanguage() {
     const labels = getDashboardLabels();
