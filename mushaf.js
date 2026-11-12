@@ -124,8 +124,7 @@ function setPageZoomMode(enabled, syncFullscreen = true) {
     pageZoomToggle.title = label;
     document.body.classList.remove('zoom-controls-hidden');
 
-    const allowNativeFullscreen = !window.matchMedia('(max-width: 767px), (pointer: coarse)').matches;
-    if (syncFullscreen && enabled && allowNativeFullscreen && !document.fullscreenElement) {
+    if (syncFullscreen && enabled && !document.fullscreenElement) {
         const requestFullscreen = document.documentElement.requestFullscreen?.bind(document.documentElement)
             || document.documentElement.webkitRequestFullscreen?.bind(document.documentElement);
         try {
