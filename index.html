@@ -2,17 +2,25 @@
 <html lang="ar" dir="rtl">
 <head>
     <script>
+        if (window.location.hostname === 'mlhmmmdwh505-sys.github.io'
+            && window.location.pathname.replace(/\/+$/, '') === '/molham') {
+            const projectBase = document.createElement('base');
+            projectBase.href = '/molham/';
+            document.head.append(projectBase);
+        }
+    </script>
+    <script>
         try {
             document.documentElement.dataset.theme = localStorage.getItem('colorScheme') === 'light' ? 'light' : 'dark';
         } catch (error) {
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="stylesheet" href="style.css?v=94">
+    <link rel="stylesheet" href="style.css?v=95">
     <link rel="stylesheet" href="fonts.css?v=7">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=11">
-    <link rel="canonical" href="https://mlhmmmdwh505-sys.github.io/">
+    <link rel="canonical" href="https://mlhmmmdwh505-sys.github.io/molham/">
     <meta name="keywords" content="ملهم ممدوح, molham, github pages, موقع ملهم">
     <meta name="description" content="هذا الموقع جميل و مثالي للدراسة و العمل و جميع المهام موقع ملهم هو اداة تنظيم و ترتيب و زيادة الانتاجية مصمم من قبل ملهم.">
     <meta name="copyright" content="Copyright © 2026 Molham Mamdouh. Original website materials reserved.">
@@ -307,6 +315,6 @@
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script src="script.js?v=98"></script>
+    <script src="script.js?v=100"></script>
 </body>
 </html>

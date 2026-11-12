@@ -3,6 +3,7 @@ const LAST_PAGE_KEY = 'mushafLastPage';
 const KHATMA_PLAN_KEY = 'mushafKhatmaPlan';
 const DAILY_SURAH_PLAN_KEY = 'mushafDailySurahPlan';
 const pageCache = new Map();
+const fullSurahMarkupCache = new Map();
 
 const pagePaper = document.getElementById('pagePaper');
 const pageContent = document.getElementById('pageContent');
@@ -119,7 +120,8 @@ function setPageZoomMode(enabled, syncFullscreen = true) {
     pageZoomToggle.title = label;
     document.body.classList.remove('zoom-controls-hidden');
 
-    if (syncFullscreen && enabled && !document.fullscreenElement) {
+    const allowNativeFullscreen = !window.matchMedia('(max-width: 767px), (pointer: coarse)').matches;
+    if (syncFullscreen && enabled && allowNativeFullscreen && !document.fullscreenElement) {
         const requestFullscreen = document.documentElement.requestFullscreen?.bind(document.documentElement)
             || document.documentElement.webkitRequestFullscreen?.bind(document.documentElement);
         try {
@@ -677,6 +679,39 @@ function renderFullSurahMarkup(ayahs) {
     return markup.join('');
 }
 
+function getFullSurahMarkup(surahNumber, ayahs) {
+    const cachedMarkup = fullSurahMarkupCache.get(surahNumber);
+    if (cachedMarkup) {
+        fullSurahMarkupCache.delete(surahNumber);
+        fullSurahMarkupCache.set(surahNumber, cachedMarkup);
+        return cachedMarkup;
+    }
+
+    const markup = renderFullSurahMarkup(ayahs);
+    fullSurahMarkupCache.set(surahNumber, markup);
+    while (fullSurahMarkupCache.size > 2) {
+        fullSurahMarkupCache.delete(fullSurahMarkupCache.keys().next().value);
+    }
+    return markup;
+}
+
+function prewarmNextSurahMarkup(surahNumber) {
+    const nextSurahNumber = surahNumber + 1;
+    if (nextSurahNumber > surahCatalog.length || fullSurahMarkupCache.has(nextSurahNumber)) return;
+
+    const warmNextSurah = () => {
+        if (!document.body.classList.contains('page-zoom-mode') || currentFullSurahNumber !== surahNumber) return;
+        const ayahs = quranAyahsBySurah.get(nextSurahNumber);
+        if (ayahs?.length) getFullSurahMarkup(nextSurahNumber, ayahs);
+    };
+
+    if (typeof window.requestIdleCallback === 'function') {
+        window.requestIdleCallback(warmNextSurah, { timeout: 500 });
+    } else {
+        window.setTimeout(warmNextSurah, 80);
+    }
+}
+
 function renderPage(pageData, options = {}) {
     const compactWords = options.compactWords === true;
     const ayahs = Array.isArray(pageData?.ayahs) ? pageData.ayahs : [];
@@ -691,7 +726,7 @@ function renderPage(pageData, options = {}) {
             currentPageSurah.textContent = firstSurah.name || `سورة ${firstSurahNumber}`;
             surahSelect.value = String(firstSurahNumber);
         }
-        pageContent.innerHTML = renderFullSurahMarkup(ayahs);
+        pageContent.innerHTML = getFullSurahMarkup(firstSurahNumber, ayahs);
         surahHeader.textContent = firstSurah?.name || 'المصحف الشريف';
         return;
     }
@@ -883,18 +918,12 @@ function getCurrentSurahNumber() {
 async function showSurahInZoom(surahNumber, returnPage = currentPage) {
     if (!document.body.classList.contains('page-zoom-mode') || isLoading) return;
     const renderToken = ++surahRenderToken;
-    pageLoading.lastElementChild.textContent = 'جارٍ تجهيز السورة…';
-    pageLoading.hidden = false;
-    pageContent.hidden = true;
     pageError.hidden = true;
     pagePaper.setAttribute('aria-busy', 'true');
     readerStatus.textContent = 'جارٍ تجهيز السورة كاملة…';
 
     try {
-        await new Promise(resolve => window.requestAnimationFrame(resolve));
-        if (renderToken !== surahRenderToken || !document.body.classList.contains('page-zoom-mode')) return;
         await loadQuranData();
-        await new Promise(resolve => window.requestAnimationFrame(resolve));
         if (renderToken !== surahRenderToken || !document.body.classList.contains('page-zoom-mode')) return;
 
         const resolvedSurahNumber = Number(surahNumber) || getCurrentSurahNumber();
@@ -917,6 +946,7 @@ async function showSurahInZoom(surahNumber, returnPage = currentPage) {
         pageContent.hidden = false;
         pagePaper.setAttribute('aria-busy', 'false');
         readerStatus.textContent = `تقرأ الآن ${surah.name} كاملة. اسحب يمينًا أو يسارًا للتنقل بين السور.`;
+        prewarmNextSurahMarkup(resolvedSurahNumber);
     } catch (error) {
         console.error('Unable to show full surah:', error);
         pageLoading.hidden = true;
