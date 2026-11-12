@@ -60,9 +60,6 @@ button { -webkit-appearance: none; appearance: none; }
 .reader-header-actions { display: flex; align-items: center; gap: 13px; }
 .reader-theme-toggle { position: relative; display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid var(--reader-border); border-radius: 50%; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; transition: background-color .28s ease, border-color .28s ease, transform .28s ease; }
 .reader-zoom-toggle { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid var(--reader-border); border-radius: 50%; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; font-size: 21px; line-height: 1; transition: background-color .28s ease, border-color .28s ease, transform .28s ease; }
-.reader-surah-view-toggle { display: none; min-height: 38px; padding: 0 13px; border: 1px solid var(--reader-border); border-radius: 99px; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; font-size: 11px; font-weight: 800; white-space: nowrap; }
-.reader-surah-view-toggle[aria-pressed="true"] { border-color: var(--reader-gold); background: color-mix(in srgb, var(--reader-gold) 14%, var(--reader-surface)); }
-.reader-surah-view-toggle:disabled { opacity: .58; cursor: wait; }
 .reader-theme-toggle:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 3px; }
 .reader-zoom-toggle:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 3px; }
 .reader-mode-icon { position: absolute; inset: 0; display: grid; place-items: center; font-size: 21px; line-height: 1; transition: opacity .24s ease, transform .36s cubic-bezier(.22, 1, .36, 1); }
@@ -326,6 +323,10 @@ body.page-zoom-mode .page-paper { align-self: flex-start; flex: 0 0 100%; width:
 body.page-zoom-mode .page-paper::before { position: absolute; z-index: 0; inset: 8px; display: block; border: 1px solid rgba(183, 156, 91, .48); border-radius: 14px; content: ''; pointer-events: none; }
 body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 44px); }
 body.page-zoom-mode .page-content { font-size: clamp(32px, 4vw, 46px); line-height: 2.1; }
+body.page-zoom-mode.full-surah-view .page-content { font-size: clamp(22px, 2.8vw, 36px); line-height: 1.9; }
+body.full-surah-view .paper-page-label,
+body.full-surah-view .page-meta,
+body.full-surah-view .paper-footer { display: none !important; }
 @media (max-width: 700px) {
     body.page-zoom-mode .reader-header-actions { top: 8px; right: 10px; gap: 10px; }
     body.page-zoom-mode #pageZoomToggle { top: auto; right: auto; }
@@ -334,4 +335,5 @@ body.page-zoom-mode .page-content { font-size: clamp(32px, 4vw, 46px); line-heig
     body.page-zoom-mode .page-paper { width: 100%; min-height: 100dvh; padding: 18px 12px; border-radius: 0; }
     body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 36px); padding: 14px 10px 12px; }
     body.page-zoom-mode .page-content { font-size: clamp(30px, 8vw, 38px); line-height: 2.1; }
+    body.page-zoom-mode.full-surah-view .page-content { font-size: clamp(21px, 6vw, 30px); line-height: 1.9; }
 }

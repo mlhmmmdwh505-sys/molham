@@ -55,8 +55,13 @@ let currentPage = readLastPage();
 let isLoading = false;
 let surahCatalog = [];
 let surahByNumber = new Map();
+let quranAyahsBySurah = new Map();
 let quranPages = null;
 let quranDataPromise = null;
+let isFullSurahView = false;
+let currentFullSurahNumber = null;
+let surahPageReturnPage = null;
+let surahRenderToken = 0;
 let khatmaPlan = readKhatmaPlan();
 let dailySurahPlan = readDailySurahPlan();
 
@@ -87,13 +92,15 @@ function setPageZoomMode(enabled, syncFullscreen = true) {
     const fromRect = pagePaper.getBoundingClientRect();
     document.documentElement.classList.toggle('page-zoom-mode', enabled);
     document.body.classList.toggle('page-zoom-mode', enabled);
+    if (!enabled) showPageByPageView();
     if (enabled) {
         readingArea.scrollTop = 0;
         readingArea.scrollLeft = 0;
+        if (!isLoading) showSurahInZoom(getCurrentSurahNumber());
     }
     const toRect = pagePaper.getBoundingClientRect();
     pageZoomToggle.setAttribute('aria-pressed', String(enabled));
-    const label = enabled ? 'إغلاق تكبير صفحة المصحف' : 'تكبير صفحة المصحف';
+    const label = enabled ? 'إغلاق تكبير المصحف' : 'تكبير المصحف';
     pageZoomToggle.setAttribute('aria-label', label);
     pageZoomToggle.title = label;
     document.body.classList.remove('zoom-controls-hidden');
@@ -536,7 +543,32 @@ function removeOpeningBasmala(text) {
     return withoutBom.slice(opening[1].length).trimStart();
 }
 
-function appendQuranWords(container, text) {
+function appendQuranWords(container, text, compact = false) {
+    if (compact) {
+        let plainText = '';
+        String(text || '').split(/(\s+)/u).forEach(part => {
+            if (!part) return;
+            if (/^\s+$/u.test(part)) {
+                plainText += part;
+                return;
+            }
+            if (!part.includes('\u06DF')) {
+                plainText += part.replace(/[\u06E2\u06ED]/gu, '');
+                return;
+            }
+            if (plainText) {
+                container.append(document.createTextNode(plainText));
+                plainText = '';
+            }
+            const word = document.createElement('span');
+            word.className = 'quran-word quran-word--round-zero';
+            word.textContent = part.replace(/[\u06E2\u06ED]/gu, '');
+            container.append(word);
+        });
+        if (plainText) container.append(document.createTextNode(plainText));
+        return;
+    }
+
     String(text || '').split(/(\s+)/u).forEach(part => {
         if (!part) return;
         if (/^\s+$/u.test(part)) {
@@ -554,7 +586,7 @@ function appendQuranWords(container, text) {
     });
 }
 
-function appendQuranText(container, text) {
+function appendQuranText(container, text, compact = false) {
     // Keep vowel/combining marks attached to their letters. Only isolate the
     // seven standalone waqf signs when whitespace on both sides proves they
     // are annotation signs, so their visual position can be tuned safely.
@@ -568,7 +600,7 @@ function appendQuranText(container, text) {
         const hasSpaceAfter = index + 1 < source.length && /\s/u.test(source[index + 1]);
         if (!hasSpaceBefore || !hasSpaceAfter) continue;
 
-        if (index > lastIndex) appendQuranWords(container, source.slice(lastIndex, index));
+        if (index > lastIndex) appendQuranWords(container, source.slice(lastIndex, index), compact);
         const stopMark = document.createElement('span');
         stopMark.className = 'quran-stop-mark';
         stopMark.textContent = match[0];
@@ -576,12 +608,88 @@ function appendQuranText(container, text) {
         lastIndex = index + match[0].length;
     }
 
-    if (lastIndex < source.length) appendQuranWords(container, source.slice(lastIndex));
+    if (lastIndex < source.length) appendQuranWords(container, source.slice(lastIndex), compact);
 }
 
-function renderPage(pageData) {
+function escapeMarkupText(text) {
+    return String(text || '').replace(/[&<>"']/gu, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]);
+}
+
+function formatCompactQuranText(text) {
+    const source = String(text || '');
+    const markup = [];
+    const signs = /[\u06D6-\u06DC]/gu;
+    let lastIndex = 0;
+    const appendWords = value => markup.push(value.replace(/\S+/gu, word => {
+        const escapedWord = escapeMarkupText(word.replace(/[\u06E2\u06ED]/gu, ''));
+        return word.includes('\u06DF')
+            ? `<span class="quran-word quran-word--round-zero">${escapedWord}</span>`
+            : escapedWord;
+    }));
+
+    for (const match of source.matchAll(signs)) {
+        const index = match.index;
+        const hasSpaceBefore = index > 0 && /\s/u.test(source[index - 1]);
+        const hasSpaceAfter = index + 1 < source.length && /\s/u.test(source[index + 1]);
+        if (!hasSpaceBefore || !hasSpaceAfter) continue;
+        appendWords(source.slice(lastIndex, index));
+        markup.push(`<span class="quran-stop-mark">${match[0]}</span>`);
+        lastIndex = index + match[0].length;
+    }
+
+    appendWords(source.slice(lastIndex));
+    return markup.join('');
+}
+
+function renderFullSurahMarkup(ayahs) {
+    const markup = [];
+    let previousSurahNumber = null;
+    ayahs.forEach(ayah => {
+        const surahNumber = Number(ayah.surahNumber ?? ayah.surah?.number);
+        const surah = ayah.surah || surahByNumber.get(surahNumber) || { number: surahNumber };
+        if (surahNumber && surahNumber !== previousSurahNumber && Number(ayah.numberInSurah) === 1) {
+            markup.push(`<h2 class="surah-heading">${escapeMarkupText(surah.name || `سورة ${surahNumber}`)}</h2>`);
+            if (surahNumber !== 1 && surahNumber !== 9) {
+                markup.push('<p class="basmala">بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ</p>');
+            }
+        }
+
+        const numberInSurah = Number(ayah.numberInSurah);
+        const ayahNumber = toArabicNumber(numberInSurah);
+        const hasSeparateBasmala = numberInSurah === 1 && surahNumber !== 1 && surahNumber !== 9;
+        const ayahText = hasSeparateBasmala ? removeOpeningBasmala(ayah.text) : (ayah.text || '');
+        const markerClass = numberInSurah >= 100
+            ? 'ayah-marker ayah-marker--three-digit'
+            : numberInSurah >= 10 ? 'ayah-marker ayah-marker--two-digit' : 'ayah-marker';
+        const markerNumberClass = Math.floor(numberInSurah / 10) % 10 === 1
+            ? 'ayah-marker-number ayah-marker-number--left-adjusted'
+            : 'ayah-marker-number';
+        markup.push(`<span class="quran-ayah">${formatCompactQuranText(ayahText)}<span class="${markerClass}" aria-label="الآية ${ayahNumber}"><span class="${markerNumberClass}">${ayahNumber}</span></span> </span>`);
+        previousSurahNumber = surahNumber || previousSurahNumber;
+    });
+    return markup.join('');
+}
+
+function renderPage(pageData, options = {}) {
+    const compactWords = options.compactWords === true;
     const ayahs = Array.isArray(pageData?.ayahs) ? pageData.ayahs : [];
     if (ayahs.length === 0) throw new Error('No verses returned for this page.');
+
+    if (compactWords) {
+        pageJuzNumber.textContent = formatPageLocations(ayahs, ayah => ayah.juz);
+        pageHizbNumber.textContent = formatPageLocations(ayahs, ayah => Math.ceil(Number(ayah.hizbQuarter) / 4));
+        const firstSurahNumber = Number(ayahs[0]?.surahNumber ?? ayahs[0]?.surah?.number);
+        const firstSurah = surahByNumber.get(firstSurahNumber) || ayahs[0]?.surah;
+        if (Number.isInteger(firstSurahNumber) && firstSurah) {
+            currentPageSurah.textContent = firstSurah.name || `سورة ${firstSurahNumber}`;
+            surahSelect.value = String(firstSurahNumber);
+        }
+        pageContent.innerHTML = renderFullSurahMarkup(ayahs);
+        surahHeader.textContent = firstSurah?.name || 'المصحف الشريف';
+        return;
+    }
 
     pageJuzNumber.textContent = formatPageLocations(ayahs, ayah => ayah.juz);
     pageHizbNumber.textContent = formatPageLocations(ayahs, ayah => Math.ceil(Number(ayah.hizbQuarter) / 4));
@@ -662,6 +770,13 @@ async function loadQuranData() {
         quranPages = payload.pages;
         surahCatalog = payload.surahs;
         surahByNumber = new Map(surahCatalog.map(surah => [Number(surah.number), surah]));
+        quranAyahsBySurah = new Map();
+        Object.values(quranPages).forEach(pageAyahs => pageAyahs.forEach(ayah => {
+            const surahNumber = Number(ayah.surahNumber ?? ayah.surah?.number);
+            if (!Number.isInteger(surahNumber)) return;
+            if (!quranAyahsBySurah.has(surahNumber)) quranAyahsBySurah.set(surahNumber, []);
+            quranAyahsBySurah.get(surahNumber).push(ayah);
+        }));
         const options = [new Option('اختر سورة…', '')];
         surahCatalog.forEach(surah => {
             options.push(new Option(`${toArabicNumber(surah.number)}. ${surah.name}`, String(surah.number)));
@@ -733,6 +848,9 @@ async function loadPage(pageNumber, forceRefresh = false, resetToPageStart = fal
         updatePageControls();
         renderKhatma();
         renderDailySurah();
+        if (document.body.classList.contains('page-zoom-mode') && pageError.hidden) {
+            showSurahInZoom(getCurrentSurahNumber(), currentPage);
+        }
         if (resetToPageStart && pageError.hidden) {
             window.requestAnimationFrame(() => {
                 if (document.body.classList.contains('page-zoom-mode')) {
@@ -753,7 +871,96 @@ function goToPage(pageNumber) {
     return loadPage(pageNumber, false, true);
 }
 
+function getCurrentSurahNumber() {
+    const ayahs = pageCache.get(currentPage)?.ayahs || quranPages?.[String(currentPage)];
+    return Number(ayahs?.[0]?.surahNumber ?? ayahs?.[0]?.surah?.number);
+}
+
+async function showSurahInZoom(surahNumber, returnPage = currentPage) {
+    if (!document.body.classList.contains('page-zoom-mode') || isLoading) return;
+    const renderToken = ++surahRenderToken;
+    pageLoading.lastElementChild.textContent = 'جارٍ تجهيز السورة…';
+    pageLoading.hidden = false;
+    pageContent.hidden = true;
+    pageError.hidden = true;
+    pagePaper.setAttribute('aria-busy', 'true');
+    readerStatus.textContent = 'جارٍ تجهيز السورة كاملة…';
+
+    try {
+        await new Promise(resolve => window.requestAnimationFrame(resolve));
+        if (renderToken !== surahRenderToken || !document.body.classList.contains('page-zoom-mode')) return;
+        await loadQuranData();
+        await new Promise(resolve => window.requestAnimationFrame(resolve));
+        if (renderToken !== surahRenderToken || !document.body.classList.contains('page-zoom-mode')) return;
+
+        const resolvedSurahNumber = Number(surahNumber) || getCurrentSurahNumber();
+        const ayahs = quranAyahsBySurah.get(resolvedSurahNumber);
+        const surah = surahByNumber.get(resolvedSurahNumber);
+        if (!ayahs?.length || !surah) throw new Error('Surah data is unavailable.');
+
+        const restoredPage = Math.min(PAGE_COUNT, Math.max(1, Math.trunc(Number(returnPage) || currentPage)));
+        surahPageReturnPage = restoredPage;
+        currentPage = restoredPage;
+        updatePageControls();
+        try { localStorage.setItem(LAST_PAGE_KEY, String(currentPage)); } catch (error) { /* Reading still works without saved progress. */ }
+        document.body.classList.add('full-surah-view');
+        currentFullSurahNumber = resolvedSurahNumber;
+        isFullSurahView = true;
+        readingArea.scrollTop = 0;
+        readingArea.scrollLeft = 0;
+        renderPage({ ayahs }, { compactWords: true });
+        pageLoading.hidden = true;
+        pageContent.hidden = false;
+        pagePaper.setAttribute('aria-busy', 'false');
+        readerStatus.textContent = `تقرأ الآن ${surah.name} كاملة. اسحب يمينًا أو يسارًا للتنقل بين السور.`;
+    } catch (error) {
+        console.error('Unable to show full surah:', error);
+        pageLoading.hidden = true;
+        pageContent.hidden = false;
+        pagePaper.setAttribute('aria-busy', 'false');
+        readerStatus.textContent = 'تعذّر تجهيز السورة كاملة.';
+    }
+}
+
+function showPageByPageView() {
+    const hadFullSurahView = isFullSurahView || document.body.classList.contains('full-surah-view');
+    const needsPageRestore = hadFullSurahView || pageContent.hidden;
+    ++surahRenderToken;
+    isFullSurahView = false;
+    currentFullSurahNumber = null;
+    document.body.classList.remove('full-surah-view');
+    if (!needsPageRestore) return;
+    pageLoading.lastElementChild.textContent = 'جارٍ تجهيز الصفحة…';
+    const restoredPage = Math.min(PAGE_COUNT, Math.max(1, Math.trunc(Number(surahPageReturnPage) || currentPage)));
+    surahPageReturnPage = null;
+    currentPage = restoredPage;
+    updatePageControls();
+    const pageData = pageCache.get(restoredPage)?.ayahs || quranPages?.[String(restoredPage)];
+    if (Array.isArray(pageData) && pageData.length) {
+        renderPage({ ayahs: pageData });
+        pageLoading.hidden = true;
+        pageContent.hidden = false;
+        pageError.hidden = true;
+        pagePaper.setAttribute('aria-busy', 'false');
+        pagePaper.classList.remove('is-loading');
+        readerStatus.textContent = `الصفحة ${toArabicNumber(currentPage)} من ${toArabicNumber(PAGE_COUNT)}`;
+        try { localStorage.setItem(LAST_PAGE_KEY, String(currentPage)); } catch (error) { /* Reading still works without persistence. */ }
+        return;
+    }
+    pageLoading.lastElementChild.textContent = 'جارٍ تجهيز الصفحة…';
+    loadPage(restoredPage, false, true);
+}
+
 function navigateReadingView(direction) {
+    if (isFullSurahView && currentFullSurahNumber !== null) {
+        const nextSurahNumber = currentFullSurahNumber + direction;
+        if (nextSurahNumber < 1 || nextSurahNumber > surahCatalog.length) {
+            readerStatus.textContent = 'وصلت إلى نهاية سور المصحف في هذا الاتجاه.';
+            return;
+        }
+        showSurahInZoom(nextSurahNumber, getSurahStartPage(nextSurahNumber));
+        return;
+    }
     goToPage(currentPage + direction);
 }
 
