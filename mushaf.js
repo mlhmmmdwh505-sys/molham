@@ -79,12 +79,13 @@ themeToggle.addEventListener('click', () => {
     setMushafTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
 });
 
-function setPageZoomMode(enabled) {
+function setPageZoomMode(enabled, syncFullscreen = true) {
     const wasEnabled = document.body.classList.contains('page-zoom-mode');
     if (wasEnabled === enabled) return;
 
     pagePaper.getAnimations().forEach(animation => animation.cancel());
     const fromRect = pagePaper.getBoundingClientRect();
+    document.documentElement.classList.toggle('page-zoom-mode', enabled);
     document.body.classList.toggle('page-zoom-mode', enabled);
     if (enabled) {
         readingArea.scrollTop = 0;
@@ -97,6 +98,22 @@ function setPageZoomMode(enabled) {
     pageZoomToggle.title = label;
     document.body.classList.remove('zoom-controls-hidden');
     lastZoomScrollTop = 0;
+
+    if (syncFullscreen && enabled && !document.fullscreenElement) {
+        const requestFullscreen = document.documentElement.requestFullscreen?.bind(document.documentElement)
+            || document.documentElement.webkitRequestFullscreen?.bind(document.documentElement);
+        try {
+            const fullscreenRequest = requestFullscreen?.();
+            fullscreenRequest?.catch(() => {});
+        } catch (error) { /* The full-viewport layout remains available when fullscreen is unavailable. */ }
+    } else if (syncFullscreen && !enabled && (document.fullscreenElement || document.webkitFullscreenElement)) {
+        const exitFullscreen = document.exitFullscreen?.bind(document)
+            || document.webkitExitFullscreen?.bind(document);
+        try {
+            const fullscreenExit = exitFullscreen?.();
+            fullscreenExit?.catch(() => {});
+        } catch (error) { /* The page has already returned to its normal layout. */ }
+    }
 
     if (!enabled && !window.matchMedia('(prefers-reduced-motion: reduce)').matches && toRect.width && toRect.height) {
         const translateX = fromRect.left - toRect.left;
@@ -115,6 +132,14 @@ function setPageZoomMode(enabled) {
         pageZoomToggle.focus({ preventScroll: true });
     }
 }
+
+function syncPageZoomAfterFullscreenExit() {
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && document.body.classList.contains('page-zoom-mode')) {
+        setPageZoomMode(false, false);
+    }
+}
+document.addEventListener('fullscreenchange', syncPageZoomAfterFullscreenExit);
+document.addEventListener('webkitfullscreenchange', syncPageZoomAfterFullscreenExit);
 
 let lastZoomScrollTop = 0;
 readingArea.addEventListener('scroll', () => {
@@ -568,7 +593,7 @@ function renderPage(pageData) {
         surahSelect.value = String(currentSurahNumber);
     }
 
-    pageContent.replaceChildren();
+    const renderedContent = document.createDocumentFragment();
     const seenSurahs = new Map();
     let previousSurahNumber = null;
 
@@ -577,7 +602,7 @@ function renderPage(pageData) {
         const surah = ayah.surah || surahByNumber.get(surahNumber) || { number: surahNumber };
         if (surahNumber && !seenSurahs.has(surahNumber)) seenSurahs.set(surahNumber, surah.name || `سورة ${surahNumber}`);
         if (surahNumber && surahNumber !== previousSurahNumber && Number(ayah.numberInSurah) === 1) {
-            appendSurahHeading(pageContent, surah);
+            appendSurahHeading(renderedContent, surah);
         }
 
         const verse = document.createElement('span');
@@ -602,12 +627,13 @@ function renderPage(pageData) {
         markerNumber.textContent = ayahNumber;
         marker.append(markerNumber);
         verse.append(marker, document.createTextNode(' '));
-        pageContent.append(verse);
+        renderedContent.append(verse);
 
         previousSurahNumber = surahNumber || previousSurahNumber;
-        if (index < ayahs.length - 1) pageContent.append(document.createTextNode(' '));
+        if (index < ayahs.length - 1) renderedContent.append(document.createTextNode(' '));
     });
 
+    pageContent.replaceChildren(renderedContent);
     const names = Array.from(seenSurahs.values());
     surahHeader.textContent = names.length ? names.join(' • ') : 'المصحف الشريف';
 }
@@ -724,7 +750,11 @@ async function loadPage(pageNumber, forceRefresh = false, resetToPageStart = fal
 
 function goToPage(pageNumber) {
     if (!Number.isFinite(pageNumber)) return;
-    loadPage(pageNumber, false, true);
+    return loadPage(pageNumber, false, true);
+}
+
+function navigateReadingView(direction) {
+    goToPage(currentPage + direction);
 }
 
 document.getElementById('retryPageButton').addEventListener('click', () => loadPage(currentPage, true));
@@ -854,8 +884,13 @@ readerPlansToggle.addEventListener('click', () => {
 
 document.addEventListener('keydown', event => {
     if (event.altKey || event.ctrlKey || event.metaKey || event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement || event.target instanceof HTMLTextAreaElement) return;
-    if (event.key === 'ArrowLeft') goToPage(currentPage + 1);
-    if (event.key === 'ArrowRight') goToPage(currentPage - 1);
+    if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        navigateReadingView(1);
+    } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        navigateReadingView(-1);
+    }
 });
 
 let touchStart = null;
@@ -868,8 +903,8 @@ pagePaper.addEventListener('pointerup', event => {
     const deltaY = event.clientY - touchStart.y;
     touchStart = null;
     if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
-    if (deltaX > 0) goToPage(currentPage + 1);
-    else goToPage(currentPage - 1);
+    if (deltaX > 0) navigateReadingView(1);
+    else navigateReadingView(-1);
 });
 pagePaper.addEventListener('pointercancel', () => { touchStart = null; });
 

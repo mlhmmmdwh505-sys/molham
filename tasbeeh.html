@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#0d2420">
-    <meta name="description" content="سبحة إلكترونية لمتابعة تسبيحك ووردك اليومي في صفحة هادئة وخفيفة.">
+    <meta name="theme-color" content="#081d19">
+    <meta name="description" content="سبحة إلكترونية هادئة تحفظ عدّك وهدفك اليومي على هذا الجهاز فقط.">
     <title>السبحة | لوحة ملهم</title>
     <link rel="manifest" href="manifest.json?v=11">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="stylesheet" href="fonts.css?v=1">
-    <link rel="stylesheet" href="tasbeeh.css?v=15">
+    <link rel="stylesheet" href="tasbeeh.css?v=27">
 </head>
 <body>
     <div class="tasbeeh-app">
@@ -20,7 +20,7 @@
             </a>
             <a class="page-brand" href="#mainContent" aria-label="السبحة">
                 <span class="brand-mark" aria-hidden="true">۞</span>
-                <span><strong>السبحة</strong><small>مساحة صغيرة للذكر</small></span>
+                <span><strong>السبحة</strong><small>ذِكر هادئ، وخصوصية أوضح</small></span>
             </a>
             <div class="tasbeeh-header-actions">
                 <button class="zoom-button" id="zoomToggle" type="button" aria-pressed="false" aria-label="تكبير السبحة" title="تكبير السبحة"><span aria-hidden="true">⤢</span></button>
@@ -31,25 +31,31 @@
         <main class="tasbeeh-main" id="mainContent">
             <section class="page-intro" aria-labelledby="pageTitle">
                 <span class="eyebrow"><span aria-hidden="true">✦</span> خُذ لحظة هدوء</span>
-                <h1 id="pageTitle">اذكر الله بقلب حاضر</h1>
-                <p>اختر التسبيح واضغط على السبحة للعدّ، وتابع إنجازك اليومي.</p>
+                <h1 id="pageTitle">مساحة هادئة لذِكرك</h1>
+                <p>ابدأ بالذكر الذي تختاره، وتابع تقدّمك اليومي. عدّك محفوظ على هذا الجهاز.</p>
             </section>
 
             <div class="tasbeeh-grid">
                 <section class="counter-card" aria-labelledby="counterTitle">
                     <div class="counter-card-head">
                         <div>
-                            <span class="card-eyebrow">سبحتك الآن</span>
-                            <h2 id="counterTitle">السبحة الإلكترونية</h2>
+                            <span class="card-eyebrow">جلسة جديدة، على مهل</span>
+                            <h2 id="counterTitle">عداد الذكر</h2>
                         </div>
                         <span class="round-badge" id="roundCount">٠ جولات</span>
                     </div>
 
                     <p class="active-dhikr" id="activeDhikrText">سُبْحَانَ اللَّهِ</p>
 
+                    <div class="dhikr-shortcuts" role="group" aria-label="اختيار ذكر سريع">
+                        <button type="button" data-dhikr-shortcut="subhanAllah" aria-pressed="true">سبحان الله</button>
+                        <button type="button" data-dhikr-shortcut="alhamdulillah" aria-pressed="false">الحمد لله</button>
+                        <button type="button" data-dhikr-shortcut="allahuAkbar" aria-pressed="false">الله أكبر</button>
+                    </div>
+
                     <label class="dhikr-select-control" for="dhikrSelect">
                         <span class="dhikr-select-mark" aria-hidden="true">✧</span>
-                        <span class="dhikr-select-label">التسبيح</span>
+                        <span class="dhikr-select-label">أذكار أخرى</span>
                         <select id="dhikrSelect" aria-label="اختيار التسبيح">
                             <option value="subhanAllah">سُبْحَانَ اللَّهِ</option>
                             <option value="alhamdulillah">الْحَمْدُ لِلَّهِ</option>
@@ -65,6 +71,27 @@
                     </label>
 
                     <div class="counter-orbit" id="counterOrbit" style="--progress: 0deg">
+                        <svg class="tasbeeh-strand" viewBox="0 0 600 165" aria-hidden="true" focusable="false">
+                            <defs>
+                                <radialGradient id="tasbeehBeadFinish" cx="30%" cy="25%" r="78%">
+                                    <stop class="bead-highlight" offset="0" />
+                                    <stop class="bead-mid" offset=".43" />
+                                    <stop class="bead-shadow" offset="1" />
+                                </radialGradient>
+                                <radialGradient id="tasbeehBeadGold" cx="30%" cy="24%" r="78%">
+                                    <stop class="bead-gold-light" offset="0" />
+                                    <stop class="bead-gold-mid" offset=".5" />
+                                    <stop class="bead-gold-shadow" offset="1" />
+                                </radialGradient>
+                                <radialGradient id="tasbeehBeadMarker" cx="30%" cy="24%" r="78%">
+                                    <stop class="bead-marker-light" offset="0" />
+                                    <stop class="bead-marker-mid" offset=".5" />
+                                    <stop class="bead-marker-shadow" offset="1" />
+                                </radialGradient>
+                            </defs>
+                            <path class="tasbeeh-thread" d="M18 24 C170 136 430 136 582 24" />
+                            <g id="tasbeehBeads"></g>
+                        </svg>
                         <button class="counter-button" id="countButton" type="button" aria-label="زيادة عدّ التسبيح">
                             <span class="count-value" id="countValue">٠</span>
                             <span class="count-divider" aria-hidden="true"></span>
@@ -141,8 +168,31 @@
                 <span>اللهم أعنّا على ذكرك وشكرك وحسن عبادتك</span>
                 <span aria-hidden="true">۞</span>
             </footer>
+
+            <aside class="privacy-note" aria-labelledby="privacyTitle">
+                <span class="privacy-lock" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" focusable="false"><path d="M7.5 10V7.5a4.5 4.5 0 0 1 9 0V10m-10 0h11a1.5 1.5 0 0 1 1.5 1.5v7A1.5 1.5 0 0 1 17.5 20h-11A1.5 1.5 0 0 1 5 18.5v-7A1.5 1.5 0 0 1 6.5 10Z"/><path d="M12 14v2"/></svg>
+                </span>
+                <span class="privacy-copy">
+                    <strong id="privacyTitle">خصوصية السبحة</strong>
+                    <span>العدّ والهدف محفوظان في هذا المتصفح فقط، ولا يدخلان في مزامنة حسابك.</span>
+                </span>
+                <button class="clear-local-data-button" id="clearLocalDataButton" type="button">مسح بيانات السبحة</button>
+            </aside>
         </main>
     </div>
-    <script src="tasbeeh.js?v=11" defer></script>
+
+    <dialog class="privacy-dialog" id="clearDataDialog" aria-labelledby="clearDataTitle" aria-describedby="clearDataDescription">
+        <div class="privacy-dialog-content">
+            <span class="privacy-dialog-mark" aria-hidden="true">⌫</span>
+            <h2 id="clearDataTitle">مسح بيانات السبحة؟</h2>
+            <p id="clearDataDescription">سيُحذف العدّ الحالي ومجموع اليوم والهدف اليومي من هذا المتصفح.</p>
+            <div class="privacy-dialog-actions">
+                <button class="secondary-button" id="cancelClearData" type="button">إلغاء</button>
+                <button class="danger-button" id="confirmClearData" type="button">مسح البيانات</button>
+            </div>
+        </div>
+    </dialog>
+    <script src="tasbeeh.js?v=17" defer></script>
 </body>
 </html>

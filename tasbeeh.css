@@ -198,3 +198,665 @@ body.tasbeeh-zoom-mode .target-picker button, body.tasbeeh-zoom-mode .secondary-
     body.tasbeeh-zoom-mode .count-value { font-size: clamp(48px, 14vw, 78px); }
     body.tasbeeh-zoom-mode .active-dhikr { min-height: 45px; margin: 5px 0 0; font-size: 22px; }
 }
+
+/* A calmer, more spacious visual treatment for the dhikr page. */
+:root {
+    --tas-bg: #081d19;
+    --tas-bg-soft: #102d26;
+    --tas-surface: rgba(17, 49, 40, .78);
+    --tas-surface-strong: rgba(25, 62, 51, .92);
+    --tas-border: rgba(221, 197, 135, .2);
+    --tas-text: #f5f1e5;
+    --tas-muted: #aabbb0;
+    --tas-gold: #e1c77f;
+    --tas-green: #398064;
+    --tas-green-soft: rgba(67, 143, 109, .16);
+    --tas-shadow: 0 28px 80px rgba(0, 0, 0, .24);
+}
+
+html[data-theme="light"] {
+    --tas-bg: #edf2eb;
+    --tas-bg-soft: #f9f8f0;
+    --tas-surface: rgba(255, 255, 255, .78);
+    --tas-surface-strong: rgba(255, 255, 255, .96);
+    --tas-border: rgba(73, 104, 82, .17);
+    --tas-text: #21392e;
+    --tas-muted: #708077;
+    --tas-gold: #a2823e;
+    --tas-green: #438268;
+    --tas-green-soft: rgba(67, 130, 104, .1);
+    --tas-shadow: 0 24px 64px rgba(47, 72, 54, .1);
+}
+
+body {
+    position: relative;
+    background:
+        radial-gradient(ellipse at 50% -12%, color-mix(in srgb, var(--tas-green) 28%, transparent), transparent 46rem),
+        radial-gradient(ellipse at 0% 55%, color-mix(in srgb, var(--tas-gold) 7%, transparent), transparent 32rem),
+        var(--tas-bg);
+}
+
+body::before {
+    position: fixed;
+    z-index: 0;
+    inset: 0;
+    background-image:
+        linear-gradient(30deg, color-mix(in srgb, var(--tas-gold) 6%, transparent) 1px, transparent 1px),
+        linear-gradient(150deg, color-mix(in srgb, var(--tas-gold) 6%, transparent) 1px, transparent 1px);
+    background-size: 58px 58px;
+    content: '';
+    mask-image: radial-gradient(ellipse at center, #000 0%, transparent 78%);
+    pointer-events: none;
+}
+
+.tasbeeh-app {
+    position: relative;
+    z-index: 1;
+    width: min(1180px, 100%);
+    padding: 22px 34px 24px;
+}
+
+.tasbeeh-header { min-height: 52px; }
+.back-link, .page-brand { gap: 11px; }
+.back-arrow, .theme-button, .zoom-button { width: 42px; height: 42px; }
+.back-arrow { border-radius: 15px; }
+.back-copy small, .page-brand small { font-size: 10px; }
+.back-copy strong, .page-brand strong { font-size: 12px; }
+.brand-mark { width: 42px; height: 42px; border-radius: 15px; font-size: 28px; }
+.tasbeeh-header-actions { gap: 10px; }
+.theme-button, .zoom-button { background: color-mix(in srgb, var(--tas-surface) 88%, transparent); }
+
+.tasbeeh-main { max-width: 1040px; margin-top: 27px; }
+.page-intro { margin-bottom: 25px; }
+.eyebrow, .card-eyebrow { font-size: 11px; }
+.eyebrow {
+    padding: 6px 13px;
+    border: 1px solid var(--tas-border);
+    border-radius: 99px;
+    background: color-mix(in srgb, var(--tas-surface) 70%, transparent);
+}
+.page-intro h1 { margin-top: 8px; font-size: clamp(30px, 4vw, 40px); line-height: 1.25; }
+.page-intro p { margin-top: 6px; font-size: 14px; }
+.tasbeeh-grid { grid-template-columns: minmax(0, 1.04fr) minmax(0, .96fr); gap: 20px; }
+.counter-card, .daily-ward-card {
+    position: relative;
+    overflow: hidden;
+    border-color: color-mix(in srgb, var(--tas-gold) 20%, var(--tas-border));
+    border-radius: 28px;
+    background: linear-gradient(145deg, color-mix(in srgb, var(--tas-green) 19%, transparent), transparent 52%), var(--tas-surface);
+    box-shadow: var(--tas-shadow);
+    backdrop-filter: blur(16px);
+}
+.counter-card::before, .daily-ward-card::before {
+    position: absolute;
+    top: -105px;
+    right: -65px;
+    width: 230px;
+    height: 230px;
+    border: 1px solid color-mix(in srgb, var(--tas-gold) 11%, transparent);
+    border-radius: 50%;
+    box-shadow: 0 0 0 22px color-mix(in srgb, var(--tas-gold) 2%, transparent), 0 0 0 45px color-mix(in srgb, var(--tas-gold) 2%, transparent);
+    content: '';
+    pointer-events: none;
+}
+.counter-card > *, .daily-ward-card > * { position: relative; z-index: 1; }
+.counter-card { padding: 25px 29px 23px; }
+.counter-card h2, .daily-ward-heading h2 { font-size: 21px; }
+.round-badge { padding: 6px 12px; font-size: 11px; }
+.active-dhikr { min-height: 55px; margin: 13px 0 4px; font-size: clamp(22px, 2.4vw, 28px); }
+.dhikr-select-control {
+    min-height: 54px;
+    margin: 4px 0 15px;
+    padding: 7px 11px;
+    border-radius: 16px;
+    font-size: 12px;
+}
+.dhikr-select-mark { width: 35px; height: 35px; flex-basis: 35px; border-radius: 11px; font-size: 21px; }
+.dhikr-select-control select { min-height: 38px; border-radius: 11px; font-size: 14px; }
+.select-chevron { left: 21px; }
+.counter-orbit { width: 238px; height: 238px; flex-basis: 238px; }
+.counter-orbit::before { inset: 2px; mask: radial-gradient(farthest-side, transparent calc(100% - 15px), #000 calc(100% - 14px)); }
+.counter-orbit::after { inset: 8px; mask: radial-gradient(farthest-side, transparent calc(100% - 5px), #000 calc(100% - 4px)); }
+.counter-button {
+    width: 188px;
+    height: 188px;
+    border-color: color-mix(in srgb, var(--tas-gold) 47%, transparent);
+    background:
+        radial-gradient(circle at 36% 24%, color-mix(in srgb, var(--tas-green) 54%, var(--tas-bg-soft)), var(--tas-bg) 75%),
+        var(--tas-bg);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, .26), 0 2px 0 rgba(255, 255, 255, .1) inset, 0 0 36px color-mix(in srgb, var(--tas-green) 15%, transparent);
+}
+.count-value { font-size: 54px; }
+.count-divider { width: 58px; margin: 9px 0 5px; }
+.count-target { font-size: 12px; }
+.counter-prompt { margin-top: 7px; font-size: 10px; }
+.counter-status { min-height: 21px; margin: 10px 0 13px; font-size: 12px; }
+.target-picker { gap: 8px; margin-bottom: 15px; }
+.target-picker > span { font-size: 11px; }
+.target-picker button { min-height: 36px; padding: 2px 14px; font-size: 11px; }
+.counter-actions { gap: 9px; }
+.secondary-button { min-height: 40px; padding: 3px 16px; border-radius: 13px; font-size: 11px; }
+
+.daily-ward-card { padding: 28px 29px 25px; }
+.daily-ward-heading { margin-bottom: 22px; }
+.daily-ward-mark { width: 46px; height: 46px; border-radius: 16px; font-size: 24px; }
+.daily-date-row { font-size: 12px; }
+.daily-total-row {
+    min-height: 142px;
+    margin: 17px 0 20px;
+    padding: 19px 21px;
+    border-radius: 22px;
+    background: radial-gradient(ellipse at 88% 0%, color-mix(in srgb, var(--tas-green) 25%, transparent), transparent 70%), color-mix(in srgb, var(--tas-bg-soft) 42%, var(--tas-surface));
+}
+.daily-total-row strong { font-size: clamp(54px, 6vw, 70px); }
+.daily-total-row > span:nth-child(2) { font-size: 13px; }
+.daily-total-icon { display: grid; width: 52px; height: 52px; place-items: center; border: 1px solid var(--tas-border); border-radius: 17px; background: var(--tas-green-soft); font-size: 29px; }
+.daily-progress-track { height: 12px; }
+.daily-progress-caption { margin-top: 10px; font-size: 11px; }
+.daily-progress-caption strong { font-size: 13px; }
+.daily-status { min-height: 24px; margin: 13px 0 20px; font-size: 12px; }
+.daily-goal-toolbar { margin-bottom: 10px; }
+.daily-goal-label { font-size: 11px; }
+.daily-reset-button { min-height: 35px; padding-inline: 12px; font-size: 10px; }
+.daily-goal-picker { gap: 8px; }
+.daily-goal-picker button { min-width: 54px; min-height: 38px; padding-inline: 13px; font-size: 11px; }
+.daily-note { padding-top: 20px; font-size: 10px; }
+.tasbeeh-footer { gap: 11px; margin-top: 20px; font-size: 14px; }
+
+button, select { -webkit-appearance: none; }
+button:focus-visible, a:focus-visible, select:focus-visible { outline: 2px solid var(--tas-gold); outline-offset: 4px; }
+
+@media (hover: hover) and (pointer: fine) {
+    .zoom-button:hover { transform: translateY(-1px); border-color: var(--tas-gold); }
+    .counter-button:hover { transform: translateY(-2px); box-shadow: 0 22px 48px rgba(0, 0, 0, .3), 0 2px 0 rgba(255, 255, 255, .1) inset, 0 0 44px color-mix(in srgb, var(--tas-green) 23%, transparent); }
+    .secondary-button:hover { background: var(--tas-green-soft); }
+}
+
+@media (max-width: 760px) {
+    .tasbeeh-app { padding: 15px 18px 20px; }
+    .tasbeeh-main { margin-top: 20px; }
+    .page-intro { margin-bottom: 19px; }
+    .tasbeeh-grid { grid-template-columns: 1fr; gap: 15px; }
+    .counter-card, .daily-ward-card { border-radius: 23px; }
+    .counter-card { padding: 22px 23px 20px; }
+    .daily-ward-card { padding: 23px; }
+    .counter-orbit { width: 218px; height: 218px; flex-basis: 218px; }
+    .counter-button { width: 170px; height: 170px; }
+    .count-value { font-size: 49px; }
+    .daily-total-row strong { font-size: 58px; }
+    .daily-note { padding-top: 16px; }
+}
+
+@media (max-width: 420px) {
+    .tasbeeh-app { padding: 12px 13px 17px; }
+    .tasbeeh-header { gap: 7px; }
+    .back-link, .page-brand { gap: 7px; }
+    .back-arrow, .theme-button, .zoom-button { width: 36px; height: 36px; }
+    .back-copy small, .page-brand small { font-size: 8px; }
+    .back-copy strong, .page-brand strong { font-size: 10px; }
+    .brand-mark { width: 36px; height: 36px; flex-basis: 36px; border-radius: 13px; font-size: 24px; }
+    .tasbeeh-header-actions { gap: 6px; }
+    .tasbeeh-main { margin-top: 17px; }
+    .page-intro h1 { font-size: 29px; }
+    .page-intro p { max-width: 290px; margin-inline: auto; font-size: 12px; }
+    .counter-card { padding: 18px 15px 17px; }
+    .daily-ward-card { padding: 20px 17px; }
+    .counter-card h2, .daily-ward-heading h2 { font-size: 19px; }
+    .dhikr-select-control { gap: 6px; padding-inline: 8px; }
+    .dhikr-select-label { font-size: 10px; }
+    .dhikr-select-control select { font-size: 12px; }
+    .counter-orbit { width: 202px; height: 202px; flex-basis: 202px; }
+    .counter-button { width: 158px; height: 158px; }
+    .count-value { font-size: 45px; }
+    .target-picker { gap: 5px; }
+    .target-picker button { min-height: 34px; padding-inline: 11px; }
+    .daily-total-row { min-height: 122px; padding: 15px; }
+    .daily-total-row strong { font-size: 51px; }
+    .daily-total-icon { width: 44px; height: 44px; font-size: 25px; }
+    .daily-goal-picker { gap: 6px; }
+    .daily-goal-picker button { min-width: 48px; min-height: 36px; padding-inline: 10px; }
+}
+
+@media (max-width: 350px) {
+    .back-copy { display: none; }
+    .page-brand small { display: none; }
+    .target-picker > span { margin-inline-end: 0; }
+    .target-picker button { padding-inline: 9px; }
+    .counter-actions { gap: 6px; }
+    .secondary-button { padding-inline: 11px; }
+}
+
+/* Focus the page on the counter and make local privacy controls easy to find. */
+.tasbeeh-main { max-width: 920px; }
+.tasbeeh-grid {
+    grid-template-columns: minmax(0, 740px);
+    justify-content: center;
+    gap: 18px;
+}
+.counter-card, .daily-ward-card { width: 100%; }
+.counter-card { padding: 27px clamp(22px, 5vw, 48px) 25px; }
+.counter-card-head { max-width: 540px; margin-inline: auto; }
+.active-dhikr { max-width: 590px; min-height: 62px; margin-top: 18px; font-size: clamp(24px, 3vw, 32px); }
+.dhikr-shortcuts {
+    display: flex;
+    width: min(100%, 560px);
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    margin: 0 auto 13px;
+}
+.dhikr-shortcuts button {
+    min-height: 39px;
+    padding: 4px 17px;
+    border: 1px solid var(--tas-border);
+    border-radius: 99px;
+    background: color-mix(in srgb, var(--tas-surface-strong) 72%, transparent);
+    color: var(--tas-muted);
+    cursor: pointer;
+    font-size: 12px;
+    transition: color .16s ease, border-color .16s ease, background .16s ease, transform .16s ease;
+}
+.dhikr-shortcuts button[aria-pressed="true"] {
+    border-color: color-mix(in srgb, var(--tas-gold) 72%, transparent);
+    background: color-mix(in srgb, var(--tas-gold) 13%, transparent);
+    color: var(--tas-gold);
+}
+.dhikr-select-control { width: min(100%, 560px); margin: 0 auto 18px; }
+.counter-orbit { margin: 2px auto 0; }
+.counter-status { max-width: 540px; }
+.target-picker { margin-top: 2px; }
+.daily-ward-card { padding: 27px clamp(22px, 4vw, 38px) 25px; }
+.daily-total-row { min-height: 130px; }
+.privacy-note {
+    display: flex;
+    width: min(740px, 100%);
+    align-items: center;
+    gap: 14px;
+    margin: 16px auto 0;
+    padding: 16px 19px;
+    border: 1px solid var(--tas-border);
+    border-radius: 19px;
+    background: color-mix(in srgb, var(--tas-surface) 78%, transparent);
+    box-shadow: 0 12px 34px rgba(0, 0, 0, .08);
+}
+.privacy-lock {
+    display: grid;
+    width: 43px;
+    height: 43px;
+    flex: 0 0 43px;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--tas-green) 35%, var(--tas-border));
+    border-radius: 14px;
+    background: var(--tas-green-soft);
+    color: var(--tas-gold);
+}
+.privacy-lock svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.6; }
+.privacy-copy { display: grid; min-width: 0; gap: 2px; }
+.privacy-copy strong { color: var(--tas-text); font-size: 12px; }
+.privacy-copy > span { color: var(--tas-muted); font-size: 10px; line-height: 1.7; }
+.clear-local-data-button {
+    min-height: 36px;
+    flex: 0 0 auto;
+    margin-inline-start: auto;
+    padding: 3px 12px;
+    border: 1px solid color-mix(in srgb, #d28378 37%, var(--tas-border));
+    border-radius: 11px;
+    background: color-mix(in srgb, #b95f53 9%, transparent);
+    color: color-mix(in srgb, #efaaa0 75%, var(--tas-text));
+    cursor: pointer;
+    font: 700 10px/1.4 'Cairo', sans-serif;
+    transition: border-color .16s ease, background .16s ease, transform .16s ease;
+}
+html[data-theme="light"] .clear-local-data-button { color: #9b5148; }
+.privacy-dialog {
+    width: min(420px, calc(100vw - 32px));
+    padding: 0;
+    border: 1px solid var(--tas-border);
+    border-radius: 23px;
+    background: var(--tas-bg-soft);
+    color: var(--tas-text);
+    box-shadow: 0 28px 90px rgba(0, 0, 0, .32);
+}
+.privacy-dialog::backdrop { background: rgba(3, 14, 11, .65); backdrop-filter: blur(5px); }
+.privacy-dialog-content { display: grid; justify-items: center; padding: 28px; text-align: center; }
+.privacy-dialog-mark { display: grid; width: 48px; height: 48px; place-items: center; border: 1px solid var(--tas-border); border-radius: 16px; background: var(--tas-green-soft); color: var(--tas-gold); font-size: 24px; }
+.privacy-dialog h2 { margin: 14px 0 4px; font: 700 24px/1.35 'Amiri', serif; }
+.privacy-dialog p { margin: 0; color: var(--tas-muted); font-size: 12px; line-height: 1.8; }
+.privacy-dialog-actions { display: flex; justify-content: center; gap: 9px; margin-top: 22px; }
+.danger-button {
+    min-height: 40px;
+    padding: 3px 16px;
+    border: 1px solid color-mix(in srgb, #c96d5f 55%, transparent);
+    border-radius: 12px;
+    background: #a94f45;
+    color: #fff7f2;
+    cursor: pointer;
+    font-size: 11px;
+}
+.tasbeeh-zoom-mode .privacy-note { display: none !important; }
+
+@media (hover: hover) and (pointer: fine) {
+    .dhikr-shortcuts button:hover { border-color: color-mix(in srgb, var(--tas-gold) 52%, transparent); color: var(--tas-gold); }
+    .clear-local-data-button:hover { transform: translateY(-1px); border-color: #d28378; background: color-mix(in srgb, #b95f53 15%, transparent); }
+    .danger-button:hover { background: #bf5d51; }
+}
+
+@media (max-width: 560px) {
+    .tasbeeh-grid { gap: 13px; }
+    .counter-card { padding: 21px 16px 19px; }
+    .active-dhikr { min-height: 54px; margin-top: 12px; }
+    .dhikr-shortcuts { gap: 6px; margin-bottom: 10px; }
+    .dhikr-shortcuts button { min-height: 36px; padding-inline: 12px; font-size: 10px; }
+    .dhikr-select-control { margin-bottom: 12px; }
+    .privacy-note { flex-wrap: wrap; gap: 10px; padding: 13px; }
+    .privacy-lock { width: 38px; height: 38px; flex-basis: 38px; }
+    .privacy-copy { flex: 1; }
+    .clear-local-data-button { width: 100%; margin: 2px 0 0; }
+}
+
+:root {
+    --bead-highlight: #a9d6b7;
+    --bead-mid: #39785e;
+    --bead-shadow: #10362b;
+    --bead-gold-light: #fff0b8;
+    --bead-gold-mid: #d6ae58;
+    --bead-gold-shadow: #88652d;
+    --bead-marker-light: #fff2c6;
+    --bead-marker-mid: #e1b958;
+    --bead-marker-shadow: #96691f;
+}
+html[data-theme="light"] {
+    --bead-highlight: #c3e8c7;
+    --bead-mid: #579071;
+    --bead-shadow: #28543f;
+    --bead-gold-light: #fff3c2;
+    --bead-gold-mid: #d3a644;
+    --bead-gold-shadow: #8b6426;
+    --bead-marker-light: #fff4cf;
+    --bead-marker-mid: #d8a83f;
+    --bead-marker-shadow: #875d1e;
+}
+.counter-orbit { width: 300px; height: 300px; flex-basis: 300px; }
+.counter-orbit::before, .counter-orbit::after { display: none; }
+.tasbeeh-strand { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.bead-highlight { stop-color: var(--bead-highlight); }
+.bead-mid { stop-color: var(--bead-mid); }
+.bead-shadow { stop-color: var(--bead-shadow); }
+.bead-gold-light { stop-color: var(--bead-gold-light); }
+.bead-gold-mid { stop-color: var(--bead-gold-mid); }
+.bead-gold-shadow { stop-color: var(--bead-gold-shadow); }
+.tasbeeh-thread { fill: none; stroke: color-mix(in srgb, var(--tas-gold) 62%, var(--tas-green)); stroke-width: 2.5; opacity: .88; }
+.strand-bead { fill: url(#tasbeehBeadFinish); stroke: color-mix(in srgb, var(--tas-gold) 50%, var(--tas-green)); stroke-width: 1.2; filter: drop-shadow(0 2px 2px rgba(0, 0, 0, .24)); transition: fill .24s ease, filter .24s ease, stroke .24s ease; }
+.strand-bead.is-counted { fill: url(#tasbeehBeadGold); stroke: #f2d487; filter: drop-shadow(0 0 4px color-mix(in srgb, var(--tas-gold) 55%, transparent)); }
+.strand-bead.strand-imame { stroke-width: 1.7; }
+.tasbeeh-tassel { fill: none; stroke: color-mix(in srgb, var(--tas-gold) 78%, var(--tas-green)); stroke-linecap: round; stroke-linejoin: round; stroke-width: 2.4; }
+.tasbeeh-knot { fill: url(#tasbeehBeadGold); stroke: #f2d487; stroke-width: 1; filter: drop-shadow(0 1px 3px rgba(0, 0, 0, .25)); }
+.counter-button { position: relative; z-index: 1; width: 188px; height: 188px; }
+
+html.tasbeeh-zoom-mode { width: 100%; height: 100%; overflow: hidden; }
+body.tasbeeh-zoom-mode {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+}
+body.tasbeeh-zoom-mode .tasbeeh-app {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    height: 100vh;
+    height: 100dvh;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+body.tasbeeh-zoom-mode .tasbeeh-header {
+    position: absolute;
+    z-index: 30;
+    inset: 0 0 auto;
+    width: 100%;
+    height: 0;
+    min-height: 0;
+    justify-content: flex-end;
+    pointer-events: none;
+}
+body.tasbeeh-zoom-mode .tasbeeh-header > :not(.tasbeeh-header-actions) { display: none !important; }
+body.tasbeeh-zoom-mode .tasbeeh-header-actions {
+    position: fixed;
+    top: max(10px, env(safe-area-inset-top));
+    right: max(12px, env(safe-area-inset-right));
+    z-index: 30;
+    pointer-events: auto;
+}
+body.tasbeeh-zoom-mode .tasbeeh-header-actions > :not(.zoom-button) { display: none !important; }
+body.tasbeeh-zoom-mode .zoom-button { width: 46px; height: 46px; background: var(--tas-bg-soft); box-shadow: 0 8px 24px rgba(0, 0, 0, .24); }
+body.tasbeeh-zoom-mode .tasbeeh-main {
+    display: grid;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    min-height: 0;
+    place-items: center;
+    margin: 0;
+    padding: max(10px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+body.tasbeeh-zoom-mode .page-intro,
+body.tasbeeh-zoom-mode .daily-ward-card,
+body.tasbeeh-zoom-mode .tasbeeh-footer,
+body.tasbeeh-zoom-mode .privacy-note,
+body.tasbeeh-zoom-mode .counter-card-head,
+body.tasbeeh-zoom-mode .dhikr-shortcuts,
+body.tasbeeh-zoom-mode .dhikr-select-control,
+body.tasbeeh-zoom-mode .target-picker,
+body.tasbeeh-zoom-mode .counter-actions { display: none !important; }
+body.tasbeeh-zoom-mode .tasbeeh-grid {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    justify-items: center;
+    gap: 0;
+    padding: 0;
+}
+body.tasbeeh-zoom-mode .counter-card {
+    position: fixed;
+    top: 0;
+    left: calc(50vw + clamp(4px, 1vw, 14px));
+    z-index: 2;
+    display: flex;
+    width: min(100%, 760px);
+    transform: translateX(-50%);
+    height: 100%;
+    max-height: 100%;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(2px, 1vh, 12px);
+    overflow: visible;
+    padding: 0 12px;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+body.tasbeeh-zoom-mode .counter-card::before { display: none; }
+body.tasbeeh-zoom-mode .active-dhikr { max-width: min(720px, 100%); min-height: 0; margin: 0; font-size: clamp(19px, 4vmin, 34px); line-height: 1.45; }
+body.tasbeeh-zoom-mode .counter-orbit { width: min(86vw, 68dvh, 440px); height: min(86vw, 68dvh, 440px); flex: 0 0 min(86vw, 68dvh, 440px); }
+body.tasbeeh-zoom-mode .counter-button { width: min(calc(100% - 68px), 320px); height: min(calc(100% - 68px), 320px); max-width: none; max-height: none; }
+body.tasbeeh-zoom-mode .count-value { font-size: clamp(44px, 14vmin, 100px); }
+body.tasbeeh-zoom-mode .count-divider { width: 68px; margin: 10px 0 6px; }
+body.tasbeeh-zoom-mode .count-target { font-size: 14px; }
+body.tasbeeh-zoom-mode .counter-prompt { font-size: 11px; }
+body.tasbeeh-zoom-mode .counter-status { min-height: 0; margin: 0; font-size: clamp(10px, 2vmin, 14px); }
+
+@media (max-width: 760px) {
+    .counter-orbit { width: 270px; height: 270px; flex-basis: 270px; }
+    .counter-button { width: 172px; height: 172px; }
+}
+@media (max-width: 420px) {
+    .counter-orbit { width: 244px; height: 244px; flex-basis: 244px; }
+    .counter-button { width: 158px; height: 158px; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+    body.tasbeeh-zoom-mode .counter-card { gap: 2px; }
+    body.tasbeeh-zoom-mode .counter-orbit { width: min(54vw, 70dvh, 360px); height: min(54vw, 70dvh, 360px); flex-basis: min(54vw, 70dvh, 360px); }
+    body.tasbeeh-zoom-mode .active-dhikr { font-size: clamp(17px, 4vmin, 26px); }
+}
+@media (max-height: 300px) {
+    body.tasbeeh-zoom-mode .active-dhikr, body.tasbeeh-zoom-mode .counter-status { display: none; }
+    body.tasbeeh-zoom-mode .counter-orbit { width: min(78vw, 78dvh, 250px); height: min(78vw, 78dvh, 250px); flex-basis: min(78vw, 78dvh, 250px); }
+}
+
+.counter-button.is-paused {
+    cursor: wait;
+    opacity: .82;
+    filter: saturate(.68);
+    transform: scale(.985);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .2), 0 2px 0 rgba(255, 255, 255, .06) inset;
+}
+.counter-button.is-paused .count-value,
+.counter-button.is-paused .counter-prompt { color: var(--tas-muted); }
+
+/* Wide curved beads mirror the strand shown in the user's screen recording. */
+:root {
+    --bead-highlight: #d1f7f6;
+    --bead-mid: #63b5c1;
+    --bead-shadow: #1b5c6c;
+    --bead-gold-light: #f3ffff;
+    --bead-gold-mid: #a7e4eb;
+    --bead-gold-shadow: #397d8d;
+}
+html[data-theme="light"] {
+    --bead-highlight: #e4ffff;
+    --bead-mid: #7fc7d1;
+    --bead-shadow: #2b7583;
+    --bead-gold-light: #ffffff;
+    --bead-gold-mid: #c2f1f4;
+    --bead-gold-shadow: #518e9a;
+    --bead-marker-light: #fff2c6;
+    --bead-marker-mid: #e1b958;
+    --bead-marker-shadow: #96691f;
+}
+.counter-orbit {
+    display: flex;
+    width: min(100%, 980px);
+    height: auto;
+    flex: 0 1 auto;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0;
+    overflow: visible;
+    border-radius: 0;
+}
+.tasbeeh-strand {
+    position: relative;
+    inset: auto;
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 600 / 165;
+    overflow: visible;
+}
+.tasbeeh-thread { stroke: color-mix(in srgb, #c4e9ed 72%, var(--tas-border)); stroke-width: 2.4; opacity: .82; }
+.bead-marker-light { stop-color: var(--bead-marker-light); }
+.bead-marker-mid { stop-color: var(--bead-marker-mid); }
+.bead-marker-shadow { stop-color: var(--bead-marker-shadow); }
+.strand-bead { stroke: color-mix(in srgb, #d5f5f5 52%, #3b8291); stroke-width: 1.5; transition: cx .34s cubic-bezier(.22, 1, .36, 1), cy .34s cubic-bezier(.22, 1, .36, 1), r .2s ease, fill .2s ease, filter .2s ease, opacity .12s ease; }
+.strand-bead.is-counted { stroke: #c8f8fb; }
+.strand-bead.strand-focus { fill: url(#tasbeehBeadGold); stroke: #e7ffff; stroke-width: 2.5; filter: drop-shadow(0 0 7px rgba(177, 245, 250, .9)); }
+.strand-bead.strand-divider { fill: url(#tasbeehBeadMarker); stroke: #f7d77c; stroke-width: 1.8; filter: drop-shadow(0 0 5px rgba(240, 196, 93, .62)); }
+.strand-bead.strand-divider.strand-focus { stroke: #fff2c6; filter: drop-shadow(0 0 10px rgba(255, 216, 111, .95)); }
+.strand-bead.is-wrapping { opacity: 0; transition: none; }
+.counter-button {
+    width: 122px;
+    height: 122px;
+    flex: 0 0 122px;
+    margin: 0 auto;
+    border-color: color-mix(in srgb, #bceef2 60%, var(--tas-gold));
+    background: radial-gradient(circle at 35% 24%, color-mix(in srgb, #247183 54%, var(--tas-bg-soft)), #07151f 78%);
+    box-shadow: 0 0 0 4px color-mix(in srgb, #9ce1ea 12%, transparent), 0 14px 35px rgba(0, 0, 0, .3), 0 2px 0 rgba(255, 255, 255, .12) inset;
+    margin-top: 9px;
+}
+.count-value { font-size: 39px; }
+.count-target { font-size: 12px; }
+.counter-prompt { margin-top: 5px; font-size: 9px; }
+
+body.tasbeeh-zoom-mode {
+    background:
+        radial-gradient(ellipse at 17% 69%, rgba(55, 119, 137, .26), transparent 37%),
+        radial-gradient(ellipse at 82% 37%, rgba(174, 111, 83, .2), transparent 34%),
+        radial-gradient(ellipse at 50% 48%, #142331 0%, #09131f 58%, #050b12 100%);
+}
+body.tasbeeh-zoom-mode::before {
+    opacity: .52;
+    background-image:
+        radial-gradient(1px 1px at 8% 19%, rgba(236, 248, 255, .8) 98%, transparent),
+        radial-gradient(1.2px 1.2px at 22% 73%, rgba(236, 248, 255, .68) 98%, transparent),
+        radial-gradient(1px 1px at 48% 13%, rgba(236, 248, 255, .75) 98%, transparent),
+        radial-gradient(1.2px 1.2px at 71% 61%, rgba(236, 248, 255, .72) 98%, transparent),
+        radial-gradient(1px 1px at 92% 28%, rgba(236, 248, 255, .7) 98%, transparent);
+    background-size: 280px 230px, 330px 270px, 240px 210px, 360px 290px, 310px 250px;
+    mask-image: none;
+}
+html[data-theme="light"] body.tasbeeh-zoom-mode {
+    --tas-bg: #091521;
+    --tas-bg-soft: #10212d;
+    --tas-text: #f4f8f2;
+    --tas-muted: #c5d1d2;
+    --tas-gold: #dfc780;
+    --tas-green: #397e8f;
+    --tas-border: rgba(218, 234, 226, .22);
+}
+body.tasbeeh-zoom-mode .counter-card { width: min(92vw, 1180px); height: 100dvh; }
+body.tasbeeh-zoom-mode .counter-orbit {
+    width: min(92vw, 1180px);
+    height: auto;
+    flex: 0 1 auto;
+    gap: 0;
+}
+body.tasbeeh-zoom-mode .tasbeeh-strand { width: 100%; height: auto; aspect-ratio: 600 / 165; }
+body.tasbeeh-zoom-mode .counter-button {
+    width: clamp(76px, 18vmin, 132px);
+    height: clamp(76px, 18vmin, 132px);
+    flex: 0 0 clamp(76px, 18vmin, 132px);
+    margin-top: clamp(6px, 1.5vh, 16px);
+}
+body.tasbeeh-zoom-mode .count-value { font-size: clamp(30px, 8vmin, 62px); }
+body.tasbeeh-zoom-mode .count-divider { width: 42px; margin: 5px 0 3px; }
+body.tasbeeh-zoom-mode .count-target { font-size: clamp(10px, 2vmin, 13px); }
+body.tasbeeh-zoom-mode .counter-prompt { display: none; }
+body.tasbeeh-zoom-mode .active-dhikr { font-size: clamp(22px, 5vmin, 40px); }
+body.tasbeeh-zoom-mode .counter-card { gap: clamp(3px, 1.2vh, 12px); }
+
+@media (max-width: 760px) {
+    .counter-orbit { width: 100%; flex-basis: auto; }
+    .counter-button { width: 108px; height: 108px; flex-basis: 108px; }
+    .count-value { font-size: 35px; }
+}
+@media (max-width: 420px) {
+    .counter-orbit { width: 100%; flex-basis: auto; }
+    .counter-button { width: 96px; height: 96px; flex-basis: 96px; }
+    .count-value { font-size: 32px; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+    body.tasbeeh-zoom-mode .counter-card { gap: 2px; }
+    body.tasbeeh-zoom-mode .counter-orbit { width: min(100%, 950px); }
+    body.tasbeeh-zoom-mode .counter-button { width: 76px; height: 76px; flex-basis: 76px; }
+}
+@media (max-height: 300px) {
+    body.tasbeeh-zoom-mode .active-dhikr,
+    body.tasbeeh-zoom-mode .counter-status { display: none; }
+    body.tasbeeh-zoom-mode .counter-orbit { width: min(100%, 720px); }
+    body.tasbeeh-zoom-mode .counter-button { width: 70px; height: 70px; flex-basis: 70px; }
+}

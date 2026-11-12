@@ -60,6 +60,9 @@ button { -webkit-appearance: none; appearance: none; }
 .reader-header-actions { display: flex; align-items: center; gap: 13px; }
 .reader-theme-toggle { position: relative; display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid var(--reader-border); border-radius: 50%; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; transition: background-color .28s ease, border-color .28s ease, transform .28s ease; }
 .reader-zoom-toggle { display: grid; flex: 0 0 40px; width: 40px; height: 40px; place-items: center; padding: 0; border: 1px solid var(--reader-border); border-radius: 50%; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; font-size: 21px; line-height: 1; transition: background-color .28s ease, border-color .28s ease, transform .28s ease; }
+.reader-surah-view-toggle { display: none; min-height: 38px; padding: 0 13px; border: 1px solid var(--reader-border); border-radius: 99px; background: var(--reader-surface); color: var(--reader-gold); cursor: pointer; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.reader-surah-view-toggle[aria-pressed="true"] { border-color: var(--reader-gold); background: color-mix(in srgb, var(--reader-gold) 14%, var(--reader-surface)); }
+.reader-surah-view-toggle:disabled { opacity: .58; cursor: wait; }
 .reader-theme-toggle:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 3px; }
 .reader-zoom-toggle:focus-visible { outline: 2px solid var(--reader-gold); outline-offset: 3px; }
 .reader-mode-icon { position: absolute; inset: 0; display: grid; place-items: center; font-size: 21px; line-height: 1; transition: opacity .24s ease, transform .36s cubic-bezier(.22, 1, .36, 1); }
@@ -301,30 +304,34 @@ html[data-theme="light"] .reader-mode-moon { opacity: 1; transform: rotate(0) sc
     *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
-body.page-zoom-mode { overflow: hidden; }
+html.page-zoom-mode { width: 100%; height: 100%; overflow: hidden; }
+body.page-zoom-mode { position: fixed; inset: 0; width: 100%; height: 100vh; height: 100dvh; overflow: hidden; }
 body.page-zoom-mode .reader-header { position: fixed; z-index: 1200; inset: 0; min-height: 0; pointer-events: none; }
 body.page-zoom-mode .reader-header > :not(.reader-header-actions) { display: none !important; }
 body.page-zoom-mode .reader-header-actions { position: fixed; z-index: 1201; top: 12px; right: 16px; pointer-events: auto; }
 body.page-zoom-mode .reader-header-actions > :not(.reader-zoom-toggle) { display: none !important; }
 body.page-zoom-mode .reader-header-actions { transition: opacity .22s ease, visibility 0s linear .22s; }
-body.page-zoom-mode #pageZoomToggle { position: fixed; z-index: 1202; top: 12px; right: 16px; }
+body.page-zoom-mode #pageZoomToggle { position: relative; z-index: 1202; top: auto; right: auto; }
 body.page-zoom-mode.zoom-controls-hidden .reader-header-actions { visibility: hidden; opacity: 0; pointer-events: none; }
 body.page-zoom-mode .reader-intro,
 body.page-zoom-mode .khatma-card,
 body.page-zoom-mode .daily-surah-card,
 body.page-zoom-mode .reader-plans,
 body.page-zoom-mode .reader-footer { display: none !important; }
-body.page-zoom-mode .mushaf-app { width: 100%; min-height: 100dvh; padding: 0; }
-body.page-zoom-mode .reader-main { width: 100%; max-width: none; margin: 0; }
-body.page-zoom-mode .reading-area { position: fixed; z-index: 1100; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: 62px 14px 14px; overflow: auto; background: rgba(7, 22, 23, .98); }
-body.page-zoom-mode .page-paper { width: min(1080px, 100%); min-height: calc(100dvh - 78px); margin: 0 auto; padding: 14px; }
-body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 108px); }
+body.page-zoom-mode .mushaf-app { position: fixed; inset: 0; width: 100%; height: 100vh; height: 100dvh; min-height: 0; padding: 0; overflow: hidden; }
+body.page-zoom-mode .reader-main { width: 100%; height: 100%; max-width: none; margin: 0; }
+body.page-zoom-mode .reading-area { position: fixed; z-index: 1100; inset: 0; display: flex; align-items: flex-start; justify-content: center; padding: 0; overflow: auto; scrollbar-width: none; background: var(--paper); }
+body.page-zoom-mode .reading-area::-webkit-scrollbar { display: none; }
+body.page-zoom-mode .page-paper { align-self: flex-start; flex: 0 0 100%; width: 100%; height: auto; max-width: none; min-height: 100dvh; margin: 0; padding: 22px clamp(16px, 3vw, 42px); border: 0; border-radius: 0; background: var(--paper); box-shadow: none; }
+body.page-zoom-mode .page-paper::before { position: absolute; z-index: 0; inset: 8px; display: block; border: 1px solid rgba(183, 156, 91, .48); border-radius: 14px; content: ''; pointer-events: none; }
+body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 44px); }
 body.page-zoom-mode .page-content { font-size: clamp(32px, 4vw, 46px); line-height: 2.1; }
 @media (max-width: 700px) {
     body.page-zoom-mode .reader-header-actions { top: 8px; right: 10px; gap: 10px; }
-    body.page-zoom-mode #pageZoomToggle { top: 8px; right: 10px; }
-    body.page-zoom-mode .reading-area { inset: 0; padding: 58px 6px 8px; }
-    body.page-zoom-mode .page-paper { min-height: calc(100dvh - 66px); padding: 7px; border-radius: 15px; }
-    body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 96px); padding: 14px 14px 12px; }
+    body.page-zoom-mode #pageZoomToggle { top: auto; right: auto; }
+    body.page-zoom-mode .reading-area { inset: 0; padding: 0; }
+    body.page-zoom-mode .page-paper::before { inset: 6px; border-radius: 12px; }
+    body.page-zoom-mode .page-paper { width: 100%; min-height: 100dvh; padding: 18px 12px; border-radius: 0; }
+    body.page-zoom-mode .paper-inner { min-height: calc(100dvh - 36px); padding: 14px 10px 12px; }
     body.page-zoom-mode .page-content { font-size: clamp(30px, 8vw, 38px); line-height: 2.1; }
 }
