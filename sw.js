@@ -1,4 +1,4 @@
-const CACHE_NAME = 'molham-dashboard-v237';
+const CACHE_NAME = 'molham-dashboard-v240';
 
 // الأصول والملفات المطلوبة للتخزين حتى يعمل الموقع بدون إنترنت
 const ASSETS_TO_CACHE = [
@@ -7,7 +7,7 @@ const ASSETS_TO_CACHE = [
   './COPYRIGHT.md',
   './style.css?v=99',
   './fonts.css?v=11',
-  './script.js?v=121',
+  './script.js?v=124',
   './mushaf.html',
   './mushaf.css?v=79',
   './quran-data.js?v=2',
@@ -34,7 +34,7 @@ const ASSETS_TO_CACHE = [
   './firebase-app-compat.js',
   './firebase-auth-compat.js',
   './firebase-firestore-compat.js',
-  './cloud-sync.js?v=2'
+  './cloud-sync.js?v=4'
 ];
 
 // 1. مرحلة التثبيت: حفظ جميع الملفات المهمة في الـ Cache
