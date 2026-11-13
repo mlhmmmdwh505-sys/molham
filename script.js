@@ -44,9 +44,11 @@ const CLOUD_STATE_KEYS = [
     'userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme',
     'surgeonTasks', 'focusLog', 'dailyTaskRewardState', 'pongDifficulty',
     'mushafColorScheme', 'mushafLastPage', 'mushafKhatmaPlan', 'mushafDailySurahPlan',
-    'tasbeehCounterState', 'tasbeehDailyTracker', 'userAvatarData'
+    'tasbeehCounterState', 'tasbeehDailyTracker', 'userAvatarData', 'pausedTimerState'
 ];
 const CLOUD_SYNC_PENDING_KEY = 'molhamCloudSyncPending';
+const TIMER_STATE_KEY = 'pausedTimerState';
+const TIMER_STATE_PENDING_KEY = 'molhamPausedTimerPending';
 const DEVICE_SESSION_ID_KEY = 'molhamCloudDeviceSessionId';
 const DEVICE_SESSION_USER_KEY = 'molhamCloudDeviceSessionUserId';
 let cloudUser = null;
@@ -1081,7 +1083,7 @@ function refreshDashboardFromStorage() {
     if (document.getElementById('colorPicker')) document.getElementById('colorPicker').value = savedColor;
     updateColorPickerPreview(savedColor);
 
-    setTimerDuration(savedMins);
+    restoreTimerState(savedMins);
     updatePointsDisplay();
     updateTimerDisplay();
     applyLanguage(currentLang);
@@ -1099,11 +1101,15 @@ async function writeCloudState(pendingToken = localStorage.getItem(CLOUD_SYNC_PE
         throw new Error('Cloud account is not ready');
     }
     if (!pendingToken) pendingToken = markCloudSyncPending();
+    const timerPendingToken = localStorage.getItem(TIMER_STATE_PENDING_KEY);
     await firebase.firestore().collection('users').doc(cloudUser.uid).set({
         state: getCloudState(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
     if (localStorage.getItem(CLOUD_SYNC_PENDING_KEY) === pendingToken) localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
+    if (timerPendingToken && localStorage.getItem(TIMER_STATE_PENDING_KEY) === timerPendingToken) {
+        localStorage.removeItem(TIMER_STATE_PENDING_KEY);
+    }
 }
 
 function cloudSyncErrorMessage(error) {
@@ -1135,19 +1141,29 @@ function saveCloudStateImmediately() {
 
 function clearLocalUserState() {
     CLOUD_STATE_KEYS.forEach(key => localStorage.removeItem(key));
+    localStorage.removeItem(TIMER_STATE_PENDING_KEY);
 }
 
 function applyCloudState(user, state) {
+    const pendingTimerState = localStorage.getItem(TIMER_STATE_PENDING_KEY)
+        ? localStorage.getItem(TIMER_STATE_KEY)
+        : null;
+    const pendingTimerToken = localStorage.getItem(TIMER_STATE_PENDING_KEY);
     clearLocalUserState();
     Object.entries(state).forEach(([key, value]) => {
         if (CLOUD_STATE_KEYS.includes(key) && typeof value === 'string') localStorage.setItem(key, value);
     });
+    if (pendingTimerState) {
+        localStorage.setItem(TIMER_STATE_KEY, pendingTimerState);
+        localStorage.setItem(TIMER_STATE_PENDING_KEY, pendingTimerToken);
+    }
     localStorage.setItem('molhamCloudUserId', user.uid);
     localStorage.setItem('molhamCloudProjectId', FIREBASE_CONFIG.projectId);
     localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
     if (user.displayName && !localStorage.getItem('userName')) localStorage.setItem('userName', user.displayName);
     refreshAccountAvatar(user);
     refreshDashboardFromStorage();
+    if (pendingTimerState) saveCloudStateImmediately();
 }
 
 function watchCloudState(user) {
@@ -1528,7 +1544,7 @@ window.onload = () => {
     document.documentElement.style.setProperty('--primary', savedColor);
     
     // ضبط الوقت الابتدائي بدون تعليق برمي الخوارزمية
-    setTimerDuration(savedMins);
+    restoreTimerState(savedMins);
     updateTimerDisplay();
     
     if(document.getElementById('taskInput')) {
@@ -1662,7 +1678,10 @@ function applyLanguage(lang) {
     const startBtn = document.getElementById('startBtn');
     if (startBtn) {
         if (timer === null) {
-            startBtn.innerText = isBreak ? trans.startBtnBreak : trans.startBtnJob;
+            const savedTimerState = readPausedTimerState();
+            startBtn.innerText = savedTimerState?.resumeAvailable
+                ? trans.startBtnResume
+                : isBreak ? trans.startBtnBreak : trans.startBtnJob;
         } else {
             startBtn.innerText = trans.startBtnPause;
         }
@@ -1717,6 +1736,7 @@ document.getElementById('mainSaveBtn').addEventListener('click', function() {
     
     if (timer === null) {
         setTimerDuration(newMins);
+        persistPausedTimerState();
         updateTimerDisplay();
     }
 
@@ -1755,6 +1775,7 @@ function toggleTimer() {
     
     if (timer === null) {
         // حالة البداية أو الاستئناف
+        clearPausedTimerState();
         startBtn.innerText = trans.startBtnPause;
         updateSmartSuggestion();
         
@@ -1790,6 +1811,7 @@ function toggleTimer() {
                 const mins = parseFloat(minsInput.value) || 25;
                 setTimerDuration(mins);
                 totalSecondsWorked = 0;
+                persistPausedTimerState();
                 updateTimerDisplay();
                 startBtn.innerText = trans.startBtnJob;
             } else {
@@ -1810,6 +1832,7 @@ function toggleTimer() {
             commitActiveFocusTime();
             addPoints(); 
         }
+        persistPausedTimerState(true);
     }
 }
 
@@ -1828,6 +1851,7 @@ function resetTimer() {
     const minsInput = document.getElementById('minsInput');
     const mins = parseFloat(minsInput ? minsInput.value : 25) || 25;
     setTimerDuration(mins);
+    persistPausedTimerState();
     
     updateTimerDisplay();
     
@@ -1841,6 +1865,64 @@ function setTimerDuration(minutes) {
     timerDurationSeconds = Math.max(1, Math.floor((Number(minutes) || 25) * 60));
     timeLeft = timerDurationSeconds;
     timerUsesHoursFormat = minutes >= 60;
+}
+
+function readPausedTimerState() {
+    try {
+        const state = JSON.parse(localStorage.getItem(TIMER_STATE_KEY) || 'null');
+        const remainingSeconds = Number(state?.remainingSeconds);
+        const durationSeconds = Number(state?.durationSeconds);
+        if (!Number.isFinite(remainingSeconds) || !Number.isFinite(durationSeconds)
+            || remainingSeconds < 1 || durationSeconds < remainingSeconds) return null;
+        return {
+            remainingSeconds: Math.ceil(remainingSeconds),
+            durationSeconds: Math.floor(durationSeconds),
+            isBreak: Boolean(state.isBreak),
+            resumeAvailable: Boolean(state.resumeAvailable)
+        };
+    } catch (error) {
+        return null;
+    }
+}
+
+function restoreTimerState(defaultMinutes) {
+    if (timer !== null) return;
+    const state = readPausedTimerState();
+    if (state) {
+        timeLeft = state.remainingSeconds;
+        timerDurationSeconds = state.durationSeconds;
+        timerUsesHoursFormat = timerDurationSeconds >= 3600;
+        isBreak = state.isBreak;
+    } else {
+        if (localStorage.getItem(TIMER_STATE_KEY)) localStorage.removeItem(TIMER_STATE_KEY);
+        localStorage.removeItem(TIMER_STATE_PENDING_KEY);
+        isBreak = false;
+        setTimerDuration(defaultMinutes);
+    }
+    const startButton = document.getElementById('startBtn');
+    if (startButton) startButton.innerText = state?.resumeAvailable
+        ? i18n[currentLang].startBtnResume
+        : isBreak ? i18n[currentLang].startBtnBreak : i18n[currentLang].startBtnJob;
+}
+
+function persistPausedTimerState(resumeAvailable = false) {
+    if (timer !== null || timeLeft === null) return;
+    const state = {
+        remainingSeconds: Math.max(1, Math.ceil(Number(timeLeft) || 0)),
+        durationSeconds: Math.max(1, Math.floor(Number(timerDurationSeconds) || 1)),
+        isBreak: Boolean(isBreak),
+        resumeAvailable: Boolean(resumeAvailable)
+    };
+    const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(state));
+    localStorage.setItem(TIMER_STATE_PENDING_KEY, token);
+    if (cloudUser) saveCloudStateImmediately();
+}
+
+function clearPausedTimerState() {
+    localStorage.removeItem(TIMER_STATE_KEY);
+    localStorage.removeItem(TIMER_STATE_PENDING_KEY);
+    if (cloudUser) saveCloudStateImmediately();
 }
 
 function updateTimerDisplay() {
@@ -1922,6 +2004,7 @@ function buyBreak(min) {
         isBreak = true;
         setTimerDuration(min);
         totalSecondsWorked = 0; // تصفير العداد لعدم حساب نقاط في الراحة
+        persistPausedTimerState();
         
         updateTimerDisplay();
         document.getElementById('startBtn').innerText = trans.startBtnBreak;

@@ -11,10 +11,12 @@
         'userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme',
         'surgeonTasks', 'focusLog', 'dailyTaskRewardState', 'pongDifficulty',
         'mushafColorScheme', 'mushafLastPage', 'mushafKhatmaPlan', 'mushafDailySurahPlan',
-        'tasbeehCounterState', 'tasbeehDailyTracker', 'userAvatarData'
+        'tasbeehCounterState', 'tasbeehDailyTracker', 'userAvatarData', 'pausedTimerState'
     ]);
     const PROJECT_MIGRATION_SOURCE = 'molham-dash-bord';
     const PENDING_SYNC_KEY = 'molhamCloudSyncPending';
+    const TIMER_STATE_KEY = 'pausedTimerState';
+    const TIMER_STATE_PENDING_KEY = 'molhamPausedTimerPending';
     const DEVICE_SESSION_ID_KEY = 'molhamCloudDeviceSessionId';
     const DEVICE_SESSION_USER_KEY = 'molhamCloudDeviceSessionUserId';
     const localStore = window.localStorage;
@@ -57,11 +59,15 @@
         if (!cloudUser || applyingRemoteState) return;
         if (!pendingToken) pendingToken = markSyncPending();
         if (!navigator.onLine) return;
+        const timerPendingToken = localStore.getItem(TIMER_STATE_PENDING_KEY);
         await firebase.firestore().collection('users').doc(cloudUser.uid).set({
             state: localState(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
         if (localStore.getItem(PENDING_SYNC_KEY) === pendingToken) localStore.removeItem(PENDING_SYNC_KEY);
+        if (timerPendingToken && localStore.getItem(TIMER_STATE_PENDING_KEY) === timerPendingToken) {
+            localStore.removeItem(TIMER_STATE_PENDING_KEY);
+        }
         setStatus('✓ تمت المزامنة مع حسابك', 'connected');
     }
 
@@ -84,6 +90,7 @@
         applyingRemoteState = true;
         STATE_KEYS.forEach(key => localStore.removeItem(key));
         localStore.removeItem(PENDING_SYNC_KEY);
+        localStore.removeItem(TIMER_STATE_PENDING_KEY);
         applyingRemoteState = false;
         window.dispatchEvent(new CustomEvent('molham:cloud-state-updated', {
             detail: { keys: [...STATE_KEYS], source: 'account-change' }
@@ -91,11 +98,19 @@
     }
 
     function applyCloudState(user, state) {
+        const pendingTimerState = localStore.getItem(TIMER_STATE_PENDING_KEY)
+            ? localStore.getItem(TIMER_STATE_KEY)
+            : null;
+        const pendingTimerToken = localStore.getItem(TIMER_STATE_PENDING_KEY);
         applyingRemoteState = true;
         STATE_KEYS.forEach(key => localStore.removeItem(key));
         Object.entries(state || {}).forEach(([key, value]) => {
             if (STATE_KEYS.has(key) && typeof value === 'string') localStore.setItem(key, value);
         });
+        if (pendingTimerState) {
+            localStore.setItem(TIMER_STATE_KEY, pendingTimerState);
+            localStore.setItem(TIMER_STATE_PENDING_KEY, pendingTimerToken);
+        }
         localStore.setItem('molhamCloudUserId', user.uid);
         localStore.setItem('molhamCloudProjectId', FIREBASE_CONFIG.projectId);
         localStore.removeItem(PENDING_SYNC_KEY);
@@ -103,6 +118,10 @@
         window.dispatchEvent(new CustomEvent('molham:cloud-state-updated', {
             detail: { keys: [...STATE_KEYS], source: 'cloud' }
         }));
+        if (pendingTimerState) writeCloudState().catch(error => {
+            setStatus(syncErrorMessage(error), 'error');
+            console.warn('Tool paused-timer sync error:', error);
+        });
     }
 
     function watchCloudState(user) {
