@@ -56,6 +56,7 @@ const completeDailySurahButton = document.getElementById('completeDailySurahButt
 
 let currentPage = readLastPage();
 let isLoading = false;
+let pendingCloudPage = null;
 let mushafTextScale = 1;
 let surahCatalog = [];
 let surahByNumber = new Map();
@@ -448,7 +449,7 @@ function renderDailySurah() {
 
     if (!dailySurahPlan) {
         dailySurahHint.textContent = 'اختر سورة ومدة الخطة للبدء.';
-        dailySurahStatus.textContent = 'يُحفظ تقدم الخطة على هذا الجهاز.';
+        dailySurahStatus.textContent = 'يُحفظ تقدم الخطة على هذا الجهاز ويتزامن مع حسابك عند تسجيل الدخول.';
     } else if (!active) {
         dailySurahHint.textContent = `انتهت مدة الخطة: أتممت ${toArabicNumber(completedDays)} من ${toArabicNumber(dailySurahPlan.durationDays)} يوم.`;
         dailySurahStatus.textContent = 'يمكنك بدء خطة جديدة في أي وقت.';
@@ -905,6 +906,11 @@ async function loadPage(pageNumber, forceRefresh = false, resetToPageStart = fal
                 }
             });
         }
+        if (pendingCloudPage !== null) {
+            const nextCloudPage = pendingCloudPage;
+            pendingCloudPage = null;
+            if (nextCloudPage !== currentPage) window.requestAnimationFrame(() => loadPage(nextCloudPage));
+        }
     }
 }
 
@@ -1049,6 +1055,28 @@ document.getElementById('surahJumpForm').addEventListener('submit', async event 
         surahJumpButton.disabled = false;
     }
 });
+
+function refreshMushafFromSyncedStorage(event) {
+    const changedKeys = event.detail?.keys || [];
+    if (changedKeys.includes(LAST_PAGE_KEY)) {
+        const nextPage = readLastPage();
+        if (nextPage !== currentPage) {
+            if (isLoading) pendingCloudPage = nextPage;
+            else loadPage(nextPage);
+        }
+    }
+    if (changedKeys.includes(KHATMA_PLAN_KEY)) khatmaPlan = readKhatmaPlan();
+    if (changedKeys.includes(DAILY_SURAH_PLAN_KEY)) dailySurahPlan = readDailySurahPlan();
+    if (changedKeys.includes('mushafColorScheme') || changedKeys.includes('colorScheme')) {
+        setMushafTheme(localStorage.getItem('mushafColorScheme') || localStorage.getItem('colorScheme') || 'dark', false);
+    }
+    if (changedKeys.some(key => [KHATMA_PLAN_KEY, DAILY_SURAH_PLAN_KEY].includes(key))) {
+        renderKhatma();
+        renderDailySurah();
+    }
+}
+
+window.addEventListener('molham:cloud-state-updated', refreshMushafFromSyncedStorage);
 
 khatmaForm.addEventListener('submit', event => {
     event.preventDefault();

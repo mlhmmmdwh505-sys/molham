@@ -33,14 +33,20 @@ let contentOverlayOpener = null;
 // Copy this object from Firebase Console > Project settings > Your apps > Web app.
 // Firebase config is public by design; the Firestore security rules protect each user's data.
 const FIREBASE_CONFIG = {
-    apiKey: 'AIzaSyD8BD5gyVpgMEaDuFU9Wn68BVUN-ChQbjw',
-    authDomain: 'molham-dash-bord.firebaseapp.com',
-    projectId: 'molham-dash-bord',
-    storageBucket: 'molham-dash-bord.firebasestorage.app',
-    messagingSenderId: '527443679426',
-    appId: '1:527443679426:web:a5b4de91a9507f8845c35b'
+    apiKey: 'AIzaSyApPkvZBmE24_coF-OSn3l463X2MdJCXtc',
+    authDomain: 'molham-dashboard-sync.firebaseapp.com',
+    projectId: 'molham-dashboard-sync',
+    storageBucket: 'molham-dashboard-sync.firebasestorage.app',
+    messagingSenderId: '41203898641',
+    appId: '1:41203898641:web:527ba65d32364e5c9494b0'
 };
-const CLOUD_STATE_KEYS = ['userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme', 'surgeonTasks', 'focusLog', 'dailyTaskRewardState'];
+const CLOUD_STATE_KEYS = [
+    'userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme',
+    'surgeonTasks', 'focusLog', 'dailyTaskRewardState', 'pongDifficulty',
+    'mushafColorScheme', 'mushafLastPage', 'mushafKhatmaPlan', 'mushafDailySurahPlan',
+    'tasbeehCounterState', 'tasbeehDailyTracker'
+];
+const CLOUD_SYNC_PENDING_KEY = 'molhamCloudSyncPending';
 let cloudUser = null;
 let cloudUnsubscribe = null;
 let cloudSaveSequence = 0;
@@ -828,14 +834,22 @@ function refreshDashboardFromStorage() {
     displayDate();
 }
 
-async function writeCloudState() {
+function markCloudSyncPending() {
+    const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    localStorage.setItem(CLOUD_SYNC_PENDING_KEY, token);
+    return token;
+}
+
+async function writeCloudState(pendingToken = localStorage.getItem(CLOUD_SYNC_PENDING_KEY)) {
     if (!cloudUser || !isFirebaseConfigured() || !window.firebase) {
         throw new Error('Cloud account is not ready');
     }
+    if (!pendingToken) pendingToken = markCloudSyncPending();
     await firebase.firestore().collection('users').doc(cloudUser.uid).set({
         state: getCloudState(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+    });
+    if (localStorage.getItem(CLOUD_SYNC_PENDING_KEY) === pendingToken) localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
 }
 
 function cloudSyncErrorMessage(error) {
@@ -849,12 +863,13 @@ function cloudSyncErrorMessage(error) {
 function saveCloudStateImmediately() {
     if (!cloudUser) return;
     const sequence = ++cloudSaveSequence;
+    const pendingToken = markCloudSyncPending();
     const localSaveMessage = navigator.onLine
         ? '✓ تم الحفظ على هذا الجهاز؛ المزامنة تعمل بالخلفية.'
         : '✓ تم الحفظ على هذا الجهاز؛ ستتم المزامنة عند عودة الاتصال.';
     setCloudStatus(localSaveMessage, navigator.onLine ? 'connected' : 'saving');
 
-    writeCloudState().then(() => {
+    writeCloudState(pendingToken).then(() => {
         if (sequence !== cloudSaveSequence) return;
         setCloudStatus('✓ تمت المزامنة مع حسابك', 'connected');
     }).catch(error => {
@@ -870,29 +885,46 @@ function clearLocalUserState() {
 
 function applyCloudState(user, state) {
     clearLocalUserState();
-    Object.entries(state).forEach(([key, value]) => localStorage.setItem(key, value));
+    Object.entries(state).forEach(([key, value]) => {
+        if (CLOUD_STATE_KEYS.includes(key) && typeof value === 'string') localStorage.setItem(key, value);
+    });
     localStorage.setItem('molhamCloudUserId', user.uid);
-    if (user.displayName) localStorage.setItem('userName', user.displayName);
+    localStorage.setItem('molhamCloudProjectId', FIREBASE_CONFIG.projectId);
+    localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
+    if (user.displayName && !localStorage.getItem('userName')) localStorage.setItem('userName', user.displayName);
     refreshDashboardFromStorage();
 }
 
 function watchCloudState(user) {
     const previousUserId = localStorage.getItem('molhamCloudUserId');
+    const previousProjectId = localStorage.getItem('molhamCloudProjectId') || 'molham-dash-bord';
+    const isProjectMigration = previousProjectId !== FIREBASE_CONFIG.projectId;
     // Never allow values left by a different account to appear in this account.
-    if (previousUserId && previousUserId !== user.uid) clearLocalUserState();
+    if (previousUserId && previousUserId !== user.uid && !isProjectMigration) {
+        clearLocalUserState();
+        localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
+    }
+    localStorage.setItem('molhamCloudProjectId', FIREBASE_CONFIG.projectId);
 
     if (cloudUnsubscribe) cloudUnsubscribe();
     cloudUnsubscribe = firebase.firestore().collection('users').doc(user.uid).onSnapshot(snapshot => {
         const remoteState = snapshot.exists ? snapshot.data().state : null;
         if (!remoteState || Object.keys(remoteState).length === 0) {
             // First use of an account: turn the current local dashboard into its cloud dashboard.
-            if (!snapshot.metadata.hasPendingWrites && !snapshot.metadata.fromCache) saveCloudStateImmediately();
+            if (!snapshot.metadata.hasPendingWrites && !snapshot.metadata.fromCache) {
+                if (!localStorage.getItem('userName')) localStorage.setItem('userName', user.displayName || user.email || 'Molham');
+                saveCloudStateImmediately();
+            }
             return;
         }
 
         // The page has already updated locally. Apply only acknowledged or remote snapshots so an
         // active timer is not reset by Firestore's local echo; other devices update immediately.
         if (snapshot.metadata.hasPendingWrites) return;
+        if (localStorage.getItem(CLOUD_SYNC_PENDING_KEY)) {
+            if (!snapshot.metadata.fromCache) saveCloudStateImmediately();
+            return;
+        }
         applyCloudState(user, snapshot.data().state);
         setCloudStatus('✓ تمت مزامنة بيانات الحساب', 'connected');
     }, error => {
@@ -919,6 +951,9 @@ async function signInWithGoogle() {
 }
 
 function initializeCloud() {
+    window.addEventListener('online', () => {
+        if (cloudUser) saveCloudStateImmediately();
+    });
     document.getElementById('googleLoginButton')?.addEventListener('click', signInWithGoogle);
     document.getElementById('guestLoginButton')?.addEventListener('click', signInWithGoogle);
     document.getElementById('continueAsGuestButton')?.addEventListener('click', continueAsGuest);
@@ -1002,6 +1037,7 @@ function signOut() {
     }
     clearLocalUserState();
     localStorage.removeItem('molhamCloudUserId');
+    localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
     if (window.firebase && firebase.auth) firebase.auth().signOut();
 }
 

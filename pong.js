@@ -494,6 +494,15 @@ difficultySelect.addEventListener('change', () => {
     if (state.mode) { initializeGame(); startButton.textContent = copy.start; startButton.hidden = false; draw(); }
 });
 
+window.addEventListener('molham:cloud-state-updated', event => {
+    if (!event.detail?.keys?.includes('pongDifficulty')) return;
+    const difficulty = readLocalSetting('pongDifficulty');
+    if (['easy', 'medium', 'hard'].includes(difficulty)) {
+        state.difficulty = difficulty;
+        difficultySelect.value = difficulty;
+    }
+});
+
 canvas.addEventListener('pointermove', event => {
     if (state.mode === 'pong') pong.playerY = getCanvasPoint(event).y;
     else if (state.mode === 'breakout') breakout.paddleX = getCanvasPoint(event).x;

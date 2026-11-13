@@ -4,12 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#07151f">
-    <meta name="description" content="سبحة إلكترونية هادئة تحفظ عدّك وهدفك اليومي على هذا الجهاز فقط.">
+    <meta name="description" content="سبحة إلكترونية هادئة تحفظ عدّك وهدفك اليومي على هذا الجهاز وتزامنه مع حسابك.">
     <title>السبحة | لوحة ملهم</title>
     <link rel="manifest" href="manifest.json?v=11">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="stylesheet" href="fonts.css?v=1">
-    <link rel="stylesheet" href="tasbeeh.css?v=45">
+    <link rel="stylesheet" href="tasbeeh.css?v=46">
 </head>
 <body>
     <div class="tasbeeh-app">
@@ -37,7 +37,8 @@
             <section class="page-intro" aria-labelledby="pageTitle">
                 <span class="eyebrow"><span aria-hidden="true">✦</span> خُذ لحظة هدوء</span>
                 <h1 id="pageTitle">مساحة هادئة لذِكرك</h1>
-                <p>ابدأ بالذكر الذي تختاره، وتابع تقدّمك اليومي. عدّك محفوظ على هذا الجهاز.</p>
+                <p>ابدأ بالذكر الذي تختاره، وتابع تقدّمك اليومي. يُحفظ على هذا الجهاز ويتزامن مع حسابك عند تسجيل الدخول.</p>
+                <p class="cloud-sync-status" id="toolCloudSyncStatus" role="status" aria-live="polite">سجّل الدخول من لوحة التحكم لمزامنة تقدمك.</p>
             </section>
 
             <div class="tasbeeh-grid">
@@ -143,7 +144,7 @@
                         <button type="button" data-daily-goal="500">٥٠٠</button>
                         <button type="button" data-daily-goal="1000">١٠٠٠</button>
                     </div>
-                    <p class="daily-note">يتحدّث مجموع اليوم مع كل تسبيحة، ويُحفظ على هذا الجهاز.</p>
+                    <p class="daily-note">يتحدّث مجموع اليوم مع كل تسبيحة، ويُحفظ على هذا الجهاز ويتزامن مع حسابك.</p>
                 </section>
             </div>
 
@@ -177,6 +178,10 @@
             </div>
         </div>
     </dialog>
-    <script src="tasbeeh.js?v=26" defer></script>
+    <script defer src="firebase-app-compat.js"></script>
+    <script defer src="firebase-auth-compat.js"></script>
+    <script defer src="firebase-firestore-compat.js"></script>
+    <script src="cloud-sync.js?v=1" defer></script>
+    <script src="tasbeeh.js?v=27" defer></script>
 </body>
 </html>

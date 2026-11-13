@@ -330,6 +330,21 @@ function setTheme(theme, persist = true) {
     }
 }
 
+function refreshTasbeehFromSyncedStorage(event) {
+    const changedKeys = event.detail?.keys || [];
+    if (changedKeys.includes(TASBEEH_STATE_KEY)) counterState = readCounterState();
+    if (changedKeys.includes(DAILY_TRACKER_KEY)) dailyTracker = readDailyTracker();
+    if (changedKeys.includes('colorScheme')) {
+        setTheme(localStorage.getItem('colorScheme') === 'light' ? 'light' : 'dark', false);
+    }
+    if (changedKeys.some(key => [TASBEEH_STATE_KEY, DAILY_TRACKER_KEY].includes(key))) {
+        renderCounter();
+        renderDailyProgress();
+    }
+}
+
+window.addEventListener('molham:cloud-state-updated', refreshTasbeehFromSyncedStorage);
+
 themeToggle.addEventListener('click', () => {
     setTheme(document.documentElement.dataset.theme === 'light' ? 'dark' : 'light');
 });

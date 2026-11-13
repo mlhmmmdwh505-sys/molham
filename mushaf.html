@@ -20,7 +20,7 @@
     <link rel="manifest" href="manifest.json?v=11">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="stylesheet" href="fonts.css?v=11">
-    <link rel="stylesheet" href="mushaf.css?v=78">
+    <link rel="stylesheet" href="mushaf.css?v=79">
 </head>
 <body>
     <div class="mushaf-app">
@@ -161,7 +161,7 @@
                         </div>
                     </form>
                 </div>
-                <p class="khatma-status" id="dailySurahStatus" aria-live="polite">يُحفظ تقدم الخطة على هذا الجهاز.</p>
+                <p class="khatma-status" id="dailySurahStatus" aria-live="polite">يُحفظ تقدم الخطة على هذا الجهاز ويتزامن مع حسابك عند تسجيل الدخول.</p>
             </section>
             </div>
 
@@ -199,6 +199,7 @@
             </section>
 
             <p class="reader-status" id="readerStatus" aria-live="polite">اسحب يمينًا أو يسارًا للتنقل بين الصفحات والسور.</p>
+            <p class="cloud-sync-status" id="toolCloudSyncStatus" role="status" aria-live="polite">سجّل الدخول من لوحة التحكم لمزامنة تقدمك.</p>
         </main>
 
         <footer class="reader-footer">
@@ -208,7 +209,11 @@
         </footer>
         <p class="reader-source">للتدقيق في النص: <a href="https://qurancomplex.gov.sa/quran-dev/" target="_blank" rel="noopener noreferrer">بيانات المصحف المعتمدة من مجمع الملك فهد</a> · <a href="https://quran.ksu.edu.sa/tafseer/saadi/sura6-aya151.html" target="_blank" rel="noopener noreferrer">مشروع آيات بجامعة الملك سعود</a></p>
     </div>
+    <script defer src="firebase-app-compat.js"></script>
+    <script defer src="firebase-auth-compat.js"></script>
+    <script defer src="firebase-firestore-compat.js"></script>
+    <script src="cloud-sync.js?v=1" defer></script>
     <script src="quran-data.js?v=2" defer></script>
-    <script src="mushaf.js?v=59" defer></script>
+    <script src="mushaf.js?v=60" defer></script>
 </body>
 </html>
