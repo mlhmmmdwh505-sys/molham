@@ -66,28 +66,6 @@ const zoomToggle = document.getElementById('zoomToggle');
 const backLink = document.querySelector('.back-link');
 const dhikrShortcutButtons = [...document.querySelectorAll('[data-dhikr-shortcut]')];
 const clearDataDialog = document.getElementById('clearDataDialog');
-const STRAND_BEAD_COUNT = 19;
-const STRAND_CENTER_SLOT = Math.floor(STRAND_BEAD_COUNT / 2);
-const strandPositions = [...Array(STRAND_BEAD_COUNT)].map((_, index) => {
-    const progress = index / (STRAND_BEAD_COUNT - 1);
-    const inverse = 1 - progress;
-    const bezier = (start, controlA, controlB, end) => inverse ** 3 * start
-        + 3 * inverse ** 2 * progress * controlA
-        + 3 * inverse * progress ** 2 * controlB
-        + progress ** 3 * end;
-    return { x: bezier(18, 170, 430, 582), y: bezier(24, 136, 136, 24) };
-});
-const tasbeehBeads = [...Array(STRAND_BEAD_COUNT)].map((_, index) => {
-    const bead = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    bead.setAttribute('cx', strandPositions[index].x.toFixed(2));
-    bead.setAttribute('cy', strandPositions[index].y.toFixed(2));
-    bead.setAttribute('r', '13.5');
-    bead.dataset.slot = String(index);
-    bead.classList.add('strand-bead');
-    document.getElementById('tasbeehBeads').appendChild(bead);
-    return bead;
-});
-let strandHasRendered = false;
 
 function readCounterState() {
     try {
@@ -198,48 +176,14 @@ function renderCounter() {
     const complete = counterState.target > 0 && counterState.count === counterState.target;
     const progress = counterState.target > 0 ? Math.min(1, Math.max(0, counterState.count / counterState.target)) : 0;
     const progressDegrees = `${progress * 360}deg`;
-    const tickAngle = counterState.target > 0 ? 360 / counterState.target : 360;
-    const tickWidth = Math.min(1.1, tickAngle * 0.42);
-
     activeDhikrText.textContent = dhikr.text;
     dhikrSelect.value = counterState.dhikrId;
     countValue.textContent = formatNumber(counterState.count);
     targetValue.textContent = counterState.target ? formatNumber(counterState.target) : '∞';
     roundCount.textContent = `${formatNumber(counterState.rounds)} ${counterState.rounds === 1 ? 'جولة' : 'جولات'}`;
     counterOrbit.style.setProperty('--progress', progressDegrees);
-    counterOrbit.style.setProperty('--tick-angle', `${tickAngle}deg`);
-    counterOrbit.style.setProperty('--tick-width', `${tickWidth}deg`);
     counterOrbit.classList.toggle('is-unlimited', counterState.target === 0);
     countButton.setAttribute('aria-label', `زيادة عدّ ${dhikr.text}، العدد الحالي ${formatNumber(counterState.count)}`);
-
-    const dailyCount = Math.max(0, Math.trunc(dailyTracker.total));
-    const strandOffset = dailyCount % STRAND_BEAD_COUNT;
-    const firstStrandRender = !strandHasRendered;
-    tasbeehBeads.forEach((bead, index) => {
-        const slot = (index - strandOffset + STRAND_BEAD_COUNT) % STRAND_BEAD_COUNT;
-        const previousSlot = Number(bead.dataset.slot);
-        const wrapped = strandHasRendered && Math.abs(slot - previousSlot) > 1;
-        if (wrapped) {
-            bead.classList.add('is-wrapping');
-            window.setTimeout(() => bead.classList.remove('is-wrapping'), 110);
-        } else bead.classList.remove('is-wrapping');
-
-        if (firstStrandRender) bead.style.transition = 'none';
-        bead.setAttribute('cx', strandPositions[slot].x.toFixed(2));
-        bead.setAttribute('cy', strandPositions[slot].y.toFixed(2));
-        bead.dataset.slot = String(slot);
-
-        const beadNumber = dailyCount + slot - STRAND_CENTER_SLOT;
-        const isDivider = beadNumber > 0 && beadNumber <= dailyCount && beadNumber % 33 === 0;
-        const isFocus = slot === STRAND_CENTER_SLOT;
-        bead.classList.toggle('strand-divider', isDivider);
-        bead.classList.toggle('strand-focus', isFocus);
-        bead.setAttribute('r', isFocus ? '17' : isDivider ? '15.5' : '13.5');
-    });
-    if (firstStrandRender) {
-        strandHasRendered = true;
-        window.requestAnimationFrame(() => tasbeehBeads.forEach(bead => bead.style.removeProperty('transition')));
-    }
 
     document.querySelectorAll('.target-picker button').forEach(button => {
         button.setAttribute('aria-pressed', String(Number(button.dataset.target) === counterState.target));

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'molham-dashboard-v212';
+const CACHE_NAME = 'molham-dashboard-v233';
 
 // الأصول والملفات المطلوبة للتخزين حتى يعمل الموقع بدون إنترنت
 const ASSETS_TO_CACHE = [
@@ -7,14 +7,14 @@ const ASSETS_TO_CACHE = [
   './COPYRIGHT.md',
   './style.css?v=97',
   './fonts.css?v=11',
-  './script.js?v=103',
+  './script.js?v=118',
   './mushaf.html',
   './mushaf.css?v=78',
   './quran-data.js?v=2',
   './mushaf.js?v=59',
   './tasbeeh.html',
-  './tasbeeh.css?v=28',
-  './tasbeeh.js?v=18',
+  './tasbeeh.css?v=45',
+  './tasbeeh.js?v=26',
   './pong.html?v=5',
   './pong.css?v=4',
   './pong.js?v=3',

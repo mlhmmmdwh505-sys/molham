@@ -421,7 +421,7 @@ function openContentOverlay(kind) {
             frame.focus({ preventScroll: true });
         }
     }, { once: true });
-    frame.src = isMushaf ? './mushaf.html?v=60' : './tasbeeh.html?v=15';
+    frame.src = isMushaf ? './mushaf.html?v=60' : './tasbeeh.html?v=31';
 }
 
 function openMushafOverlay() {
