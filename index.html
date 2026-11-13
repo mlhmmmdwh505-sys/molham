@@ -16,7 +16,7 @@
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="stylesheet" href="style.css?v=97">
+    <link rel="stylesheet" href="style.css?v=98">
     <link rel="stylesheet" href="fonts.css?v=7">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=11">
@@ -39,14 +39,26 @@
             <div class="login-logo-wrap"><img src="gnome-books.png" alt="شعار الموقع" class="login-logo"></div>
             <span class="login-eyebrow">منظّم الدراسة الشخصي</span>
             <h1 id="loginTitle">أهلاً بك في لوحة ملهم</h1>
-            <p>سجّل بحساب Google لمزامنة بياناتك عند الاتصال، أو تابع كضيف. بعد فتح الموقع مرةً بالإنترنت، تعمل الأدوات المحفوظة على هذا الجهاز دون اتصال.</p>
-            <button id="googleLoginButton" class="firebase-google-button" type="button">
+            <p id="loginDescription">سجّل بحساب Google أو بريدك الإلكتروني لمزامنة بياناتك عند الاتصال، أو تابع كضيف.</p>
+            <button id="googleLoginButton" class="firebase-provider-button firebase-google-button" type="button">
                 <span class="google-mark" aria-hidden="true">G</span>
-                المتابعة باستخدام Google
+                <span id="googleLoginLabel">المتابعة باستخدام Google</span>
             </button>
+            <form id="emailAuthForm" class="credential-login-form">
+                <label id="emailLabel" for="emailInput">البريد الإلكتروني</label>
+                <input id="emailInput" type="email" inputmode="email" autocomplete="username" dir="ltr" placeholder="name@example.com" required>
+                <label id="passwordLabel" for="passwordInput">كلمة المرور</label>
+                <input id="passwordInput" type="password" autocomplete="current-password" minlength="6" required>
+                <button id="emailAuthSubmitButton" class="email-auth-submit" type="submit">تسجيل الدخول بالبريد</button>
+                <div class="email-auth-links">
+                    <button id="emailAuthModeButton" type="button">إنشاء حساب جديد</button>
+                    <button id="passwordResetButton" type="button">نسيت كلمة المرور؟</button>
+                </div>
+            </form>
             <button id="continueAsGuestButton" class="guest-skip-button" type="button">تخطي والمتابعة كضيف</button>
             <p id="googleLoginError" class="login-error" role="alert" hidden></p>
-            <p class="login-note">لن نطلب كلمة مرور حساب Google أبدًا.</p>
+            <p id="loginStatus" class="login-status" role="status" aria-live="polite" hidden></p>
+            <p id="loginNote" class="login-note">كلمة المرور 6 أحرف على الأقل. لربطها بحساب Google الحالي، سجّل به أولًا ثم أضف كلمة المرور من قائمة الحساب.</p>
         </div>
     </section>
 
@@ -102,6 +114,12 @@
             </button>
             <div id="accountMenu" class="account-menu" hidden>
                 <p id="cloudSyncStatus" class="cloud-sync-status" role="status" aria-live="polite">جارٍ تحميل بيانات الحساب…</p>
+                <button type="button" id="linkEmailPasswordButton" class="link-auth-button" hidden>إضافة كلمة مرور لهذا الحساب</button>
+                <form id="linkEmailPasswordForm" class="link-auth-form" hidden>
+                    <label id="linkEmailPasswordLabel" for="linkEmailPasswordInput">كلمة مرور للحساب نفسه</label>
+                    <input id="linkEmailPasswordInput" type="password" autocomplete="new-password" minlength="6" required>
+                    <button id="linkEmailPasswordSubmit" type="submit">ربط كلمة المرور</button>
+                </form>
                 <button type="button" id="logoutButton" class="logout-button">تسجيل الخروج</button>
             </div>
         </div>
@@ -315,6 +333,6 @@
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script defer src="script.js?v=119"></script>
+    <script defer src="script.js?v=120"></script>
 </body>
 </html>

@@ -750,6 +750,54 @@ function showLoginError(message) {
     if (!errorBox) return;
     errorBox.textContent = message;
     errorBox.hidden = false;
+    const status = document.getElementById('loginStatus');
+    if (status) status.hidden = true;
+}
+
+function setLoginStatus(message) {
+    const status = document.getElementById('loginStatus');
+    if (!status) return;
+    status.textContent = message;
+    status.hidden = !message;
+    const errorBox = document.getElementById('googleLoginError');
+    if (errorBox) errorBox.hidden = true;
+}
+
+function loginMessage(arabic, english) {
+    return currentLang === 'en' ? english : arabic;
+}
+
+function canStartCloudSignIn() {
+    if (!navigator.onLine) {
+        showLoginError(loginMessage('تسجيل الدخول والمزامنة يحتاجان اتصالًا بالإنترنت. يمكنك المتابعة كضيف الآن.', 'Sign-in and cloud sync require an internet connection. You can continue as a guest.'));
+        return false;
+    }
+    if (!isFirebaseConfigured() || !window.firebase) {
+        showLoginError(loginMessage('خدمة تسجيل الدخول غير جاهزة حاليًا.', 'Sign-in is not available right now.'));
+        return false;
+    }
+    return true;
+}
+
+function authErrorMessage(error, fallback) {
+    const code = String(error?.code || '').replace(/^auth\//, '');
+    const messages = {
+        'operation-not-allowed': loginMessage('طريقة تسجيل الدخول دي لم تُفعّل في Firebase بعد.', 'This sign-in method is not enabled in Firebase yet.'),
+        'unauthorized-domain': loginMessage('نطاق الموقع غير مضاف ضمن النطاقات المسموح بها في Firebase.', 'This website domain is not authorized in Firebase.'),
+        'account-exists-with-different-credential': loginMessage('هذا البريد مرتبط بطريقة دخول أخرى. سجّل بالطريقة الأصلية أولًا.', 'This email already uses another sign-in method. Sign in with that method first.'),
+        'popup-blocked': loginMessage('المتصفح منع نافذة تسجيل الدخول. اسمح بالنوافذ المنبثقة ثم أعد المحاولة.', 'Your browser blocked the sign-in popup. Allow popups and try again.'),
+        'too-many-requests': loginMessage('طلبات كثيرة؛ انتظر قليلًا ثم أعد المحاولة.', 'Too many attempts. Wait a little and try again.'),
+        'invalid-email': loginMessage('اكتب بريدًا إلكترونيًا صحيحًا.', 'Enter a valid email address.'),
+        'email-already-in-use': loginMessage('هذا البريد لديه حساب بالفعل. سجّل الدخول بدل إنشاء حساب جديد.', 'This email already has an account. Switch to sign in instead.'),
+        'weak-password': loginMessage('كلمة المرور ضعيفة؛ استخدم 6 أحرف على الأقل.', 'That password is too weak. Use at least 6 characters.'),
+        'user-not-found': loginMessage('لم نعثر على حساب بهذا البريد. أنشئ حسابًا جديدًا أولًا.', 'No account was found for that email. Create an account first.'),
+        'wrong-password': loginMessage('كلمة المرور غير صحيحة.', 'That password is incorrect.'),
+        'invalid-credential': loginMessage('البريد أو كلمة المرور غير صحيحة.', 'The email or password is incorrect.'),
+        'credential-already-in-use': loginMessage('كلمة المرور دي مرتبطة بحساب آخر؛ استخدم بريدًا غير مرتبط بحساب آخر.', 'That email credential is already linked to another account.'),
+        'provider-already-linked': loginMessage('طريقة البريد وكلمة المرور مربوطة بهذا الحساب بالفعل.', 'Email and password are already linked to this account.'),
+        'user-disabled': loginMessage('هذا الحساب غير متاح حاليًا.', 'This account is currently disabled.')
+    };
+    return messages[code] || fallback;
 }
 
 function setCloudStatus(message, state = 'connected') {
@@ -766,16 +814,28 @@ function setSignedInView(user) {
     const accountName = document.getElementById('accountName');
     const accountEmail = document.getElementById('accountEmail');
     const accountAvatar = document.getElementById('accountAvatar');
+    const linkEmailPasswordButton = document.getElementById('linkEmailPasswordButton');
+    const linkEmailPasswordForm = document.getElementById('linkEmailPasswordForm');
 
     if (loginScreen) loginScreen.classList.toggle('is-hidden', Boolean(user) || guestModeSelected);
     document.body.classList.toggle('login-visible', !user && !guestModeSelected);
     if (accountControl) accountControl.hidden = !user;
     if (guestAccountControl) guestAccountControl.hidden = Boolean(user) || !guestModeSelected;
+    if (linkEmailPasswordForm) linkEmailPasswordForm.hidden = true;
     if (!user) return;
 
     setCloudStatus('جاري تحميل بيانات حسابك…', 'saving');
     if (accountName) accountName.textContent = user.name || user.displayName || user.email;
     if (accountEmail) accountEmail.textContent = user.email || '';
+    const hasEmailPassword = (user.providerData || []).some(provider => provider.providerId === 'password');
+    if (linkEmailPasswordButton) {
+        linkEmailPasswordButton.hidden = hasEmailPassword || !user.email;
+        linkEmailPasswordButton.textContent = currentLang === 'en' ? 'Add a password to this account' : 'إضافة كلمة مرور لهذا الحساب';
+    }
+    const linkLabel = document.getElementById('linkEmailPasswordLabel');
+    const linkSubmit = document.getElementById('linkEmailPasswordSubmit');
+    if (linkLabel) linkLabel.textContent = currentLang === 'en' ? 'Password for this account' : 'كلمة مرور للحساب نفسه';
+    if (linkSubmit) linkSubmit.textContent = currentLang === 'en' ? 'Link password' : 'ربط كلمة المرور';
     if (accountAvatar) {
         accountAvatar.onerror = () => {
             accountAvatar.onerror = null;
@@ -788,6 +848,12 @@ function setSignedInView(user) {
 
 function continueAsGuest() {
     guestModeSelected = true;
+    setSignedInView(null);
+}
+
+function openLoginOptions() {
+    if (cloudUser) return;
+    guestModeSelected = false;
     setSignedInView(null);
 }
 
@@ -934,19 +1000,99 @@ function watchCloudState(user) {
 }
 
 async function signInWithGoogle() {
-    if (!navigator.onLine) {
-        showLoginError('تسجيل Google والمزامنة بين الأجهزة يحتاجان اتصالًا بالإنترنت. يمكنك المتابعة كضيف الآن.');
-        return;
-    }
-    if (!isFirebaseConfigured() || !window.firebase) {
-        showLoginError('أضف إعدادات Firebase في ملف script.js لتفعيل تسجيل الدخول والحفظ بين الأجهزة.');
-        return;
-    }
+    if (!canStartCloudSignIn()) return;
     try {
         const provider = new firebase.auth.GoogleAuthProvider();
         await firebase.auth().signInWithPopup(provider);
     } catch (error) {
-        showLoginError('تعذر إكمال تسجيل الدخول. أعد المحاولة من فضلك.');
+        showLoginError(authErrorMessage(error, loginMessage('تعذر تسجيل الدخول باستخدام Google. أعد المحاولة.', 'Could not sign in with Google. Please try again.')));
+    }
+}
+
+let emailAuthMode = 'signin';
+
+function updateEmailAuthMode(mode = emailAuthMode) {
+    emailAuthMode = mode === 'signup' ? 'signup' : 'signin';
+    const isEnglish = currentLang === 'en';
+    const isSignup = emailAuthMode === 'signup';
+    const submitButton = document.getElementById('emailAuthSubmitButton');
+    const modeButton = document.getElementById('emailAuthModeButton');
+    const resetButton = document.getElementById('passwordResetButton');
+    const passwordInput = document.getElementById('passwordInput');
+    if (submitButton) submitButton.textContent = isSignup
+        ? (isEnglish ? 'Create account' : 'إنشاء حساب')
+        : (isEnglish ? 'Sign in with email' : 'تسجيل الدخول بالبريد');
+    if (modeButton) modeButton.textContent = isSignup
+        ? (isEnglish ? 'I already have an account' : 'لدي حساب بالفعل')
+        : (isEnglish ? 'Create a new account' : 'إنشاء حساب جديد');
+    if (resetButton) resetButton.hidden = isSignup;
+    if (passwordInput) passwordInput.autocomplete = isSignup ? 'new-password' : 'current-password';
+}
+
+async function submitEmailAuth(event) {
+    event.preventDefault();
+    if (!canStartCloudSignIn()) return;
+    const email = (document.getElementById('emailInput')?.value || '').trim();
+    const password = document.getElementById('passwordInput')?.value || '';
+    const submitButton = document.getElementById('emailAuthSubmitButton');
+    if (submitButton) submitButton.disabled = true;
+    setLoginStatus(emailAuthMode === 'signup'
+        ? loginMessage('جارٍ إنشاء الحساب…', 'Creating your account…')
+        : loginMessage('جارٍ تسجيل الدخول…', 'Signing in…'));
+    try {
+        if (emailAuthMode === 'signup') await firebase.auth().createUserWithEmailAndPassword(email, password);
+        else await firebase.auth().signInWithEmailAndPassword(email, password);
+    } catch (error) {
+        showLoginError(authErrorMessage(error, loginMessage('تعذر إكمال العملية. تحقق من البريد وكلمة المرور ثم أعد المحاولة.', 'Could not complete sign-in. Check the email and password, then try again.')));
+    } finally {
+        if (submitButton) submitButton.disabled = false;
+    }
+}
+
+async function sendPasswordReset() {
+    if (!canStartCloudSignIn()) return;
+    const email = (document.getElementById('emailInput')?.value || '').trim();
+    if (!email) {
+        showLoginError(loginMessage('اكتب بريدك الإلكتروني أولًا ليرسل رابط الاستعادة.', 'Enter your email first so we can send a reset link.'));
+        document.getElementById('emailInput')?.focus();
+        return;
+    }
+    const resetButton = document.getElementById('passwordResetButton');
+    if (resetButton) resetButton.disabled = true;
+    try {
+        await firebase.auth().sendPasswordResetEmail(email);
+        setLoginStatus(loginMessage('إذا كان لهذا البريد حساب، سيصلك رابط استعادة كلمة المرور.', 'If an account exists for that email, a password reset link will arrive shortly.'));
+    } catch (error) {
+        showLoginError(authErrorMessage(error, loginMessage('تعذر إرسال رابط الاستعادة. تحقق من البريد وحاول مجددًا.', 'Could not send a reset link. Check the email and try again.')));
+    } finally {
+        if (resetButton) resetButton.disabled = false;
+    }
+}
+
+async function linkEmailPasswordToCurrentAccount(event) {
+    event.preventDefault();
+    if (!cloudUser?.email) return;
+    const passwordInput = document.getElementById('linkEmailPasswordInput');
+    const password = passwordInput?.value || '';
+    if (password.length < 6) {
+        setCloudStatus(loginMessage('استخدم كلمة مرور من 6 أحرف على الأقل.', 'Use a password with at least 6 characters.'), 'error');
+        passwordInput?.focus();
+        return;
+    }
+    const submitButton = document.getElementById('linkEmailPasswordSubmit');
+    if (submitButton) submitButton.disabled = true;
+    setCloudStatus(loginMessage('جارٍ ربط كلمة المرور بهذا الحساب…', 'Linking the password to this account…'), 'saving');
+    try {
+        const credential = firebase.auth.EmailAuthProvider.credential(cloudUser.email, password);
+        await cloudUser.linkWithCredential(credential);
+        document.getElementById('linkEmailPasswordForm').hidden = true;
+        document.getElementById('linkEmailPasswordButton').hidden = true;
+        document.getElementById('linkEmailPasswordForm').reset();
+        setCloudStatus(loginMessage('تم ربط البريد وكلمة المرور بنفس حساب المزامنة.', 'Email and password now use the same sync account.'), 'connected');
+    } catch (error) {
+        setCloudStatus(authErrorMessage(error, loginMessage('تعذر ربط كلمة المرور بهذا الحساب.', 'Could not link a password to this account.')), 'error');
+    } finally {
+        if (submitButton) submitButton.disabled = false;
     }
 }
 
@@ -955,7 +1101,19 @@ function initializeCloud() {
         if (cloudUser) saveCloudStateImmediately();
     });
     document.getElementById('googleLoginButton')?.addEventListener('click', signInWithGoogle);
-    document.getElementById('guestLoginButton')?.addEventListener('click', signInWithGoogle);
+    document.getElementById('emailAuthForm')?.addEventListener('submit', submitEmailAuth);
+    document.getElementById('emailAuthModeButton')?.addEventListener('click', () => {
+        updateEmailAuthMode(emailAuthMode === 'signup' ? 'signin' : 'signup');
+    });
+    document.getElementById('passwordResetButton')?.addEventListener('click', sendPasswordReset);
+    document.getElementById('linkEmailPasswordButton')?.addEventListener('click', () => {
+        const form = document.getElementById('linkEmailPasswordForm');
+        if (!form) return;
+        form.hidden = !form.hidden;
+        if (!form.hidden) document.getElementById('linkEmailPasswordInput')?.focus();
+    });
+    document.getElementById('linkEmailPasswordForm')?.addEventListener('submit', linkEmailPasswordToCurrentAccount);
+    document.getElementById('guestLoginButton')?.addEventListener('click', openLoginOptions);
     document.getElementById('continueAsGuestButton')?.addEventListener('click', continueAsGuest);
     document.getElementById('logoutButton')?.addEventListener('click', signOut);
     initializeAccountMenu('accountControl', 'accountMenuButton', 'accountMenu');
@@ -1186,6 +1344,50 @@ function applyLanguage(lang) {
     localStorage.setItem('userLang', lang); 
     
     const trans = i18n[lang];
+    const loginText = lang === 'en' ? {
+        title: 'Welcome to Molham Dashboard',
+        description: 'Sign in with Google or your email to sync your data online, or continue as a guest.',
+        google: 'Continue with Google',
+        email: 'Email address',
+        password: 'Password',
+        signIn: 'Sign in with email',
+        createAccount: 'Create a new account',
+        resetPassword: 'Forgot password?',
+        guest: 'Skip and continue as guest',
+        note: 'Use at least 6 characters. To use your existing Google sync account, sign in with Google first, then add a password from Account settings.'
+    } : {
+        title: 'أهلاً بك في لوحة ملهم',
+        description: 'سجّل بحساب Google أو بريدك الإلكتروني لمزامنة بياناتك عند الاتصال، أو تابع كضيف.',
+        google: 'المتابعة باستخدام Google',
+        email: 'البريد الإلكتروني',
+        password: 'كلمة المرور',
+        signIn: 'تسجيل الدخول بالبريد',
+        createAccount: 'إنشاء حساب جديد',
+        resetPassword: 'نسيت كلمة المرور؟',
+        guest: 'تخطي والمتابعة كضيف',
+        note: 'كلمة المرور 6 أحرف على الأقل. لربطها بحساب Google الحالي، سجّل به أولًا ثم أضف كلمة المرور من قائمة الحساب.'
+    };
+    const setLoginText = (id, text) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = text;
+    };
+    setLoginText('loginTitle', loginText.title);
+    setLoginText('loginDescription', loginText.description);
+    setLoginText('googleLoginLabel', loginText.google);
+    setLoginText('emailLabel', loginText.email);
+    setLoginText('passwordLabel', loginText.password);
+    setLoginText('emailAuthSubmitButton', loginText.signIn);
+    setLoginText('emailAuthModeButton', loginText.createAccount);
+    setLoginText('passwordResetButton', loginText.resetPassword);
+    setLoginText('continueAsGuestButton', loginText.guest);
+    setLoginText('loginNote', loginText.note);
+    updateEmailAuthMode();
+    const linkEmailPasswordButton = document.getElementById('linkEmailPasswordButton');
+    const linkEmailPasswordLabel = document.getElementById('linkEmailPasswordLabel');
+    const linkEmailPasswordSubmit = document.getElementById('linkEmailPasswordSubmit');
+    if (linkEmailPasswordButton) linkEmailPasswordButton.textContent = lang === 'en' ? 'Add a password to this account' : 'إضافة كلمة مرور لهذا الحساب';
+    if (linkEmailPasswordLabel) linkEmailPasswordLabel.textContent = lang === 'en' ? 'Password for this account' : 'كلمة مرور للحساب نفسه';
+    if (linkEmailPasswordSubmit) linkEmailPasswordSubmit.textContent = lang === 'en' ? 'Link password' : 'ربط كلمة المرور';
     const savedName = localStorage.getItem('userName') || (lang === 'ar' ? "ملهم" : "Molham");
     
     if(document.getElementById('welcomeWord')) document.getElementById('welcomeWord').innerText = trans.welcome;
@@ -1584,8 +1786,18 @@ function changeFocusVerse() {
 function displayDate() {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     const locale = currentLang === 'ar' ? 'ar-EG' : 'en-US';
-    if(document.getElementById('dateDisplay')) {
-        document.getElementById('dateDisplay').innerText = new Date().toLocaleDateString(locale, options);
+    const dateDisplay = document.getElementById('dateDisplay');
+    if (!dateDisplay) return;
+    dateDisplay.innerText = new Date().toLocaleDateString(locale, options);
+    const glassCard = dateDisplay.closest('.glass-card');
+    if (!glassCard) return;
+    const updateDateSpacing = () => {
+        glassCard.style.setProperty('--date-display-width', `${Math.ceil(dateDisplay.getBoundingClientRect().width)}px`);
+    };
+    requestAnimationFrame(updateDateSpacing);
+    if (!dateDisplay._accountSpacingObserver && typeof ResizeObserver !== 'undefined') {
+        dateDisplay._accountSpacingObserver = new ResizeObserver(updateDateSpacing);
+        dateDisplay._accountSpacingObserver.observe(dateDisplay);
     }
 }
 
