@@ -44,11 +44,10 @@ const CLOUD_STATE_KEYS = [
     'userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme',
     'surgeonTasks', 'focusLog', 'dailyTaskRewardState', 'pongDifficulty',
     'mushafColorScheme', 'mushafLastPage', 'mushafKhatmaPlan', 'mushafDailySurahPlan',
-    'tasbeehCounterState', 'tasbeehDailyTracker', 'userAvatarData', 'pausedTimerState'
+    'tasbeehCounterState', 'tasbeehDailyTracker', 'userAvatarData'
 ];
 const CLOUD_SYNC_PENDING_KEY = 'molhamCloudSyncPending';
-const TIMER_STATE_KEY = 'pausedTimerState';
-const TIMER_STATE_PENDING_KEY = 'molhamPausedTimerPending';
+const TIMER_STATE_KEY = 'localPausedTimerState';
 const DEVICE_SESSION_ID_KEY = 'molhamCloudDeviceSessionId';
 const DEVICE_SESSION_USER_KEY = 'molhamCloudDeviceSessionUserId';
 let cloudUser = null;
@@ -1101,15 +1100,11 @@ async function writeCloudState(pendingToken = localStorage.getItem(CLOUD_SYNC_PE
         throw new Error('Cloud account is not ready');
     }
     if (!pendingToken) pendingToken = markCloudSyncPending();
-    const timerPendingToken = localStorage.getItem(TIMER_STATE_PENDING_KEY);
     await firebase.firestore().collection('users').doc(cloudUser.uid).set({
         state: getCloudState(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
     if (localStorage.getItem(CLOUD_SYNC_PENDING_KEY) === pendingToken) localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
-    if (timerPendingToken && localStorage.getItem(TIMER_STATE_PENDING_KEY) === timerPendingToken) {
-        localStorage.removeItem(TIMER_STATE_PENDING_KEY);
-    }
 }
 
 function cloudSyncErrorMessage(error) {
@@ -1141,29 +1136,19 @@ function saveCloudStateImmediately() {
 
 function clearLocalUserState() {
     CLOUD_STATE_KEYS.forEach(key => localStorage.removeItem(key));
-    localStorage.removeItem(TIMER_STATE_PENDING_KEY);
 }
 
 function applyCloudState(user, state) {
-    const pendingTimerState = localStorage.getItem(TIMER_STATE_PENDING_KEY)
-        ? localStorage.getItem(TIMER_STATE_KEY)
-        : null;
-    const pendingTimerToken = localStorage.getItem(TIMER_STATE_PENDING_KEY);
     clearLocalUserState();
     Object.entries(state).forEach(([key, value]) => {
         if (CLOUD_STATE_KEYS.includes(key) && typeof value === 'string') localStorage.setItem(key, value);
     });
-    if (pendingTimerState) {
-        localStorage.setItem(TIMER_STATE_KEY, pendingTimerState);
-        localStorage.setItem(TIMER_STATE_PENDING_KEY, pendingTimerToken);
-    }
     localStorage.setItem('molhamCloudUserId', user.uid);
     localStorage.setItem('molhamCloudProjectId', FIREBASE_CONFIG.projectId);
     localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
     if (user.displayName && !localStorage.getItem('userName')) localStorage.setItem('userName', user.displayName);
     refreshAccountAvatar(user);
     refreshDashboardFromStorage();
-    if (pendingTimerState) saveCloudStateImmediately();
 }
 
 function watchCloudState(user) {
@@ -1207,6 +1192,7 @@ function watchCloudState(user) {
 
 async function signInWithGoogle() {
     if (!canStartCloudSignIn()) return;
+    checkpointPausedTimerForSignIn();
     const sessionId = beginDeviceSessionActivation();
     try {
         const provider = new firebase.auth.GoogleAuthProvider();
@@ -1273,6 +1259,7 @@ async function submitEmailAuth(event) {
     setLoginStatus(emailAuthMode === 'signup'
         ? loginMessage('جارٍ إنشاء الحساب…', 'Creating your account…')
         : loginMessage('جارٍ تسجيل الدخول…', 'Signing in…'));
+    checkpointPausedTimerForSignIn();
     const sessionId = beginDeviceSessionActivation();
     try {
         const result = emailAuthMode === 'signup'
@@ -1446,7 +1433,20 @@ function signOut() {
         cloudUnsubscribe();
         cloudUnsubscribe = null;
     }
+    if (timer !== null) {
+        clearInterval(timer);
+        timer = null;
+    }
+    focusStartedAt = null;
+    focusSegmentEndsAt = null;
+    totalSecondsWorked = 0;
+    isBreak = false;
+    clearPausedTimerState();
     clearLocalUserState();
+    setTimerDuration(25);
+    updateTimerDisplay();
+    const startButton = document.getElementById('startBtn');
+    if (startButton) startButton.innerText = i18n[currentLang].startBtnJob;
     localStorage.removeItem('molhamCloudUserId');
     localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
     localStorage.removeItem(DEVICE_SESSION_ID_KEY);
@@ -1867,6 +1867,14 @@ function setTimerDuration(minutes) {
     timerUsesHoursFormat = minutes >= 60;
 }
 
+function checkpointPausedTimerForSignIn() {
+    if (timer !== null || timeLeft === null) return;
+    const storedState = readPausedTimerState();
+    if (storedState?.resumeAvailable || Number(timeLeft) < Number(timerDurationSeconds)) {
+        persistPausedTimerState(true);
+    }
+}
+
 function readPausedTimerState() {
     try {
         const state = JSON.parse(localStorage.getItem(TIMER_STATE_KEY) || 'null');
@@ -1895,7 +1903,6 @@ function restoreTimerState(defaultMinutes) {
         isBreak = state.isBreak;
     } else {
         if (localStorage.getItem(TIMER_STATE_KEY)) localStorage.removeItem(TIMER_STATE_KEY);
-        localStorage.removeItem(TIMER_STATE_PENDING_KEY);
         isBreak = false;
         setTimerDuration(defaultMinutes);
     }
@@ -1913,16 +1920,11 @@ function persistPausedTimerState(resumeAvailable = false) {
         isBreak: Boolean(isBreak),
         resumeAvailable: Boolean(resumeAvailable)
     };
-    const token = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
     localStorage.setItem(TIMER_STATE_KEY, JSON.stringify(state));
-    localStorage.setItem(TIMER_STATE_PENDING_KEY, token);
-    if (cloudUser) saveCloudStateImmediately();
 }
 
 function clearPausedTimerState() {
     localStorage.removeItem(TIMER_STATE_KEY);
-    localStorage.removeItem(TIMER_STATE_PENDING_KEY);
-    if (cloudUser) saveCloudStateImmediately();
 }
 
 function updateTimerDisplay() {
