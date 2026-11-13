@@ -16,7 +16,7 @@
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="stylesheet" href="style.css?v=98">
+    <link rel="stylesheet" href="style.css?v=99">
     <link rel="stylesheet" href="fonts.css?v=7">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=11">
@@ -44,7 +44,11 @@
                 <span class="google-mark" aria-hidden="true">G</span>
                 <span id="googleLoginLabel">المتابعة باستخدام Google</span>
             </button>
-            <form id="emailAuthForm" class="credential-login-form">
+            <button id="emailLoginOpenButton" class="firebase-provider-button email-login-open-button" type="button">
+                <span aria-hidden="true">✉</span>
+                <span id="emailLoginOpenLabel">التسجيل عبر البريد الإلكتروني</span>
+            </button>
+            <form id="emailAuthForm" class="credential-login-form" hidden>
                 <label id="emailLabel" for="emailInput">البريد الإلكتروني</label>
                 <input id="emailInput" type="email" inputmode="email" autocomplete="username" dir="ltr" placeholder="name@example.com" required>
                 <label id="passwordLabel" for="passwordInput">كلمة المرور</label>
@@ -54,6 +58,7 @@
                     <button id="emailAuthModeButton" type="button">إنشاء حساب جديد</button>
                     <button id="passwordResetButton" type="button">نسيت كلمة المرور؟</button>
                 </div>
+                <button id="emailAuthBackButton" class="email-auth-back" type="button">العودة لخيارات الدخول</button>
             </form>
             <button id="continueAsGuestButton" class="guest-skip-button" type="button">تخطي والمتابعة كضيف</button>
             <p id="googleLoginError" class="login-error" role="alert" hidden></p>
@@ -114,6 +119,9 @@
             </button>
             <div id="accountMenu" class="account-menu" hidden>
                 <p id="cloudSyncStatus" class="cloud-sync-status" role="status" aria-live="polite">جارٍ تحميل بيانات الحساب…</p>
+                <button type="button" id="changeAvatarButton" class="avatar-action-button">تغيير صورة الحساب</button>
+                <button type="button" id="resetAvatarButton" class="avatar-action-button avatar-reset-button" hidden>استعادة الصورة الأصلية</button>
+                <input id="avatarFileInput" class="avatar-file-input" type="file" accept="image/*" aria-label="اختيار صورة الحساب" hidden>
                 <button type="button" id="linkEmailPasswordButton" class="link-auth-button" hidden>إضافة كلمة مرور لهذا الحساب</button>
                 <form id="linkEmailPasswordForm" class="link-auth-form" hidden>
                     <label id="linkEmailPasswordLabel" for="linkEmailPasswordInput">كلمة مرور للحساب نفسه</label>
@@ -333,6 +341,6 @@
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script defer src="script.js?v=120"></script>
+    <script defer src="script.js?v=121"></script>
 </body>
 </html>

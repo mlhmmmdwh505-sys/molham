@@ -44,13 +44,18 @@ const CLOUD_STATE_KEYS = [
     'userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme',
     'surgeonTasks', 'focusLog', 'dailyTaskRewardState', 'pongDifficulty',
     'mushafColorScheme', 'mushafLastPage', 'mushafKhatmaPlan', 'mushafDailySurahPlan',
-    'tasbeehCounterState', 'tasbeehDailyTracker'
+    'tasbeehCounterState', 'tasbeehDailyTracker', 'userAvatarData'
 ];
 const CLOUD_SYNC_PENDING_KEY = 'molhamCloudSyncPending';
+const DEVICE_SESSION_ID_KEY = 'molhamCloudDeviceSessionId';
+const DEVICE_SESSION_USER_KEY = 'molhamCloudDeviceSessionUserId';
 let cloudUser = null;
 let cloudUnsubscribe = null;
 let cloudSaveSequence = 0;
 let guestModeSelected = false;
+let sessionActivationPending = false;
+let sessionActivationId = '';
+let sessionRegistrationId = '';
 
 function updateThemeToggleLabel() {
     const toggle = document.getElementById('themeToggle');
@@ -807,13 +812,202 @@ function setCloudStatus(message, state = 'connected') {
     status.dataset.state = state;
 }
 
+function refreshAccountAvatar(user = cloudUser) {
+    const accountAvatar = document.getElementById('accountAvatar');
+    if (!accountAvatar) return;
+    const savedAvatar = localStorage.getItem('userAvatarData');
+    const source = savedAvatar || user?.picture || user?.photoURL || 'gnome-books.png';
+    accountAvatar.classList.toggle('account-avatar-custom', Boolean(savedAvatar));
+    accountAvatar.classList.toggle('account-avatar-default', !savedAvatar);
+    accountAvatar.onerror = () => {
+        accountAvatar.onerror = null;
+        accountAvatar.classList.remove('account-avatar-custom');
+        accountAvatar.classList.add('account-avatar-default');
+        accountAvatar.src = 'gnome-books.png';
+    };
+    if (accountAvatar.src !== new URL(source, document.baseURI).href) accountAvatar.src = source;
+    accountAvatar.alt = currentLang === 'en' ? 'Account photo' : 'صورة الحساب';
+    const resetButton = document.getElementById('resetAvatarButton');
+    if (resetButton) resetButton.hidden = !savedAvatar;
+}
+
+function updateAvatarActionLabels() {
+    const isEnglish = currentLang === 'en';
+    const changeButton = document.getElementById('changeAvatarButton');
+    const resetButton = document.getElementById('resetAvatarButton');
+    const input = document.getElementById('avatarFileInput');
+    if (changeButton) changeButton.textContent = isEnglish ? 'Change account photo' : 'تغيير صورة الحساب';
+    if (resetButton) resetButton.textContent = isEnglish ? 'Restore original picture' : 'استعادة الصورة الأصلية';
+    if (input) input.setAttribute('aria-label', isEnglish ? 'Choose account photo' : 'اختيار صورة الحساب');
+}
+
+function makeDeviceSessionId() {
+    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
+    return `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
+}
+
+function beginDeviceSessionActivation() {
+    const id = makeDeviceSessionId();
+    sessionActivationPending = true;
+    sessionActivationId = id;
+    localStorage.setItem(DEVICE_SESSION_ID_KEY, id);
+    localStorage.removeItem(DEVICE_SESSION_USER_KEY);
+    sessionRegistrationId = '';
+    return id;
+}
+
+function abandonDeviceSessionActivation(id) {
+    if (localStorage.getItem(DEVICE_SESSION_ID_KEY) === id) {
+        localStorage.removeItem(DEVICE_SESSION_ID_KEY);
+        localStorage.removeItem(DEVICE_SESSION_USER_KEY);
+    }
+    if (sessionActivationId === id) {
+        sessionActivationPending = false;
+        sessionActivationId = '';
+    }
+}
+
+async function registerDeviceSession(user, id) {
+    localStorage.setItem(DEVICE_SESSION_ID_KEY, id);
+    localStorage.setItem(DEVICE_SESSION_USER_KEY, user.uid);
+    sessionRegistrationId = id;
+    await firebase.firestore().collection('users').doc(user.uid).set({
+        activeSessionId: id,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    if (sessionActivationId === id) {
+        sessionActivationPending = false;
+        sessionActivationId = '';
+    }
+}
+
+function registerSessionForExistingSignIn(user, id) {
+    if (sessionRegistrationId === id) return;
+    registerDeviceSession(user, id).catch(error => {
+        sessionRegistrationId = '';
+        setCloudStatus(loginMessage('تعذر تحديث جلسة الحساب. تحقق من الاتصال ثم سجّل الدخول مجددًا.', 'Could not update this account session. Check the connection and sign in again.'), 'error');
+        console.warn('Device session registration error:', error);
+    });
+}
+
+function releaseReplacedDeviceSession() {
+    if (cloudUnsubscribe) {
+        cloudUnsubscribe();
+        cloudUnsubscribe = null;
+    }
+    localStorage.removeItem(DEVICE_SESSION_ID_KEY);
+    localStorage.removeItem(DEVICE_SESSION_USER_KEY);
+    localStorage.removeItem('molhamCloudUserId');
+    localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
+    clearLocalUserState();
+    setLoginStatus(loginMessage('تم تسجيل الخروج لأن الحساب فُتح من جهاز آخر.', 'You were signed out because this account was opened on another device.'));
+    firebase.auth().signOut();
+}
+
+function synchronizeDeviceSession(user, snapshot) {
+    if (sessionActivationPending || snapshot.metadata.fromCache || snapshot.metadata.hasPendingWrites) return true;
+    const data = snapshot.exists ? snapshot.data() : {};
+    const activeSessionId = data.activeSessionId;
+    const localUserId = localStorage.getItem(DEVICE_SESSION_USER_KEY);
+    let localSessionId = localUserId === user.uid ? localStorage.getItem(DEVICE_SESSION_ID_KEY) : null;
+
+    if (activeSessionId && !localSessionId) {
+        const pendingSessionId = localStorage.getItem(DEVICE_SESSION_ID_KEY);
+        if (pendingSessionId === activeSessionId) {
+            localSessionId = pendingSessionId;
+            localStorage.setItem(DEVICE_SESSION_USER_KEY, user.uid);
+        } else {
+            releaseReplacedDeviceSession();
+            return false;
+        }
+    }
+
+    if (activeSessionId && activeSessionId !== localSessionId) {
+        releaseReplacedDeviceSession();
+        return false;
+    }
+    if (!localSessionId) {
+        localSessionId = makeDeviceSessionId();
+        localStorage.setItem(DEVICE_SESSION_ID_KEY, localSessionId);
+        localStorage.setItem(DEVICE_SESSION_USER_KEY, user.uid);
+    }
+    if (!activeSessionId) registerSessionForExistingSignIn(user, localSessionId);
+    return true;
+}
+
+function imageFileToAvatarData(file) {
+    return new Promise((resolve, reject) => {
+        const image = new Image();
+        const objectUrl = URL.createObjectURL(file);
+        image.onload = () => {
+            URL.revokeObjectURL(objectUrl);
+            const sourceSide = Math.min(image.naturalWidth, image.naturalHeight);
+            const sourceX = (image.naturalWidth - sourceSide) / 2;
+            const sourceY = (image.naturalHeight - sourceSide) / 2;
+            for (const size of [256, 192, 160]) {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const context = canvas.getContext('2d');
+                if (!context) {
+                    reject(new Error('Image processing is unavailable'));
+                    return;
+                }
+                context.fillStyle = '#ffffff';
+                context.fillRect(0, 0, size, size);
+                context.drawImage(image, sourceX, sourceY, sourceSide, sourceSide, 0, 0, size, size);
+                for (const quality of [0.84, 0.76, 0.68, 0.58]) {
+                    const dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    if (dataUrl.length <= 96 * 1024) {
+                        resolve(dataUrl);
+                        return;
+                    }
+                }
+            }
+            reject(new Error('Image is too large after compression'));
+        };
+        image.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error('Image could not be loaded'));
+        };
+        image.src = objectUrl;
+    });
+}
+
+async function updateAccountPhoto(file) {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+        setCloudStatus(loginMessage('اختر ملف صورة صالحًا.', 'Choose a valid image file.'), 'error');
+        return;
+    }
+    if (file.size > 15 * 1024 * 1024) {
+        setCloudStatus(loginMessage('حجم الصورة كبير؛ اختر صورة أصغر من 15 ميجابايت.', 'The image is too large. Choose one under 15 MB.'), 'error');
+        return;
+    }
+    const changeButton = document.getElementById('changeAvatarButton');
+    if (changeButton) changeButton.disabled = true;
+    setCloudStatus(loginMessage('جارٍ تجهيز صورة الحساب…', 'Preparing account photo…'), 'saving');
+    try {
+        const dataUrl = await imageFileToAvatarData(file);
+        localStorage.setItem('userAvatarData', dataUrl);
+        refreshAccountAvatar();
+        saveCloudStateImmediately();
+    } catch (error) {
+        setCloudStatus(loginMessage('تعذر تجهيز الصورة. اختر صورة أخرى.', 'Could not prepare the image. Choose another one.'), 'error');
+        console.warn('Account photo update error:', error);
+    } finally {
+        if (changeButton) changeButton.disabled = false;
+        const input = document.getElementById('avatarFileInput');
+        if (input) input.value = '';
+    }
+}
+
 function setSignedInView(user) {
     const loginScreen = document.getElementById('loginScreen');
     const accountControl = document.getElementById('accountControl');
     const guestAccountControl = document.getElementById('guestAccountControl');
     const accountName = document.getElementById('accountName');
     const accountEmail = document.getElementById('accountEmail');
-    const accountAvatar = document.getElementById('accountAvatar');
     const linkEmailPasswordButton = document.getElementById('linkEmailPasswordButton');
     const linkEmailPasswordForm = document.getElementById('linkEmailPasswordForm');
 
@@ -836,14 +1030,8 @@ function setSignedInView(user) {
     const linkSubmit = document.getElementById('linkEmailPasswordSubmit');
     if (linkLabel) linkLabel.textContent = currentLang === 'en' ? 'Password for this account' : 'كلمة مرور للحساب نفسه';
     if (linkSubmit) linkSubmit.textContent = currentLang === 'en' ? 'Link password' : 'ربط كلمة المرور';
-    if (accountAvatar) {
-        accountAvatar.onerror = () => {
-            accountAvatar.onerror = null;
-            accountAvatar.src = 'gnome-books.png';
-        };
-        accountAvatar.src = user.picture || user.photoURL || 'gnome-books.png';
-        accountAvatar.alt = `Account photo for ${user.name || user.displayName || 'user'}`;
-    }
+    updateAvatarActionLabels();
+    refreshAccountAvatar(user);
 }
 
 function continueAsGuest() {
@@ -914,7 +1102,7 @@ async function writeCloudState(pendingToken = localStorage.getItem(CLOUD_SYNC_PE
     await firebase.firestore().collection('users').doc(cloudUser.uid).set({
         state: getCloudState(),
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    }, { merge: true });
     if (localStorage.getItem(CLOUD_SYNC_PENDING_KEY) === pendingToken) localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
 }
 
@@ -958,6 +1146,7 @@ function applyCloudState(user, state) {
     localStorage.setItem('molhamCloudProjectId', FIREBASE_CONFIG.projectId);
     localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
     if (user.displayName && !localStorage.getItem('userName')) localStorage.setItem('userName', user.displayName);
+    refreshAccountAvatar(user);
     refreshDashboardFromStorage();
 }
 
@@ -974,6 +1163,7 @@ function watchCloudState(user) {
 
     if (cloudUnsubscribe) cloudUnsubscribe();
     cloudUnsubscribe = firebase.firestore().collection('users').doc(user.uid).onSnapshot(snapshot => {
+        if (!synchronizeDeviceSession(user, snapshot)) return;
         const remoteState = snapshot.exists ? snapshot.data().state : null;
         if (!remoteState || Object.keys(remoteState).length === 0) {
             // First use of an account: turn the current local dashboard into its cloud dashboard.
@@ -1001,15 +1191,41 @@ function watchCloudState(user) {
 
 async function signInWithGoogle() {
     if (!canStartCloudSignIn()) return;
+    const sessionId = beginDeviceSessionActivation();
     try {
         const provider = new firebase.auth.GoogleAuthProvider();
-        await firebase.auth().signInWithPopup(provider);
+        const result = await firebase.auth().signInWithPopup(provider);
+        await registerDeviceSession(result.user, sessionId);
     } catch (error) {
+        abandonDeviceSessionActivation(sessionId);
         showLoginError(authErrorMessage(error, loginMessage('تعذر تسجيل الدخول باستخدام Google. أعد المحاولة.', 'Could not sign in with Google. Please try again.')));
     }
 }
 
 let emailAuthMode = 'signin';
+let emailAuthViewOpen = false;
+
+function setEmailAuthView(isOpen) {
+    emailAuthViewOpen = Boolean(isOpen);
+    const isEnglish = currentLang === 'en';
+    const loginTitle = document.getElementById('loginTitle');
+    const loginDescription = document.getElementById('loginDescription');
+    const googleButton = document.getElementById('googleLoginButton');
+    const emailOpenButton = document.getElementById('emailLoginOpenButton');
+    const emailForm = document.getElementById('emailAuthForm');
+    const guestButton = document.getElementById('continueAsGuestButton');
+    const loginNote = document.getElementById('loginNote');
+
+    if (loginTitle) loginTitle.textContent = emailAuthViewOpen
+        ? (isEnglish ? 'Sign in with email' : 'تسجيل الدخول عبر البريد الإلكتروني')
+        : (isEnglish ? 'Welcome to Molham Dashboard' : 'أهلاً بك في لوحة ملهم');
+    if (loginDescription) loginDescription.hidden = emailAuthViewOpen;
+    if (googleButton) googleButton.hidden = emailAuthViewOpen;
+    if (emailOpenButton) emailOpenButton.hidden = emailAuthViewOpen;
+    if (emailForm) emailForm.hidden = !emailAuthViewOpen;
+    if (guestButton) guestButton.hidden = emailAuthViewOpen;
+    if (loginNote) loginNote.hidden = !emailAuthViewOpen;
+}
 
 function updateEmailAuthMode(mode = emailAuthMode) {
     emailAuthMode = mode === 'signup' ? 'signup' : 'signin';
@@ -1019,6 +1235,7 @@ function updateEmailAuthMode(mode = emailAuthMode) {
     const modeButton = document.getElementById('emailAuthModeButton');
     const resetButton = document.getElementById('passwordResetButton');
     const passwordInput = document.getElementById('passwordInput');
+    const links = document.querySelector('.email-auth-links');
     if (submitButton) submitButton.textContent = isSignup
         ? (isEnglish ? 'Create account' : 'إنشاء حساب')
         : (isEnglish ? 'Sign in with email' : 'تسجيل الدخول بالبريد');
@@ -1026,6 +1243,7 @@ function updateEmailAuthMode(mode = emailAuthMode) {
         ? (isEnglish ? 'I already have an account' : 'لدي حساب بالفعل')
         : (isEnglish ? 'Create a new account' : 'إنشاء حساب جديد');
     if (resetButton) resetButton.hidden = isSignup;
+    if (links) links.style.gridTemplateColumns = isSignup ? '1fr' : '';
     if (passwordInput) passwordInput.autocomplete = isSignup ? 'new-password' : 'current-password';
 }
 
@@ -1039,10 +1257,14 @@ async function submitEmailAuth(event) {
     setLoginStatus(emailAuthMode === 'signup'
         ? loginMessage('جارٍ إنشاء الحساب…', 'Creating your account…')
         : loginMessage('جارٍ تسجيل الدخول…', 'Signing in…'));
+    const sessionId = beginDeviceSessionActivation();
     try {
-        if (emailAuthMode === 'signup') await firebase.auth().createUserWithEmailAndPassword(email, password);
-        else await firebase.auth().signInWithEmailAndPassword(email, password);
+        const result = emailAuthMode === 'signup'
+            ? await firebase.auth().createUserWithEmailAndPassword(email, password)
+            : await firebase.auth().signInWithEmailAndPassword(email, password);
+        await registerDeviceSession(result.user, sessionId);
     } catch (error) {
+        abandonDeviceSessionActivation(sessionId);
         showLoginError(authErrorMessage(error, loginMessage('تعذر إكمال العملية. تحقق من البريد وكلمة المرور ثم أعد المحاولة.', 'Could not complete sign-in. Check the email and password, then try again.')));
     } finally {
         if (submitButton) submitButton.disabled = false;
@@ -1102,10 +1324,25 @@ function initializeCloud() {
     });
     document.getElementById('googleLoginButton')?.addEventListener('click', signInWithGoogle);
     document.getElementById('emailAuthForm')?.addEventListener('submit', submitEmailAuth);
+    document.getElementById('emailLoginOpenButton')?.addEventListener('click', () => {
+        setEmailAuthView(true);
+        document.getElementById('emailInput')?.focus();
+    });
+    document.getElementById('emailAuthBackButton')?.addEventListener('click', () => {
+        setEmailAuthView(false);
+        setLoginStatus('');
+    });
     document.getElementById('emailAuthModeButton')?.addEventListener('click', () => {
         updateEmailAuthMode(emailAuthMode === 'signup' ? 'signin' : 'signup');
     });
     document.getElementById('passwordResetButton')?.addEventListener('click', sendPasswordReset);
+    document.getElementById('changeAvatarButton')?.addEventListener('click', () => document.getElementById('avatarFileInput')?.click());
+    document.getElementById('avatarFileInput')?.addEventListener('change', event => updateAccountPhoto(event.target.files?.[0]));
+    document.getElementById('resetAvatarButton')?.addEventListener('click', () => {
+        localStorage.removeItem('userAvatarData');
+        refreshAccountAvatar();
+        saveCloudStateImmediately();
+    });
     document.getElementById('linkEmailPasswordButton')?.addEventListener('click', () => {
         const form = document.getElementById('linkEmailPasswordForm');
         if (!form) return;
@@ -1196,6 +1433,8 @@ function signOut() {
     clearLocalUserState();
     localStorage.removeItem('molhamCloudUserId');
     localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
+    localStorage.removeItem(DEVICE_SESSION_ID_KEY);
+    localStorage.removeItem(DEVICE_SESSION_USER_KEY);
     if (window.firebase && firebase.auth) firebase.auth().signOut();
 }
 
@@ -1382,6 +1621,7 @@ function applyLanguage(lang) {
     setLoginText('continueAsGuestButton', loginText.guest);
     setLoginText('loginNote', loginText.note);
     updateEmailAuthMode();
+    updateAvatarActionLabels();
     const linkEmailPasswordButton = document.getElementById('linkEmailPasswordButton');
     const linkEmailPasswordLabel = document.getElementById('linkEmailPasswordLabel');
     const linkEmailPasswordSubmit = document.getElementById('linkEmailPasswordSubmit');

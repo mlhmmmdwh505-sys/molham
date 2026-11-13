@@ -11,10 +11,12 @@
         'userPoints', 'gradDate', 'userLang', 'userName', 'userMins', 'userRole', 'themeColor', 'colorScheme',
         'surgeonTasks', 'focusLog', 'dailyTaskRewardState', 'pongDifficulty',
         'mushafColorScheme', 'mushafLastPage', 'mushafKhatmaPlan', 'mushafDailySurahPlan',
-        'tasbeehCounterState', 'tasbeehDailyTracker'
+        'tasbeehCounterState', 'tasbeehDailyTracker', 'userAvatarData'
     ]);
     const PROJECT_MIGRATION_SOURCE = 'molham-dash-bord';
     const PENDING_SYNC_KEY = 'molhamCloudSyncPending';
+    const DEVICE_SESSION_ID_KEY = 'molhamCloudDeviceSessionId';
+    const DEVICE_SESSION_USER_KEY = 'molhamCloudDeviceSessionUserId';
     const localStore = window.localStorage;
     const status = document.getElementById('toolCloudSyncStatus');
     let cloudUser = null;
@@ -58,7 +60,7 @@
         await firebase.firestore().collection('users').doc(cloudUser.uid).set({
             state: localState(),
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+        }, { merge: true });
         if (localStore.getItem(PENDING_SYNC_KEY) === pendingToken) localStore.removeItem(PENDING_SYNC_KEY);
         setStatus('✓ تمت المزامنة مع حسابك', 'connected');
     }
@@ -114,6 +116,50 @@
         cloudUnsubscribe = firebase.firestore().collection('users').doc(user.uid).onSnapshot(snapshot => {
             const remoteState = snapshot.exists ? snapshot.data().state : null;
             if (snapshot.metadata.hasPendingWrites) return;
+            if (!snapshot.metadata.fromCache) {
+                const data = snapshot.exists ? snapshot.data() : {};
+                const activeSessionId = data.activeSessionId;
+                let sessionId = localStore.getItem(DEVICE_SESSION_USER_KEY) === user.uid
+                    ? localStore.getItem(DEVICE_SESSION_ID_KEY)
+                    : null;
+                if (activeSessionId && !sessionId) {
+                    const pendingId = localStore.getItem(DEVICE_SESSION_ID_KEY);
+                    if (pendingId && pendingId === activeSessionId) {
+                        sessionId = pendingId;
+                        localStore.setItem(DEVICE_SESSION_USER_KEY, user.uid);
+                    } else {
+                        localStore.removeItem(DEVICE_SESSION_ID_KEY);
+                        localStore.removeItem(DEVICE_SESSION_USER_KEY);
+                        localStore.removeItem('molhamCloudUserId');
+                        localStore.removeItem(PENDING_SYNC_KEY);
+                        clearSyncedState();
+                        setStatus('تم تسجيل الخروج لأن الحساب فُتح من جهاز آخر.', 'error');
+                        firebase.auth().signOut();
+                        return;
+                    }
+                } else if (activeSessionId && activeSessionId !== sessionId) {
+                    localStore.removeItem(DEVICE_SESSION_ID_KEY);
+                    localStore.removeItem(DEVICE_SESSION_USER_KEY);
+                    localStore.removeItem('molhamCloudUserId');
+                    localStore.removeItem(PENDING_SYNC_KEY);
+                    clearSyncedState();
+                    setStatus('تم تسجيل الخروج لأن الحساب فُتح من جهاز آخر.', 'error');
+                    firebase.auth().signOut();
+                    return;
+                }
+                if (!activeSessionId) {
+                    sessionId ||= localStore.getItem(DEVICE_SESSION_ID_KEY) || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+                    localStore.setItem(DEVICE_SESSION_ID_KEY, sessionId);
+                    localStore.setItem(DEVICE_SESSION_USER_KEY, user.uid);
+                    firebase.firestore().collection('users').doc(user.uid).set({
+                        activeSessionId: sessionId,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true }).catch(error => {
+                        setStatus(syncErrorMessage(error), 'error');
+                        console.warn('Tool device-session registration error:', error);
+                    });
+                }
+            }
             if (localStore.getItem(PENDING_SYNC_KEY)) {
                 if (!snapshot.metadata.fromCache) {
                     writeCloudState().catch(error => {

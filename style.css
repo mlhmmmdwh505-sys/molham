@@ -938,6 +938,7 @@ html[data-theme="light"] .guest-skip-button {
 .google-login-button > div { display: flex; justify-content: center; }
 .firebase-provider-button { display: flex; align-items: center; justify-content: center; gap: 12px; width: min(100%, 320px); min-height: 46px; margin: 10px auto; padding: 0 18px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 999px; background: #fff; color: #1f2937; font: 700 14px 'Cairo', sans-serif; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
 .firebase-google-button { margin-top: 22px; }
+.email-login-open-button { margin-top: 10px; }
 @media (hover: hover) and (pointer: fine) { .firebase-provider-button:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, .25); } }
 .guest-skip-button { display: block; width: min(100%, 320px); min-height: 42px; margin: 0 auto 14px; padding: 0 18px; border: 1px solid rgba(165, 180, 252, .55); border-radius: 999px; background: rgba(99, 102, 241, .12); color: #c7d2fe; font: 700 13px 'Cairo', sans-serif; cursor: pointer; transition: transform .2s ease, background .2s ease; }
 @media (hover: hover) and (pointer: fine) { .guest-skip-button:hover { transform: translateY(-2px); background: rgba(99, 102, 241, .24); } }
@@ -947,8 +948,9 @@ html[data-theme="light"] .guest-skip-button {
 .credential-login-form input { display: block; width: 100%; height: 42px; padding: 0 12px; border: 1px solid rgba(165, 180, 252, .38); border-radius: 12px; background: rgba(2, 6, 23, .6); color: #f8fafc; font: 600 14px 'Cairo', sans-serif; text-align: left; }
 .credential-login-form input::placeholder { color: #94a3b8; }
 .email-auth-submit { display: block; width: 100%; min-height: 43px; margin: 12px 0 8px; padding: 0 14px; border: 1px solid rgba(165, 180, 252, .52); border-radius: 12px; background: rgba(99, 102, 241, .28); color: #e0e7ff; font: 700 13px 'Cairo', sans-serif; cursor: pointer; }
-.email-auth-links { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
-.email-auth-links button { padding: 3px 0; border: 0; background: transparent; color: #c7d2fe; font: 600 12px 'Cairo', sans-serif; text-decoration: underline; cursor: pointer; }
+.email-auth-links { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 9px; }
+.email-auth-links button { min-width: 0; min-height: 42px; padding: 7px 9px; border: 1px solid rgba(165, 180, 252, .4) !important; border-radius: 12px !important; background: rgba(99, 102, 241, .13) !important; color: #c7d2fe !important; font: 700 12px/1.4 'Cairo', sans-serif; text-decoration: none; white-space: normal; cursor: pointer; }
+.email-auth-back { display: flex; align-items: center; justify-content: center; width: 100%; min-height: 42px; margin: 9px auto 0; padding: 7px 12px; border: 1px solid rgba(165, 180, 252, .32) !important; border-radius: 12px !important; background: rgba(255, 255, 255, .045) !important; color: var(--text-muted) !important; font: 700 12px/1.4 'Cairo', sans-serif; text-decoration: none; cursor: pointer; }
 .email-auth-links button[hidden] { display: none !important; }
 .email-auth-links button:disabled, .email-auth-submit:disabled { opacity: .6; cursor: wait; }
 .login-status { margin: 0 0 10px; color: #86efac !important; font-size: 12px !important; }
@@ -1008,7 +1010,7 @@ header { position: relative; }
 @media (hover: hover) and (pointer: fine) { .account-trigger:hover { transform: translateY(-2px); border-color: var(--primary) !important; box-shadow: 0 0 18px var(--primary-glow); } }
 .account-avatar { display: block; width: 100%; height: 100%; border: 0; }
 .account-menu { position: absolute; top: 52px; left: 0; width: 225px; padding: 15px; border: 1px solid var(--glass-border); border-radius: 17px; background: rgba(15,23,42,.96); box-shadow: 0 16px 42px rgba(0,0,0,.35); backdrop-filter: blur(16px); text-align: start; }
-.account-menu[hidden] { display: none !important; }.account-menu-label { display: block; margin-bottom: 4px; color: var(--text-darker); font-size: 11px; }.account-menu strong { display: block; overflow: hidden; color: var(--text-main); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }.account-email { display: block; overflow: hidden; margin-top: 3px; color: var(--text-muted); font-size: 11px; direction: ltr; text-align: left; text-overflow: ellipsis; white-space: nowrap; }.account-menu .logout-button { position: static; width: 100%; min-width: 0 !important; margin-top: 13px; padding: 8px 12px !important; border: 1px solid rgba(251,113,133,.65) !important; background: rgba(127,29,29,.28) !important; color: #fecdd3 !important; }
+.account-menu[hidden] { display: none !important; }.account-menu-label { display: block; margin-bottom: 4px; color: var(--text-darker); font-size: 11px; }.account-menu strong { display: block; overflow: hidden; color: var(--text-main); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }.account-email { display: block; overflow: hidden; margin-top: 3px; color: var(--text-muted); font-size: 11px; direction: ltr; text-align: left; text-overflow: ellipsis; white-space: nowrap; }.account-menu .logout-button { position: static; width: 100%; min-width: 0 !important; min-height: 40px; box-sizing: border-box; margin-top: 13px; padding: 8px 12px !important; border: 1px solid rgba(251,113,133,.65) !important; background: rgba(127,29,29,.28) !important; color: #fecdd3 !important; }
 .account-settings-icon { display: block !important; width: 22px; height: 22px; fill: #f8fafc; pointer-events: none; }.account-menu .guest-login-button { width: 100%; min-width: 0 !important; padding: 8px 12px !important; border: 1px solid rgba(165,180,252,.65) !important; border-radius: 999px; background: rgba(99,102,241,.18) !important; color: #e0e7ff !important; font: 700 12px 'Cairo', sans-serif; cursor: pointer; }.account-menu .logout-button:only-child { margin-top: 0; }
 .cloud-sync-status { display: block; margin-top: 10px; font-size: 11px; color: #86efac; }.cloud-sync-status[data-state="saving"] { color: #fde68a; }.cloud-sync-status[data-state="error"] { color: #fda4af; }
 .link-auth-button { width: 100%; margin-top: 10px; padding: 8px 10px; border: 1px solid rgba(165, 180, 252, .45); border-radius: 10px; background: rgba(99, 102, 241, .16); color: #e0e7ff; font: 700 11px 'Cairo', sans-serif; cursor: pointer; }
@@ -1017,6 +1019,10 @@ header { position: relative; }
 .link-auth-form label { color: var(--text-muted); font-size: 11px; }
 .link-auth-form input { width: 100%; min-width: 0; padding: 8px 9px; border: 1px solid rgba(165, 180, 252, .38); border-radius: 9px; background: rgba(2, 6, 23, .6); color: #f8fafc; font: 600 12px 'Cairo', sans-serif; }
 .link-auth-form button { padding: 7px 9px; border: 1px solid rgba(165, 180, 252, .45); border-radius: 9px; background: rgba(99, 102, 241, .2); color: #e0e7ff; font: 700 11px 'Cairo', sans-serif; cursor: pointer; }
+.account-menu .avatar-action-button { display: flex; align-items: center; justify-content: center; width: 100%; min-width: 0 !important; min-height: 40px; box-sizing: border-box; margin: 9px 0 0; padding: 8px 12px; border: 1px solid rgba(165, 180, 252, .55) !important; border-radius: 50px !important; background: rgba(99, 102, 241, .14) !important; color: #e0e7ff !important; font: 700 12px/1.4 'Cairo', sans-serif; white-space: normal; cursor: pointer; }
+.account-menu .avatar-action-button:disabled { opacity: .6; cursor: wait; }
+.account-menu .avatar-action-button[hidden] { display: none !important; }
+.account-menu .avatar-reset-button { background: rgba(255, 255, 255, .045) !important; color: var(--text-muted) !important; }
 @media (max-width: 767px) {
     .date-tag, .mini-score { position: static; margin: 6px auto; }
 
@@ -1227,6 +1233,9 @@ header { position: relative; }
     object-fit: cover;
     border-radius: inherit;
 }
+
+.account-avatar-default { object-fit: cover; transform: scale(1.3); }
+.account-avatar-custom { object-fit: cover; transform: none; }
 
 @media only screen and (max-width: 1024px) {
     .glass-card > .account-control {
