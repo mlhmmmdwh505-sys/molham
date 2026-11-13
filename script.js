@@ -896,6 +896,7 @@ function releaseReplacedDeviceSession() {
         cloudUnsubscribe();
         cloudUnsubscribe = null;
     }
+    resetTimerForSignOut();
     localStorage.removeItem(DEVICE_SESSION_ID_KEY);
     localStorage.removeItem(DEVICE_SESSION_USER_KEY);
     localStorage.removeItem('molhamCloudUserId');
@@ -1433,6 +1434,16 @@ function signOut() {
         cloudUnsubscribe();
         cloudUnsubscribe = null;
     }
+    resetTimerForSignOut();
+    clearLocalUserState();
+    localStorage.removeItem('molhamCloudUserId');
+    localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
+    localStorage.removeItem(DEVICE_SESSION_ID_KEY);
+    localStorage.removeItem(DEVICE_SESSION_USER_KEY);
+    if (window.firebase && firebase.auth) firebase.auth().signOut();
+}
+
+function resetTimerForSignOut() {
     if (timer !== null) {
         clearInterval(timer);
         timer = null;
@@ -1442,16 +1453,10 @@ function signOut() {
     totalSecondsWorked = 0;
     isBreak = false;
     clearPausedTimerState();
-    clearLocalUserState();
     setTimerDuration(25);
     updateTimerDisplay();
     const startButton = document.getElementById('startBtn');
     if (startButton) startButton.innerText = i18n[currentLang].startBtnJob;
-    localStorage.removeItem('molhamCloudUserId');
-    localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
-    localStorage.removeItem(DEVICE_SESSION_ID_KEY);
-    localStorage.removeItem(DEVICE_SESSION_USER_KEY);
-    if (window.firebase && firebase.auth) firebase.auth().signOut();
 }
 
 const quotes = {
