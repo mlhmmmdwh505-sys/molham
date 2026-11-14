@@ -48,17 +48,11 @@ const CLOUD_STATE_KEYS = [
 ];
 const CLOUD_SYNC_PENDING_KEY = 'molhamCloudSyncPending';
 const TIMER_STATE_KEY = 'localPausedTimerState';
-const DEVICE_SESSION_ID_KEY = 'molhamCloudDeviceSessionId';
-const DEVICE_SESSION_USER_KEY = 'molhamCloudDeviceSessionUserId';
 let cloudUser = null;
 let cloudUnsubscribe = null;
-let deviceSessionUnsubscribe = null;
 let cloudSaveSequence = 0;
 let guestModeSelected = false;
 let emailVerificationUser = null;
-let sessionActivationPending = false;
-let sessionActivationId = '';
-let sessionRegistrationId = '';
 
 function updateThemeToggleLabel() {
     const toggle = document.getElementById('themeToggle');
@@ -854,110 +848,6 @@ function updateAccountEmailActionLabels() {
     if (submit) submit.textContent = isEnglish ? 'Send verification link' : 'إرسال رابط التأكيد';
 }
 
-function makeDeviceSessionId() {
-    if (window.crypto?.randomUUID) return window.crypto.randomUUID();
-    return `${Date.now()}-${Math.random().toString(36).slice(2)}-${Math.random().toString(36).slice(2)}`;
-}
-
-function beginDeviceSessionActivation() {
-    const id = makeDeviceSessionId();
-    sessionActivationPending = true;
-    sessionActivationId = id;
-    localStorage.setItem(DEVICE_SESSION_ID_KEY, id);
-    localStorage.removeItem(DEVICE_SESSION_USER_KEY);
-    sessionRegistrationId = '';
-    return id;
-}
-
-function abandonDeviceSessionActivation(id) {
-    if (localStorage.getItem(DEVICE_SESSION_ID_KEY) === id) {
-        localStorage.removeItem(DEVICE_SESSION_ID_KEY);
-        localStorage.removeItem(DEVICE_SESSION_USER_KEY);
-    }
-    if (sessionActivationId === id) {
-        sessionActivationPending = false;
-        sessionActivationId = '';
-    }
-}
-
-async function registerDeviceSession(user, id) {
-    localStorage.setItem(DEVICE_SESSION_ID_KEY, id);
-    localStorage.setItem(DEVICE_SESSION_USER_KEY, user.uid);
-    sessionRegistrationId = id;
-    const userReference = firebase.firestore().collection('users').doc(user.uid);
-    await userReference.collection('deviceSessions').doc('active').set({
-        activeSessionId: id,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    if (sessionActivationId === id) {
-        sessionActivationPending = false;
-        sessionActivationId = '';
-    }
-    userReference.set({
-        activeSessionId: id,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true }).catch(error => console.warn('Legacy device session update error:', error));
-}
-
-function registerSessionForExistingSignIn(user, id) {
-    if (sessionRegistrationId === id) return;
-    registerDeviceSession(user, id).catch(error => {
-        sessionRegistrationId = '';
-        setCloudStatus(loginMessage('تعذر تحديث جلسة الحساب. تحقق من الاتصال ثم سجّل الدخول مجددًا.', 'Could not update this account session. Check the connection and sign in again.'), 'error');
-        console.warn('Device session registration error:', error);
-    });
-}
-
-function releaseReplacedDeviceSession() {
-    if (cloudUnsubscribe) {
-        cloudUnsubscribe();
-        cloudUnsubscribe = null;
-    }
-    if (deviceSessionUnsubscribe) {
-        deviceSessionUnsubscribe();
-        deviceSessionUnsubscribe = null;
-    }
-    resetTimerForSignOut();
-    localStorage.removeItem(DEVICE_SESSION_ID_KEY);
-    localStorage.removeItem(DEVICE_SESSION_USER_KEY);
-    localStorage.removeItem('molhamCloudUserId');
-    localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
-    clearLocalUserState();
-    setLoginStatus(loginMessage('تم تسجيل الخروج لأن الحساب فُتح من جهاز آخر.', 'You were signed out because this account was opened on another device.'));
-    firebase.auth().signOut();
-}
-
-function synchronizeDeviceSession(user, snapshot) {
-    if (sessionActivationPending || snapshot.metadata.fromCache) return true;
-    const data = snapshot.exists ? snapshot.data() : {};
-    const activeSessionId = data.activeSessionId;
-    const localUserId = localStorage.getItem(DEVICE_SESSION_USER_KEY);
-    let localSessionId = localUserId === user.uid ? localStorage.getItem(DEVICE_SESSION_ID_KEY) : null;
-
-    if (activeSessionId && !localSessionId) {
-        const pendingSessionId = localStorage.getItem(DEVICE_SESSION_ID_KEY);
-        if (pendingSessionId === activeSessionId) {
-            localSessionId = pendingSessionId;
-            localStorage.setItem(DEVICE_SESSION_USER_KEY, user.uid);
-        } else {
-            releaseReplacedDeviceSession();
-            return false;
-        }
-    }
-
-    if (activeSessionId && activeSessionId !== localSessionId) {
-        releaseReplacedDeviceSession();
-        return false;
-    }
-    if (!localSessionId) {
-        localSessionId = makeDeviceSessionId();
-        localStorage.setItem(DEVICE_SESSION_ID_KEY, localSessionId);
-        localStorage.setItem(DEVICE_SESSION_USER_KEY, user.uid);
-    }
-    if (!activeSessionId) registerSessionForExistingSignIn(user, localSessionId);
-    return true;
-}
-
 function imageFileToAvatarData(file) {
     return new Promise((resolve, reject) => {
         const image = new Image();
@@ -1068,21 +958,12 @@ function continueAsGuest() {
         cloudUnsubscribe();
         cloudUnsubscribe = null;
     }
-    if (deviceSessionUnsubscribe) {
-        deviceSessionUnsubscribe();
-        deviceSessionUnsubscribe = null;
-    }
     cloudUser = null;
     cloudSaveSequence += 1;
-    sessionActivationPending = false;
-    sessionActivationId = '';
-    sessionRegistrationId = '';
     resetTimerForSignOut();
     clearLocalUserState();
     localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
     localStorage.removeItem('molhamCloudUserId');
-    localStorage.removeItem(DEVICE_SESSION_ID_KEY);
-    localStorage.removeItem(DEVICE_SESSION_USER_KEY);
     refreshDashboardFromStorage();
 
     const auth = window.firebase?.apps?.length ? firebase.auth() : null;
@@ -1203,19 +1084,6 @@ function applyCloudState(user, state) {
     refreshDashboardFromStorage();
 }
 
-function watchDeviceSession(user) {
-    if (deviceSessionUnsubscribe) deviceSessionUnsubscribe();
-    const sessionReference = firebase.firestore()
-        .collection('users').doc(user.uid)
-        .collection('deviceSessions').doc('active');
-    deviceSessionUnsubscribe = sessionReference.onSnapshot({ includeMetadataChanges: true }, snapshot => {
-        if (!synchronizeDeviceSession(user, snapshot)) return;
-    }, error => {
-        setCloudStatus(cloudSyncErrorMessage(error), 'error');
-        console.warn('Device session listener error:', error);
-    });
-}
-
 function watchCloudState(user) {
     const previousUserId = localStorage.getItem('molhamCloudUserId');
     const previousProjectId = localStorage.getItem('molhamCloudProjectId') || 'molham-dash-bord';
@@ -1227,11 +1095,8 @@ function watchCloudState(user) {
     }
     localStorage.setItem('molhamCloudProjectId', FIREBASE_CONFIG.projectId);
 
-    watchDeviceSession(user);
     if (cloudUnsubscribe) cloudUnsubscribe();
     cloudUnsubscribe = firebase.firestore().collection('users').doc(user.uid).onSnapshot(snapshot => {
-        if (!snapshot.metadata.fromCache && snapshot.exists && snapshot.data().activeSessionId
-            && !synchronizeDeviceSession(user, snapshot)) return;
         const remoteState = snapshot.exists ? snapshot.data().state : null;
         if (!remoteState || Object.keys(remoteState).length === 0) {
             // First use of an account: turn the current local dashboard into its cloud dashboard.
@@ -1260,18 +1125,14 @@ function watchCloudState(user) {
 async function signInWithGoogle() {
     if (!canStartCloudSignIn()) return;
     checkpointPausedTimerForSignIn();
-    const sessionId = beginDeviceSessionActivation();
     try {
         const provider = new firebase.auth.GoogleAuthProvider();
-        const result = await firebase.auth().signInWithPopup(provider);
+        await firebase.auth().signInWithPopup(provider);
         if (guestModeSelected) {
-            abandonDeviceSessionActivation(sessionId);
             await firebase.auth().signOut();
             return;
         }
-        await registerDeviceSession(result.user, sessionId);
     } catch (error) {
-        abandonDeviceSessionActivation(sessionId);
         showLoginError(authErrorMessage(error, loginMessage('تعذر تسجيل الدخول باستخدام Google. أعد المحاولة.', 'Could not sign in with Google. Please try again.')));
     }
 }
@@ -1462,8 +1323,6 @@ async function submitEmailAuth(event) {
             await auth.signOut();
             return;
         }
-        const sessionId = beginDeviceSessionActivation();
-        await registerDeviceSession(result.user, sessionId);
     } catch (error) {
         showLoginError(authErrorMessage(error, loginMessage('تعذر إكمال العملية. تحقق من البريد وكلمة المرور ثم أعد المحاولة.', 'Could not complete sign-in. Check the email and password, then try again.')));
     } finally {
@@ -1766,18 +1625,9 @@ function initializeCloud() {
         }
         if (needsEmailVerification(user)) {
             cloudUser = null;
-            const pendingSessionId = localStorage.getItem(DEVICE_SESSION_ID_KEY);
-            if (pendingSessionId) abandonDeviceSessionActivation(pendingSessionId);
-            localStorage.removeItem(DEVICE_SESSION_ID_KEY);
-            localStorage.removeItem(DEVICE_SESSION_USER_KEY);
-            sessionRegistrationId = '';
             if (cloudUnsubscribe) {
                 cloudUnsubscribe();
                 cloudUnsubscribe = null;
-            }
-            if (deviceSessionUnsubscribe) {
-                deviceSessionUnsubscribe();
-                deviceSessionUnsubscribe = null;
             }
             setSignedInView(null);
             emailVerificationUser = user;
@@ -1798,10 +1648,6 @@ function initializeCloud() {
             if (cloudUnsubscribe) {
                 cloudUnsubscribe();
                 cloudUnsubscribe = null;
-            }
-            if (deviceSessionUnsubscribe) {
-                deviceSessionUnsubscribe();
-                deviceSessionUnsubscribe = null;
             }
             emailVerificationUser = null;
             renderEmailAuthView();
@@ -1843,16 +1689,10 @@ function signOut() {
         cloudUnsubscribe();
         cloudUnsubscribe = null;
     }
-    if (deviceSessionUnsubscribe) {
-        deviceSessionUnsubscribe();
-        deviceSessionUnsubscribe = null;
-    }
     resetTimerForSignOut();
     clearLocalUserState();
     localStorage.removeItem('molhamCloudUserId');
     localStorage.removeItem(CLOUD_SYNC_PENDING_KEY);
-    localStorage.removeItem(DEVICE_SESSION_ID_KEY);
-    localStorage.removeItem(DEVICE_SESSION_USER_KEY);
     if (window.firebase && firebase.auth) firebase.auth().signOut();
 }
 
