@@ -17,7 +17,7 @@
         }
     </script>
     <link rel="stylesheet" href="style.css?v=100">
-    <link rel="stylesheet" href="fonts.css?v=7">
+    <link rel="stylesheet" href="fonts.css?v=12">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=11">
     <link rel="canonical" href="https://mlhmmmdwh505-sys.github.io/molham/">
@@ -61,27 +61,11 @@
                 <button id="emailAuthBackButton" class="email-auth-back" type="button">العودة لخيارات الدخول</button>
             </form>
             <form id="passwordRecoveryRequestForm" class="credential-login-form recovery-form" hidden>
-                <p id="passwordRecoveryRequestHint" class="recovery-hint">أدخل البريد المسجل في حسابك لإرسال رمز استعادة كلمة المرور.</p>
+                <p id="passwordRecoveryRequestHint" class="recovery-hint">أدخل البريد المرتبط بحسابك، وسنرسل إليه رسالة من Firebase لتغيير كلمة المرور.</p>
                 <label id="passwordRecoveryEmailLabel" for="passwordRecoveryEmailInput">البريد الإلكتروني للحساب</label>
                 <input id="passwordRecoveryEmailInput" type="email" inputmode="email" autocomplete="email" dir="ltr" placeholder="name@example.com" required>
-                <button id="passwordRecoverySendButton" class="email-auth-submit" type="submit">إرسال رمز التحقق</button>
+                <button id="passwordRecoverySendButton" class="email-auth-submit" type="submit">إرسال رابط تغيير كلمة المرور</button>
                 <button id="passwordRecoveryRequestBackButton" class="email-auth-back" type="button">العودة لتسجيل الدخول</button>
-            </form>
-            <form id="passwordRecoveryCodeForm" class="credential-login-form recovery-form" hidden>
-                <p id="passwordRecoveryCodeHint" class="recovery-hint">أدخل رمز التحقق وكلمة المرور الجديدة.</p>
-                <label id="passwordRecoveryCodeEmailLabel" for="passwordRecoveryCodeEmail">البريد الذي أرسلنا إليه الرمز</label>
-                <input id="passwordRecoveryCodeEmail" type="email" autocomplete="email" dir="ltr" readonly required>
-                <label id="passwordRecoveryCodeLabel" for="passwordRecoveryCodeInput">رمز التحقق</label>
-                <input id="passwordRecoveryCodeInput" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" dir="ltr" placeholder="123456" required>
-                <label id="passwordRecoveryNewPasswordLabel" for="passwordRecoveryNewPassword">كلمة المرور الجديدة</label>
-                <input id="passwordRecoveryNewPassword" type="password" autocomplete="new-password" minlength="6" required>
-                <label id="passwordRecoveryConfirmPasswordLabel" for="passwordRecoveryConfirmPassword">تأكيد كلمة المرور الجديدة</label>
-                <input id="passwordRecoveryConfirmPassword" type="password" autocomplete="new-password" minlength="6" required>
-                <button id="passwordRecoveryCompleteButton" class="email-auth-submit" type="submit">تغيير كلمة المرور</button>
-                <div class="email-auth-links recovery-links">
-                    <button id="passwordRecoveryResendButton" type="button">إرسال الرمز مرة أخرى</button>
-                    <button id="passwordRecoveryChangeEmailButton" type="button">تغيير البريد</button>
-                </div>
             </form>
             <button id="continueAsGuestButton" class="guest-skip-button" type="button">ابدأ كضيف ببيانات جديدة</button>
             <p id="googleLoginError" class="login-error" role="alert" hidden></p>
@@ -370,6 +354,6 @@
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script defer src="script.js?v=133"></script>
+    <script defer src="script.js?v=135"></script>
 </body>
 </html>

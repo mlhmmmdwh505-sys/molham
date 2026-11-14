@@ -52,6 +52,7 @@ const DEVICE_SESSION_ID_KEY = 'molhamCloudDeviceSessionId';
 const DEVICE_SESSION_USER_KEY = 'molhamCloudDeviceSessionUserId';
 let cloudUser = null;
 let cloudUnsubscribe = null;
+let deviceSessionUnsubscribe = null;
 let cloudSaveSequence = 0;
 let guestModeSelected = false;
 let sessionActivationPending = false;
@@ -882,14 +883,19 @@ async function registerDeviceSession(user, id) {
     localStorage.setItem(DEVICE_SESSION_ID_KEY, id);
     localStorage.setItem(DEVICE_SESSION_USER_KEY, user.uid);
     sessionRegistrationId = id;
-    await firebase.firestore().collection('users').doc(user.uid).set({
+    const userReference = firebase.firestore().collection('users').doc(user.uid);
+    await userReference.collection('deviceSessions').doc('active').set({
         activeSessionId: id,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
+    });
     if (sessionActivationId === id) {
         sessionActivationPending = false;
         sessionActivationId = '';
     }
+    userReference.set({
+        activeSessionId: id,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true }).catch(error => console.warn('Legacy device session update error:', error));
 }
 
 function registerSessionForExistingSignIn(user, id) {
@@ -905,6 +911,10 @@ function releaseReplacedDeviceSession() {
     if (cloudUnsubscribe) {
         cloudUnsubscribe();
         cloudUnsubscribe = null;
+    }
+    if (deviceSessionUnsubscribe) {
+        deviceSessionUnsubscribe();
+        deviceSessionUnsubscribe = null;
     }
     resetTimerForSignOut();
     localStorage.removeItem(DEVICE_SESSION_ID_KEY);
@@ -1057,6 +1067,10 @@ function continueAsGuest() {
         cloudUnsubscribe();
         cloudUnsubscribe = null;
     }
+    if (deviceSessionUnsubscribe) {
+        deviceSessionUnsubscribe();
+        deviceSessionUnsubscribe = null;
+    }
     cloudUser = null;
     cloudSaveSequence += 1;
     sessionActivationPending = false;
@@ -1188,6 +1202,19 @@ function applyCloudState(user, state) {
     refreshDashboardFromStorage();
 }
 
+function watchDeviceSession(user) {
+    if (deviceSessionUnsubscribe) deviceSessionUnsubscribe();
+    const sessionReference = firebase.firestore()
+        .collection('users').doc(user.uid)
+        .collection('deviceSessions').doc('active');
+    deviceSessionUnsubscribe = sessionReference.onSnapshot({ includeMetadataChanges: true }, snapshot => {
+        if (!synchronizeDeviceSession(user, snapshot)) return;
+    }, error => {
+        setCloudStatus(cloudSyncErrorMessage(error), 'error');
+        console.warn('Device session listener error:', error);
+    });
+}
+
 function watchCloudState(user) {
     const previousUserId = localStorage.getItem('molhamCloudUserId');
     const previousProjectId = localStorage.getItem('molhamCloudProjectId') || 'molham-dash-bord';
@@ -1199,9 +1226,11 @@ function watchCloudState(user) {
     }
     localStorage.setItem('molhamCloudProjectId', FIREBASE_CONFIG.projectId);
 
+    watchDeviceSession(user);
     if (cloudUnsubscribe) cloudUnsubscribe();
-    cloudUnsubscribe = firebase.firestore().collection('users').doc(user.uid).onSnapshot({ includeMetadataChanges: true }, snapshot => {
-        if (!synchronizeDeviceSession(user, snapshot)) return;
+    cloudUnsubscribe = firebase.firestore().collection('users').doc(user.uid).onSnapshot(snapshot => {
+        if (!snapshot.metadata.fromCache && snapshot.exists && snapshot.data().activeSessionId
+            && !synchronizeDeviceSession(user, snapshot)) return;
         const remoteState = snapshot.exists ? snapshot.data().state : null;
         if (!remoteState || Object.keys(remoteState).length === 0) {
             // First use of an account: turn the current local dashboard into its cloud dashboard.
@@ -1249,7 +1278,6 @@ async function signInWithGoogle() {
 let emailAuthMode = 'signin';
 let emailAuthViewOpen = false;
 let passwordRecoveryStep = 'none';
-let passwordRecoveryEmail = '';
 
 function setEmailAuthView(isOpen) {
     emailAuthViewOpen = Boolean(isOpen);
@@ -1265,25 +1293,20 @@ function renderEmailAuthView() {
     const emailOpenButton = document.getElementById('emailLoginOpenButton');
     const emailForm = document.getElementById('emailAuthForm');
     const recoveryRequestForm = document.getElementById('passwordRecoveryRequestForm');
-    const recoveryCodeForm = document.getElementById('passwordRecoveryCodeForm');
     const guestButton = document.getElementById('continueAsGuestButton');
     const loginNote = document.getElementById('loginNote');
     const isRecoveryRequest = passwordRecoveryStep === 'request';
-    const isRecoveryCode = passwordRecoveryStep === 'code';
 
     if (loginTitle) loginTitle.textContent = isRecoveryRequest
         ? (isEnglish ? 'Recover your password' : 'استعادة كلمة المرور')
-        : isRecoveryCode
-            ? (isEnglish ? 'Enter your code and new password' : 'أدخل الرمز وكلمة المرور الجديدة')
-            : emailAuthViewOpen
-                ? (isEnglish ? 'Sign in with email' : 'تسجيل الدخول عبر البريد الإلكتروني')
-                : (isEnglish ? 'Welcome to Molham Dashboard' : 'أهلاً بك في لوحة ملهم');
+        : emailAuthViewOpen
+            ? (isEnglish ? 'Sign in with email' : 'تسجيل الدخول عبر البريد الإلكتروني')
+            : (isEnglish ? 'Welcome to Molham Dashboard' : 'أهلاً بك في لوحة ملهم');
     if (loginDescription) loginDescription.hidden = emailAuthViewOpen;
     if (googleButton) googleButton.hidden = emailAuthViewOpen;
     if (emailOpenButton) emailOpenButton.hidden = emailAuthViewOpen;
     if (emailForm) emailForm.hidden = !emailAuthViewOpen || passwordRecoveryStep !== 'none';
     if (recoveryRequestForm) recoveryRequestForm.hidden = !emailAuthViewOpen || !isRecoveryRequest;
-    if (recoveryCodeForm) recoveryCodeForm.hidden = !emailAuthViewOpen || !isRecoveryCode;
     if (guestButton) guestButton.hidden = emailAuthViewOpen;
     if (loginNote) loginNote.hidden = !emailAuthViewOpen || passwordRecoveryStep !== 'none';
 }
@@ -1311,31 +1334,15 @@ function updateEmailAuthMode(mode = emailAuthMode) {
 function updatePasswordRecoveryLabels() {
     const isEnglish = currentLang === 'en';
     const labels = isEnglish ? {
-        requestHint: 'Enter the email registered to your account to request a password recovery code.',
+        requestHint: 'Enter the email linked to your account. To use a different inbox, first change and verify your sign-in email in Account settings.',
         emailLabel: 'Account email address',
-        send: 'Send verification code',
-        back: 'Back to sign in',
-        codeHint: 'Enter the verification code and choose a new password.',
-        codeEmailLabel: 'Email address for the code',
-        codeLabel: 'Verification code',
-        newPassword: 'New password',
-        confirmPassword: 'Confirm new password',
-        changePassword: 'Change password',
-        resend: 'Send the code again',
-        changeEmail: 'Change email'
+        send: 'Send password reset link',
+        back: 'Back to sign in'
     } : {
-        requestHint: 'أدخل البريد المسجل في حسابك لإرسال رمز استعادة كلمة المرور.',
+        requestHint: 'أدخل البريد المرتبط بحسابك. لاستخدام بريد آخر، غيّر بريد الدخول وأكّده أولًا من إعدادات الحساب.',
         emailLabel: 'البريد الإلكتروني للحساب',
-        send: 'إرسال رمز التحقق',
-        back: 'العودة لتسجيل الدخول',
-        codeHint: 'أدخل رمز التحقق وكلمة المرور الجديدة.',
-        codeEmailLabel: 'البريد الذي أرسلنا إليه الرمز',
-        codeLabel: 'رمز التحقق',
-        newPassword: 'كلمة المرور الجديدة',
-        confirmPassword: 'تأكيد كلمة المرور الجديدة',
-        changePassword: 'تغيير كلمة المرور',
-        resend: 'إرسال الرمز مرة أخرى',
-        changeEmail: 'تغيير البريد'
+        send: 'إرسال رابط تغيير كلمة المرور',
+        back: 'العودة لتسجيل الدخول'
     };
     const setText = (id, value) => {
         const element = document.getElementById(id);
@@ -1345,14 +1352,6 @@ function updatePasswordRecoveryLabels() {
     setText('passwordRecoveryEmailLabel', labels.emailLabel);
     setText('passwordRecoverySendButton', labels.send);
     setText('passwordRecoveryRequestBackButton', labels.back);
-    setText('passwordRecoveryCodeHint', labels.codeHint);
-    setText('passwordRecoveryCodeEmailLabel', labels.codeEmailLabel);
-    setText('passwordRecoveryCodeLabel', labels.codeLabel);
-    setText('passwordRecoveryNewPasswordLabel', labels.newPassword);
-    setText('passwordRecoveryConfirmPasswordLabel', labels.confirmPassword);
-    setText('passwordRecoveryCompleteButton', labels.changePassword);
-    setText('passwordRecoveryResendButton', labels.resend);
-    setText('passwordRecoveryChangeEmailButton', labels.changeEmail);
 }
 
 async function submitEmailAuth(event) {
@@ -1388,33 +1387,12 @@ async function submitEmailAuth(event) {
 function openPasswordRecovery() {
     if (!canStartCloudSignIn()) return;
     passwordRecoveryStep = 'request';
-    passwordRecoveryEmail = (document.getElementById('emailInput')?.value || '').trim();
+    const loginEmail = (document.getElementById('emailInput')?.value || '').trim();
     const recoveryEmailInput = document.getElementById('passwordRecoveryEmailInput');
-    if (recoveryEmailInput) recoveryEmailInput.value = passwordRecoveryEmail;
+    if (recoveryEmailInput) recoveryEmailInput.value = loginEmail;
     setLoginStatus('');
     renderEmailAuthView();
     recoveryEmailInput?.focus();
-}
-
-async function callPasswordRecoveryFunction(functionName, payload) {
-    const endpoint = `https://us-central1-${FIREBASE_CONFIG.projectId}.cloudfunctions.net/${functionName}`;
-    const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-    });
-    let result = {};
-    try { result = await response.json(); } catch (error) { /* Use the generic response below. */ }
-    if (!response.ok) {
-        const failure = new Error(result.message || 'recovery-request-failed');
-        failure.code = result.code || 'recovery-request-failed';
-        throw failure;
-    }
-    return result;
-}
-
-async function requestPasswordRecoveryCode(email) {
-    return callPasswordRecoveryFunction('requestPasswordRecoveryCode', { email });
 }
 
 async function submitPasswordRecoveryRequest(event) {
@@ -1423,88 +1401,25 @@ async function submitPasswordRecoveryRequest(event) {
     const email = (document.getElementById('passwordRecoveryEmailInput')?.value || '').trim();
     const submitButton = document.getElementById('passwordRecoverySendButton');
     if (submitButton) submitButton.disabled = true;
-    setLoginStatus(loginMessage('جارٍ إرسال طلب الرمز…', 'Sending your code request…'));
+    setLoginStatus(loginMessage('جارٍ إرسال رسالة إعادة التعيين…', 'Sending the password reset email…'));
     try {
-        await requestPasswordRecoveryCode(email);
-        passwordRecoveryEmail = email;
-        const codeEmail = document.getElementById('passwordRecoveryCodeEmail');
-        if (codeEmail) codeEmail.value = email;
-        passwordRecoveryStep = 'code';
-        renderEmailAuthView();
-        setLoginStatus(loginMessage('أدخل الرمز الذي يصلك على البريد، ثم اختر كلمة مرور جديدة.', 'Enter the code sent to your email, then choose a new password.'));
-        document.getElementById('passwordRecoveryCodeInput')?.focus();
+        const auth = firebase.auth();
+        auth.languageCode = currentLang === 'en' ? 'en' : 'ar';
+        await auth.sendPasswordResetEmail(email);
+        setLoginStatus(loginMessage(
+            'إذا كان هذا البريد مرتبطًا بحساب، ستصلك رسالة فيها رابط تغيير كلمة المرور. افحص البريد غير المرغوب فيه أيضًا.',
+            'If this email is linked to an account, you will receive a password reset link. Check your spam folder too.'
+        ));
     } catch (error) {
-        showLoginError(loginMessage('تعذر بدء الاستعادة الآن. تحقق من اتصالك وحاول مرة أخرى.', 'Could not start recovery. Check your connection and try again.'));
-    } finally {
-        if (submitButton) submitButton.disabled = false;
-    }
-}
-
-async function resendPasswordRecoveryCode() {
-    if (!canStartCloudSignIn() || !passwordRecoveryEmail) return;
-    const resendButton = document.getElementById('passwordRecoveryResendButton');
-    if (resendButton) resendButton.disabled = true;
-    setLoginStatus(loginMessage('جارٍ طلب رمز جديد…', 'Requesting a new code…'));
-    try {
-        await requestPasswordRecoveryCode(passwordRecoveryEmail);
-        setLoginStatus(loginMessage('إذا كان البريد مرتبطًا بحساب، سيصلك رمز جديد. افحص الرسائل غير المرغوب فيها أيضًا.', 'If this email is linked to an account, a new code will arrive. Check your spam folder too.'));
-    } catch (error) {
-        setLoginStatus(loginMessage('لم نتمكن من طلب رمز جديد الآن. حاول بعد قليل.', 'Could not request another code. Try again shortly.'));
-    } finally {
-        if (resendButton) resendButton.disabled = false;
-    }
-}
-
-async function submitPasswordRecoveryCode(event) {
-    event.preventDefault();
-    if (!canStartCloudSignIn()) return;
-    const codeInput = document.getElementById('passwordRecoveryCodeInput');
-    const newPasswordInput = document.getElementById('passwordRecoveryNewPassword');
-    const confirmPasswordInput = document.getElementById('passwordRecoveryConfirmPassword');
-    const code = (codeInput?.value || '').trim();
-    const password = newPasswordInput?.value || '';
-    const confirmation = confirmPasswordInput?.value || '';
-    if (!/^\d{6}$/.test(code)) {
-        showLoginError(loginMessage('اكتب رمز التحقق المكوّن من 6 أرقام.', 'Enter the 6-digit verification code.'));
-        codeInput?.focus();
-        return;
-    }
-    if (password.length < 6) {
-        showLoginError(loginMessage('استخدم كلمة مرور من 6 أحرف على الأقل.', 'Use a password with at least 6 characters.'));
-        newPasswordInput?.focus();
-        return;
-    }
-    if (password !== confirmation) {
-        showLoginError(loginMessage('كلمتا المرور غير متطابقتين.', 'The passwords do not match.'));
-        confirmPasswordInput?.focus();
-        return;
-    }
-    const submitButton = document.getElementById('passwordRecoveryCompleteButton');
-    if (submitButton) submitButton.disabled = true;
-    setLoginStatus(loginMessage('جارٍ تغيير كلمة المرور…', 'Changing your password…'));
-    try {
-        await callPasswordRecoveryFunction('completePasswordRecovery', {
-            email: passwordRecoveryEmail,
-            code,
-            newPassword: password
-        });
-        passwordRecoveryStep = 'none';
-        setEmailAuthView(true);
-        updateEmailAuthMode('signin');
-        const loginEmail = document.getElementById('emailInput');
-        const loginPassword = document.getElementById('passwordInput');
-        if (loginEmail) loginEmail.value = passwordRecoveryEmail;
-        if (loginPassword) loginPassword.value = '';
-        if (newPasswordInput) newPasswordInput.value = '';
-        if (confirmPasswordInput) confirmPasswordInput.value = '';
-        if (codeInput) codeInput.value = '';
-        setLoginStatus(loginMessage('تم تغيير كلمة المرور. سجّل الدخول بها الآن.', 'Password changed. Sign in with your new password.'));
-        loginPassword?.focus();
-    } catch (error) {
-        const message = error.code === 'invalid-code'
-            ? loginMessage('الرمز غير صحيح أو انتهت صلاحيته. اطلب رمزًا جديدًا وحاول مجددًا.', 'That code is invalid or expired. Request a new one and try again.')
-            : loginMessage('تعذر تغيير كلمة المرور الآن. تحقق من البيانات أو اطلب رمزًا جديدًا.', 'Could not change the password. Check the details or request a new code.');
-        showLoginError(message);
+        const code = String(error?.code || '').replace(/^auth\//, '');
+        if (code === 'user-not-found') {
+            setLoginStatus(loginMessage(
+                'إذا كان هذا البريد مرتبطًا بحساب، ستصلك رسالة فيها رابط تغيير كلمة المرور. افحص البريد غير المرغوب فيه أيضًا.',
+                'If this email is linked to an account, you will receive a password reset link. Check your spam folder too.'
+            ));
+        } else {
+            showLoginError(authErrorMessage(error, loginMessage('تعذر إرسال الرسالة. تحقق من اتصالك والبريد ثم أعد المحاولة.', 'Could not send the email. Check your connection and email address, then try again.')));
+        }
     } finally {
         if (submitButton) submitButton.disabled = false;
     }
@@ -1603,21 +1518,11 @@ function initializeCloud() {
     });
     document.getElementById('passwordResetButton')?.addEventListener('click', openPasswordRecovery);
     document.getElementById('passwordRecoveryRequestForm')?.addEventListener('submit', submitPasswordRecoveryRequest);
-    document.getElementById('passwordRecoveryCodeForm')?.addEventListener('submit', submitPasswordRecoveryCode);
     document.getElementById('passwordRecoveryRequestBackButton')?.addEventListener('click', () => {
         passwordRecoveryStep = 'none';
         setLoginStatus('');
         renderEmailAuthView();
         document.getElementById('emailInput')?.focus();
-    });
-    document.getElementById('passwordRecoveryResendButton')?.addEventListener('click', resendPasswordRecoveryCode);
-    document.getElementById('passwordRecoveryChangeEmailButton')?.addEventListener('click', () => {
-        passwordRecoveryStep = 'request';
-        const emailInput = document.getElementById('passwordRecoveryEmailInput');
-        if (emailInput) emailInput.value = passwordRecoveryEmail;
-        setLoginStatus('');
-        renderEmailAuthView();
-        emailInput?.focus();
     });
     document.getElementById('changeAvatarButton')?.addEventListener('click', () => document.getElementById('avatarFileInput')?.click());
     document.getElementById('avatarFileInput')?.addEventListener('change', event => updateAccountPhoto(event.target.files?.[0]));
@@ -1688,6 +1593,10 @@ function initializeCloud() {
                 cloudUnsubscribe();
                 cloudUnsubscribe = null;
             }
+            if (deviceSessionUnsubscribe) {
+                deviceSessionUnsubscribe();
+                deviceSessionUnsubscribe = null;
+            }
             if (!navigator.onLine) continueAsGuest();
         }
     });
@@ -1725,6 +1634,10 @@ function signOut() {
     if (cloudUnsubscribe) {
         cloudUnsubscribe();
         cloudUnsubscribe = null;
+    }
+    if (deviceSessionUnsubscribe) {
+        deviceSessionUnsubscribe();
+        deviceSessionUnsubscribe = null;
     }
     resetTimerForSignOut();
     clearLocalUserState();
