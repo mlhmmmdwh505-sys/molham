@@ -955,6 +955,9 @@ html[data-theme="light"] .guest-skip-button {
 .email-auth-links button:disabled, .email-auth-submit:disabled { opacity: .6; cursor: wait; }
 .login-status { margin: 0 0 10px; color: #86efac !important; font-size: 12px !important; }
 .login-status[hidden] { display: none !important; }
+.recovery-hint { margin: 4px 2px 12px; color: var(--text-muted); font-size: 12px; line-height: 1.8; }
+.recovery-form input[readonly] { color: #cbd5e1; opacity: .82; }
+.recovery-links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .login-error { margin: -4px 0 12px; color: #fda4af !important; font-size: 13px !important; }
 .login-note { font-size: 12px !important; color: var(--text-darker) !important; }
 .account-control { position: fixed; z-index: 50; bottom: 24px; left: 24px; display: flex; align-items: center; gap: 8px; color: var(--text-muted); font-size: 12px; }

@@ -16,7 +16,7 @@
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="stylesheet" href="style.css?v=99">
+    <link rel="stylesheet" href="style.css?v=100">
     <link rel="stylesheet" href="fonts.css?v=7">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=11">
@@ -39,7 +39,7 @@
             <div class="login-logo-wrap"><img src="gnome-books.png" alt="شعار الموقع" class="login-logo"></div>
             <span class="login-eyebrow">منظّم الدراسة الشخصي</span>
             <h1 id="loginTitle">أهلاً بك في لوحة ملهم</h1>
-            <p id="loginDescription">سجّل بحساب Google أو بريدك الإلكتروني لمزامنة بياناتك عند الاتصال، أو تابع كضيف.</p>
+            <p id="loginDescription">سجّل بحساب Google أو بريدك الإلكتروني لمزامنة بياناتك، أو ابدأ بلوحة جديدة كضيف.</p>
             <button id="googleLoginButton" class="firebase-provider-button firebase-google-button" type="button">
                 <span class="google-mark" aria-hidden="true">G</span>
                 <span id="googleLoginLabel">المتابعة باستخدام Google</span>
@@ -60,10 +60,33 @@
                 </div>
                 <button id="emailAuthBackButton" class="email-auth-back" type="button">العودة لخيارات الدخول</button>
             </form>
-            <button id="continueAsGuestButton" class="guest-skip-button" type="button">تخطي والمتابعة كضيف</button>
+            <form id="passwordRecoveryRequestForm" class="credential-login-form recovery-form" hidden>
+                <p id="passwordRecoveryRequestHint" class="recovery-hint">أدخل البريد المسجل في حسابك لإرسال رمز استعادة كلمة المرور.</p>
+                <label id="passwordRecoveryEmailLabel" for="passwordRecoveryEmailInput">البريد الإلكتروني للحساب</label>
+                <input id="passwordRecoveryEmailInput" type="email" inputmode="email" autocomplete="email" dir="ltr" placeholder="name@example.com" required>
+                <button id="passwordRecoverySendButton" class="email-auth-submit" type="submit">إرسال رمز التحقق</button>
+                <button id="passwordRecoveryRequestBackButton" class="email-auth-back" type="button">العودة لتسجيل الدخول</button>
+            </form>
+            <form id="passwordRecoveryCodeForm" class="credential-login-form recovery-form" hidden>
+                <p id="passwordRecoveryCodeHint" class="recovery-hint">أدخل رمز التحقق وكلمة المرور الجديدة.</p>
+                <label id="passwordRecoveryCodeEmailLabel" for="passwordRecoveryCodeEmail">البريد الذي أرسلنا إليه الرمز</label>
+                <input id="passwordRecoveryCodeEmail" type="email" autocomplete="email" dir="ltr" readonly required>
+                <label id="passwordRecoveryCodeLabel" for="passwordRecoveryCodeInput">رمز التحقق</label>
+                <input id="passwordRecoveryCodeInput" type="text" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" dir="ltr" placeholder="123456" required>
+                <label id="passwordRecoveryNewPasswordLabel" for="passwordRecoveryNewPassword">كلمة المرور الجديدة</label>
+                <input id="passwordRecoveryNewPassword" type="password" autocomplete="new-password" minlength="6" required>
+                <label id="passwordRecoveryConfirmPasswordLabel" for="passwordRecoveryConfirmPassword">تأكيد كلمة المرور الجديدة</label>
+                <input id="passwordRecoveryConfirmPassword" type="password" autocomplete="new-password" minlength="6" required>
+                <button id="passwordRecoveryCompleteButton" class="email-auth-submit" type="submit">تغيير كلمة المرور</button>
+                <div class="email-auth-links recovery-links">
+                    <button id="passwordRecoveryResendButton" type="button">إرسال الرمز مرة أخرى</button>
+                    <button id="passwordRecoveryChangeEmailButton" type="button">تغيير البريد</button>
+                </div>
+            </form>
+            <button id="continueAsGuestButton" class="guest-skip-button" type="button">ابدأ كضيف ببيانات جديدة</button>
             <p id="googleLoginError" class="login-error" role="alert" hidden></p>
             <p id="loginStatus" class="login-status" role="status" aria-live="polite" hidden></p>
-            <p id="loginNote" class="login-note">كلمة المرور 6 أحرف على الأقل. لربطها بحساب Google الحالي، سجّل به أولًا ثم أضف كلمة المرور من قائمة الحساب.</p>
+            <p id="loginNote" class="login-note">استخدم بريدًا حقيقيًا لاستعادة كلمة المرور. إذا كان بريدك الحالي لا يستقبل الرسائل، سجّل الدخول وغيّره من إعدادات الحساب.</p>
         </div>
     </section>
 
@@ -127,6 +150,12 @@
                     <label id="linkEmailPasswordLabel" for="linkEmailPasswordInput">كلمة مرور للحساب نفسه</label>
                     <input id="linkEmailPasswordInput" type="password" autocomplete="new-password" minlength="6" required>
                     <button id="linkEmailPasswordSubmit" type="submit">ربط كلمة المرور</button>
+                </form>
+                <button type="button" id="changeLoginEmailButton" class="link-auth-button"></button>
+                <form id="changeLoginEmailForm" class="link-auth-form" hidden>
+                    <label id="changeLoginEmailLabel" for="changeLoginEmailInput">البريد الحقيقي للدخول واستعادة كلمة المرور</label>
+                    <input id="changeLoginEmailInput" type="email" inputmode="email" autocomplete="email" dir="ltr" placeholder="name@example.com" required>
+                    <button id="changeLoginEmailSubmit" type="submit">إرسال رابط التأكيد</button>
                 </form>
                 <button type="button" id="logoutButton" class="logout-button">تسجيل الخروج</button>
             </div>
@@ -341,6 +370,6 @@
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script defer src="script.js?v=129"></script>
+    <script defer src="script.js?v=133"></script>
 </body>
 </html>
