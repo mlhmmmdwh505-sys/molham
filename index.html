@@ -16,7 +16,7 @@
             document.documentElement.dataset.theme = 'dark';
         }
     </script>
-    <link rel="stylesheet" href="style.css?v=100">
+    <link rel="stylesheet" href="style.css?v=101">
     <link rel="stylesheet" href="fonts.css?v=12">
     <link rel="icon" type="image/png" href="gnome-books.png">
     <link rel="manifest" href="manifest.json?v=11">
@@ -45,7 +45,7 @@
                 <span id="googleLoginLabel">المتابعة باستخدام Google</span>
             </button>
             <button id="emailLoginOpenButton" class="firebase-provider-button email-login-open-button" type="button">
-                <span aria-hidden="true">✉</span>
+                <span class="email-provider-icon" aria-hidden="true">✉</span>
                 <span id="emailLoginOpenLabel">التسجيل عبر البريد الإلكتروني</span>
             </button>
             <form id="emailAuthForm" class="credential-login-form" hidden>
@@ -53,6 +53,7 @@
                 <input id="emailInput" type="email" inputmode="email" autocomplete="username" dir="ltr" placeholder="name@example.com" required>
                 <label id="passwordLabel" for="passwordInput">كلمة المرور</label>
                 <input id="passwordInput" type="password" autocomplete="current-password" minlength="6" required>
+                <p id="emailSignupHint" class="recovery-hint" hidden>استخدم بريدًا حقيقيًا تستطيع فتحه. سنرسل إليه رابط تأكيد، ولن يكتمل إنشاء الحساب قبل فتحه.</p>
                 <button id="emailAuthSubmitButton" class="email-auth-submit" type="submit">تسجيل الدخول بالبريد</button>
                 <div class="email-auth-links">
                     <button id="emailAuthModeButton" type="button">إنشاء حساب جديد</button>
@@ -61,12 +62,23 @@
                 <button id="emailAuthBackButton" class="email-auth-back" type="button">العودة لخيارات الدخول</button>
             </form>
             <form id="passwordRecoveryRequestForm" class="credential-login-form recovery-form" hidden>
-                <p id="passwordRecoveryRequestHint" class="recovery-hint">أدخل البريد المرتبط بحسابك، وسنرسل إليه رسالة من Firebase لتغيير كلمة المرور.</p>
+                <p id="passwordRecoveryRequestHint" class="recovery-hint">لا يشترط أن يكون البريد Gmail؛ ينفع أي بريد حقيقي تقدر تفتحه. رابط الاستعادة يذهب إلى البريد المرتبط بالحساب. لاستخدام بريد آخر، غيّر بريد الدخول وأكّده أولًا من إعدادات الحساب. تأكد من صحة البريد؛ نحن غير مسؤولين عن إدخال بريد خاطئ.</p>
                 <label id="passwordRecoveryEmailLabel" for="passwordRecoveryEmailInput">البريد الإلكتروني للحساب</label>
                 <input id="passwordRecoveryEmailInput" type="email" inputmode="email" autocomplete="email" dir="ltr" placeholder="name@example.com" required>
                 <button id="passwordRecoverySendButton" class="email-auth-submit" type="submit">إرسال رابط تغيير كلمة المرور</button>
                 <button id="passwordRecoveryRequestBackButton" class="email-auth-back" type="button">العودة لتسجيل الدخول</button>
             </form>
+            <section id="emailVerificationPanel" class="email-verification-panel" hidden>
+                <p id="emailVerificationMessage" class="recovery-hint"></p>
+                <button id="emailVerificationResendButton" class="email-auth-submit" type="button">إعادة إرسال رابط التأكيد</button>
+                <form id="emailVerificationChangeForm" class="credential-login-form">
+                    <label id="emailVerificationChangeLabel" for="emailVerificationChangeInput">لو البريد خطأ، أدخل بريدًا حقيقيًا بدلًا منه</label>
+                    <input id="emailVerificationChangeInput" type="email" inputmode="email" autocomplete="email" dir="ltr" placeholder="name@example.com" required>
+                    <button id="emailVerificationChangeSubmit" class="email-auth-submit" type="submit">إرسال رابط التأكيد للبريد الجديد</button>
+                </form>
+                <button id="emailVerificationCheckButton" class="email-auth-submit" type="button">أكدت البريد، تحقق الآن</button>
+                <button id="emailVerificationBackButton" class="email-auth-back" type="button">العودة لتسجيل الدخول</button>
+            </section>
             <button id="continueAsGuestButton" class="guest-skip-button" type="button">ابدأ كضيف ببيانات جديدة</button>
             <p id="googleLoginError" class="login-error" role="alert" hidden></p>
             <p id="loginStatus" class="login-status" role="status" aria-live="polite" hidden></p>
@@ -354,6 +366,6 @@
     </nav>
     <div class="focus-session-toast" id="focusSessionToast" role="status" aria-live="polite" hidden></div>
 <video id="bgTrack" playsinline autoplay loop muted style="position:fixed; width:1px; height:1px; opacity:0.01; pointer-events:none;"></video>
-    <script defer src="script.js?v=135"></script>
+    <script defer src="script.js?v=136"></script>
 </body>
 </html>

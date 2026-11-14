@@ -218,6 +218,14 @@
         setStatus('سجّل الدخول من لوحة التحكم لمزامنة تقدمك.', 'saving');
     }
     firebase.auth().onAuthStateChanged(user => {
+        const hasPasswordProvider = (user?.providerData || []).some(provider => provider.providerId === 'password');
+        if (hasPasswordProvider && user.emailVerified !== true) {
+            cloudUser = null;
+            if (cloudUnsubscribe) cloudUnsubscribe();
+            cloudUnsubscribe = null;
+            setStatus('أكد بريدك من لوحة التحكم لتفعيل مزامنة الحساب.', 'saving');
+            return;
+        }
         cloudUser = user;
         if (!user) {
             if (cloudUnsubscribe) cloudUnsubscribe();

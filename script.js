@@ -55,6 +55,7 @@ let cloudUnsubscribe = null;
 let deviceSessionUnsubscribe = null;
 let cloudSaveSequence = 0;
 let guestModeSelected = false;
+let emailVerificationUser = null;
 let sessionActivationPending = false;
 let sessionActivationId = '';
 let sessionRegistrationId = '';
@@ -1285,8 +1286,17 @@ function setEmailAuthView(isOpen) {
     renderEmailAuthView();
 }
 
+function isEmailPasswordUser(user) {
+    return (user?.providerData || []).some(provider => provider.providerId === 'password');
+}
+
+function needsEmailVerification(user) {
+    return isEmailPasswordUser(user) && user.emailVerified !== true;
+}
+
 function renderEmailAuthView() {
     const isEnglish = currentLang === 'en';
+    const verificationPending = Boolean(emailVerificationUser);
     const loginTitle = document.getElementById('loginTitle');
     const loginDescription = document.getElementById('loginDescription');
     const googleButton = document.getElementById('googleLoginButton');
@@ -1295,20 +1305,27 @@ function renderEmailAuthView() {
     const recoveryRequestForm = document.getElementById('passwordRecoveryRequestForm');
     const guestButton = document.getElementById('continueAsGuestButton');
     const loginNote = document.getElementById('loginNote');
+    const verificationPanel = document.getElementById('emailVerificationPanel');
     const isRecoveryRequest = passwordRecoveryStep === 'request';
 
-    if (loginTitle) loginTitle.textContent = isRecoveryRequest
-        ? (isEnglish ? 'Recover your password' : 'استعادة كلمة المرور')
-        : emailAuthViewOpen
-            ? (isEnglish ? 'Sign in with email' : 'تسجيل الدخول عبر البريد الإلكتروني')
-            : (isEnglish ? 'Welcome to Molham Dashboard' : 'أهلاً بك في لوحة ملهم');
-    if (loginDescription) loginDescription.hidden = emailAuthViewOpen;
-    if (googleButton) googleButton.hidden = emailAuthViewOpen;
-    if (emailOpenButton) emailOpenButton.hidden = emailAuthViewOpen;
-    if (emailForm) emailForm.hidden = !emailAuthViewOpen || passwordRecoveryStep !== 'none';
-    if (recoveryRequestForm) recoveryRequestForm.hidden = !emailAuthViewOpen || !isRecoveryRequest;
-    if (guestButton) guestButton.hidden = emailAuthViewOpen;
-    if (loginNote) loginNote.hidden = !emailAuthViewOpen || passwordRecoveryStep !== 'none';
+    if (loginTitle) loginTitle.textContent = verificationPending
+        ? (isEnglish ? 'Verify your email address' : 'أكد بريدك الإلكتروني')
+        : isRecoveryRequest
+            ? (isEnglish ? 'Recover your password' : 'استعادة كلمة المرور')
+            : emailAuthViewOpen
+                ? (emailAuthMode === 'signup'
+                    ? (isEnglish ? 'Create an account' : 'إنشاء حساب جديد')
+                    : (isEnglish ? 'Sign in with email' : 'تسجيل الدخول عبر البريد الإلكتروني'))
+                : (isEnglish ? 'Welcome to Molham Dashboard' : 'أهلاً بك في لوحة ملهم');
+    if (loginDescription) loginDescription.hidden = emailAuthViewOpen || verificationPending;
+    if (googleButton) googleButton.hidden = emailAuthViewOpen || verificationPending;
+    if (emailOpenButton) emailOpenButton.hidden = emailAuthViewOpen || verificationPending;
+    if (emailForm) emailForm.hidden = !emailAuthViewOpen || passwordRecoveryStep !== 'none' || verificationPending;
+    if (recoveryRequestForm) recoveryRequestForm.hidden = !emailAuthViewOpen || !isRecoveryRequest || verificationPending;
+    if (guestButton) guestButton.hidden = emailAuthViewOpen || verificationPending;
+    if (loginNote) loginNote.hidden = !emailAuthViewOpen || passwordRecoveryStep !== 'none' || verificationPending;
+    if (verificationPanel) verificationPanel.hidden = !verificationPending;
+    updateEmailVerificationLabels();
 }
 
 function updateEmailAuthMode(mode = emailAuthMode) {
@@ -1319,6 +1336,7 @@ function updateEmailAuthMode(mode = emailAuthMode) {
     const modeButton = document.getElementById('emailAuthModeButton');
     const resetButton = document.getElementById('passwordResetButton');
     const passwordInput = document.getElementById('passwordInput');
+    const signupHint = document.getElementById('emailSignupHint');
     const links = document.querySelector('.email-auth-links');
     if (submitButton) submitButton.textContent = isSignup
         ? (isEnglish ? 'Create account' : 'إنشاء حساب')
@@ -1329,17 +1347,54 @@ function updateEmailAuthMode(mode = emailAuthMode) {
     if (resetButton) resetButton.hidden = isSignup;
     if (links) links.style.gridTemplateColumns = isSignup ? '1fr' : '';
     if (passwordInput) passwordInput.autocomplete = isSignup ? 'new-password' : 'current-password';
+    if (signupHint) {
+        signupHint.hidden = !isSignup;
+        signupHint.textContent = isEnglish
+            ? 'Use a real inbox you can open. We will send a verification link, and you cannot use the account until you confirm it.'
+            : 'استخدم بريدًا حقيقيًا تستطيع فتحه. سنرسل إليه رابط تأكيد، ولن تقدر على استخدام الحساب قبل تأكيده.';
+    }
+    renderEmailAuthView();
+}
+
+function updateEmailVerificationLabels() {
+    const isEnglish = currentLang === 'en';
+    const email = emailVerificationUser?.email || '';
+    const labels = isEnglish ? {
+        message: `A verification link was sent to ${email}. Open it, then return here and choose “I verified my email”. If the address is wrong, enter a real inbox below.`,
+        resend: 'Resend verification link',
+        changeLabel: 'If you entered the wrong address, use a real inbox',
+        changeSubmit: 'Send a verification link to the new address',
+        check: 'I verified my email — check now',
+        back: 'Sign out and return to sign in'
+    } : {
+        message: `أرسلنا رابط تأكيد إلى ${email}. افتحه ثم ارجع هنا واضغط «أكدت البريد». لو العنوان خطأ، أدخل بريدًا حقيقيًا بالأسفل.`,
+        resend: 'إعادة إرسال رابط التأكيد',
+        changeLabel: 'لو كتبت العنوان خطأ، أدخل بريدًا حقيقيًا',
+        changeSubmit: 'إرسال رابط التأكيد إلى البريد الجديد',
+        check: 'أكدت البريد، تحقق الآن',
+        back: 'تسجيل الخروج والعودة للدخول'
+    };
+    const setText = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    };
+    setText('emailVerificationMessage', labels.message);
+    setText('emailVerificationResendButton', labels.resend);
+    setText('emailVerificationChangeLabel', labels.changeLabel);
+    setText('emailVerificationChangeSubmit', labels.changeSubmit);
+    setText('emailVerificationCheckButton', labels.check);
+    setText('emailVerificationBackButton', labels.back);
 }
 
 function updatePasswordRecoveryLabels() {
     const isEnglish = currentLang === 'en';
     const labels = isEnglish ? {
-        requestHint: 'Enter the email linked to your account. To use a different inbox, first change and verify your sign-in email in Account settings.',
+        requestHint: 'The address does not have to be Gmail, but it must be a real inbox you can open. Password reset goes to the email linked to your account. To use a different inbox, first change and verify your sign-in email in Account settings. Please check the address carefully; we are not responsible for an incorrect email address.',
         emailLabel: 'Account email address',
         send: 'Send password reset link',
         back: 'Back to sign in'
     } : {
-        requestHint: 'أدخل البريد المرتبط بحسابك. لاستخدام بريد آخر، غيّر بريد الدخول وأكّده أولًا من إعدادات الحساب.',
+        requestHint: 'لا يشترط أن يكون البريد Gmail؛ ينفع أي بريد حقيقي تقدر تفتحه. رابط الاستعادة يذهب إلى البريد المرتبط بالحساب. لاستخدام بريد آخر، غيّر بريد الدخول وأكّده أولًا من إعدادات الحساب. تأكد من صحة البريد؛ نحن غير مسؤولين عن إدخال بريد خاطئ.',
         emailLabel: 'البريد الإلكتروني للحساب',
         send: 'إرسال رابط تغيير كلمة المرور',
         back: 'العودة لتسجيل الدخول'
@@ -1360,28 +1415,153 @@ async function submitEmailAuth(event) {
     const email = (document.getElementById('emailInput')?.value || '').trim();
     const password = document.getElementById('passwordInput')?.value || '';
     const submitButton = document.getElementById('emailAuthSubmitButton');
+    const isSignup = emailAuthMode === 'signup';
+    const auth = firebase.auth();
     if (submitButton) submitButton.disabled = true;
-    setLoginStatus(emailAuthMode === 'signup'
+    setLoginStatus(isSignup
         ? loginMessage('جارٍ إنشاء الحساب…', 'Creating your account…')
         : loginMessage('جارٍ تسجيل الدخول…', 'Signing in…'));
     checkpointPausedTimerForSignIn();
-    const sessionId = beginDeviceSessionActivation();
     try {
-        const result = emailAuthMode === 'signup'
-            ? await firebase.auth().createUserWithEmailAndPassword(email, password)
-            : await firebase.auth().signInWithEmailAndPassword(email, password);
-        if (guestModeSelected) {
-            abandonDeviceSessionActivation(sessionId);
-            await firebase.auth().signOut();
+        auth.languageCode = currentLang === 'en' ? 'en' : 'ar';
+        if (isSignup) {
+            const result = await auth.createUserWithEmailAndPassword(email, password);
+            emailVerificationUser = result.user;
+            emailAuthViewOpen = false;
+            passwordRecoveryStep = 'none';
+            renderEmailAuthView();
+            setLoginStatus(loginMessage('جارٍ إرسال رابط تأكيد البريد…', 'Sending the email verification link…'));
+            try {
+                await result.user.sendEmailVerification();
+                setLoginStatus(loginMessage(
+                    'أرسلنا رابط تأكيد إلى بريدك. افتحه ثم ارجع واضغط «أكدت البريد» لإكمال إنشاء الحساب.',
+                    'We sent a verification link to your inbox. Open it, return here, and choose “I verified my email” to finish creating your account.'
+                ));
+            } catch (verificationError) {
+                showLoginError(authErrorMessage(verificationError, loginMessage(
+                    'تم إنشاء حساب غير مكتمل لكن تعذر إرسال رابط التأكيد. صحّح البريد أو أعد إرسال الرابط من الشاشة.',
+                    'The account is pending, but we could not send the verification link. Correct the address or resend the link from this screen.'
+                )));
+            }
             return;
         }
+
+        const result = await auth.signInWithEmailAndPassword(email, password);
+        if (needsEmailVerification(result.user)) {
+            emailVerificationUser = result.user;
+            emailAuthViewOpen = false;
+            passwordRecoveryStep = 'none';
+            renderEmailAuthView();
+            setLoginStatus(loginMessage(
+                'أكد بريدك قبل استخدام الحساب. أعد إرسال الرابط أو أدخل بريدًا صحيحًا بالأسفل.',
+                'Verify your email before using this account. Resend the link or enter a correct address below.'
+            ));
+            return;
+        }
+        if (guestModeSelected) {
+            await auth.signOut();
+            return;
+        }
+        const sessionId = beginDeviceSessionActivation();
         await registerDeviceSession(result.user, sessionId);
     } catch (error) {
-        abandonDeviceSessionActivation(sessionId);
         showLoginError(authErrorMessage(error, loginMessage('تعذر إكمال العملية. تحقق من البريد وكلمة المرور ثم أعد المحاولة.', 'Could not complete sign-in. Check the email and password, then try again.')));
     } finally {
         if (submitButton) submitButton.disabled = false;
     }
+}
+
+async function resendEmailVerification() {
+    const user = firebase.auth()?.currentUser || emailVerificationUser;
+    if (!user) return;
+    if (!canStartCloudSignIn()) return;
+    const button = document.getElementById('emailVerificationResendButton');
+    if (button) button.disabled = true;
+    try {
+        await user.reload();
+        const refreshedUser = firebase.auth().currentUser || user;
+        if (refreshedUser.emailVerified) {
+            setLoginStatus(loginMessage('تم تأكيد البريد. اضغط «أكدت البريد» للمتابعة.', 'Your email is verified. Choose “I verified my email” to continue.'));
+            return;
+        }
+        firebase.auth().languageCode = currentLang === 'en' ? 'en' : 'ar';
+        await refreshedUser.sendEmailVerification();
+        emailVerificationUser = refreshedUser;
+        renderEmailAuthView();
+        setLoginStatus(loginMessage('أعدنا إرسال رابط التأكيد. افحص البريد الوارد والرسائل غير المرغوب فيها.', 'The verification link was resent. Check your inbox and spam folder.'));
+    } catch (error) {
+        showLoginError(authErrorMessage(error, loginMessage('تعذر إرسال رابط التأكيد. تحقق من البريد والاتصال ثم أعد المحاولة.', 'Could not send the verification link. Check the address and connection, then try again.')));
+    } finally {
+        if (button) button.disabled = false;
+    }
+}
+
+async function requestPendingEmailChange(event) {
+    event.preventDefault();
+    const user = firebase.auth()?.currentUser || emailVerificationUser;
+    const input = document.getElementById('emailVerificationChangeInput');
+    const button = document.getElementById('emailVerificationChangeSubmit');
+    const newEmail = (input?.value || '').trim();
+    if (!user || !newEmail) return;
+    if (button) button.disabled = true;
+    try {
+        firebase.auth().languageCode = currentLang === 'en' ? 'en' : 'ar';
+        await user.verifyBeforeUpdateEmail(newEmail);
+        setLoginStatus(loginMessage(
+            'أرسلنا رابط التأكيد إلى البريد الجديد. افتحه ثم ارجع واضغط «أكدت البريد».',
+            'We sent a verification link to the new address. Open it, return here, and choose “I verified my email”.'
+        ));
+    } catch (error) {
+        const code = String(error?.code || '').replace(/^auth\//, '');
+        const message = code === 'requires-recent-login'
+            ? loginMessage('لأمان الحساب، سجّل الخروج ثم ادخل مرة أخرى بكلمة مرورك، وبعدها صحّح البريد.', 'For account security, sign out and sign in again with your password, then correct the address.')
+            : code === 'email-already-in-use'
+                ? loginMessage('هذا البريد مرتبط بحساب آخر.', 'This email address is already linked to another account.')
+                : code === 'invalid-email'
+                    ? loginMessage('اكتب بريدًا إلكترونيًا صحيحًا.', 'Enter a valid email address.')
+                    : authErrorMessage(error, loginMessage('تعذر إرسال رابط التأكيد إلى البريد الجديد.', 'Could not send a verification link to the new address.'));
+        showLoginError(message);
+    } finally {
+        if (button) button.disabled = false;
+    }
+}
+
+async function confirmEmailVerification() {
+    const user = firebase.auth()?.currentUser || emailVerificationUser;
+    if (!user) return;
+    const button = document.getElementById('emailVerificationCheckButton');
+    if (button) button.disabled = true;
+    try {
+        await user.reload();
+        const refreshedUser = firebase.auth().currentUser || user;
+        if (!refreshedUser.emailVerified) {
+            setLoginStatus(loginMessage('لم يظهر تأكيد البريد بعد. افتح رابط التأكيد ثم حاول مرة أخرى.', 'The email is not verified yet. Open the verification link, then try again.'));
+            return;
+        }
+        const verifiedEmail = refreshedUser.email || emailVerificationUser?.email || '';
+        emailVerificationUser = null;
+        await firebase.auth().signOut();
+        setEmailAuthView(true);
+        updateEmailAuthMode('signin');
+        const emailInput = document.getElementById('emailInput');
+        if (emailInput) emailInput.value = verifiedEmail;
+        setLoginStatus(loginMessage('تم تأكيد البريد. سجّل الدخول به لإكمال إنشاء الحساب.', 'Email verified. Sign in with it to finish creating your account.'));
+    } catch (error) {
+        showLoginError(authErrorMessage(error, loginMessage('تعذر التحقق من حالة البريد. أعد تحميل الصفحة وحاول مرة أخرى.', 'Could not check the email status. Reload the page and try again.')));
+    } finally {
+        if (button) button.disabled = false;
+    }
+}
+
+async function leaveEmailVerification() {
+    try {
+        if (firebase.auth()?.currentUser) await firebase.auth().signOut();
+    } catch (error) {
+        console.warn('Pending email verification sign-out error:', error);
+    }
+    emailVerificationUser = null;
+    setEmailAuthView(false);
+    setLoginStatus('');
 }
 
 function openPasswordRecovery() {
@@ -1518,6 +1698,10 @@ function initializeCloud() {
     });
     document.getElementById('passwordResetButton')?.addEventListener('click', openPasswordRecovery);
     document.getElementById('passwordRecoveryRequestForm')?.addEventListener('submit', submitPasswordRecoveryRequest);
+    document.getElementById('emailVerificationResendButton')?.addEventListener('click', resendEmailVerification);
+    document.getElementById('emailVerificationChangeForm')?.addEventListener('submit', requestPendingEmailChange);
+    document.getElementById('emailVerificationCheckButton')?.addEventListener('click', confirmEmailVerification);
+    document.getElementById('emailVerificationBackButton')?.addEventListener('click', leaveEmailVerification);
     document.getElementById('passwordRecoveryRequestBackButton')?.addEventListener('click', () => {
         passwordRecoveryStep = 'none';
         setLoginStatus('');
@@ -1580,6 +1764,28 @@ function initializeCloud() {
             firebase.auth().signOut().catch(error => console.warn('Guest sign-out error:', error));
             return;
         }
+        if (needsEmailVerification(user)) {
+            cloudUser = null;
+            const pendingSessionId = localStorage.getItem(DEVICE_SESSION_ID_KEY);
+            if (pendingSessionId) abandonDeviceSessionActivation(pendingSessionId);
+            localStorage.removeItem(DEVICE_SESSION_ID_KEY);
+            localStorage.removeItem(DEVICE_SESSION_USER_KEY);
+            sessionRegistrationId = '';
+            if (cloudUnsubscribe) {
+                cloudUnsubscribe();
+                cloudUnsubscribe = null;
+            }
+            if (deviceSessionUnsubscribe) {
+                deviceSessionUnsubscribe();
+                deviceSessionUnsubscribe = null;
+            }
+            setSignedInView(null);
+            emailVerificationUser = user;
+            renderEmailAuthView();
+            return;
+        }
+        emailVerificationUser = null;
+        renderEmailAuthView();
         cloudUser = user;
         setSignedInView(user);
         if (user) {
@@ -1597,6 +1803,8 @@ function initializeCloud() {
                 deviceSessionUnsubscribe();
                 deviceSessionUnsubscribe = null;
             }
+            emailVerificationUser = null;
+            renderEmailAuthView();
             if (!navigator.onLine) continueAsGuest();
         }
     });

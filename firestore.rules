@@ -3,13 +3,18 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if request.auth != null
+        && request.auth.uid == userId
+        && (request.auth.token.email_verified == true
+          || request.auth.token.firebase.sign_in_provider != 'password');
     }
 
     match /users/{userId}/deviceSessions/{sessionId} {
       allow read, write: if request.auth != null
         && request.auth.uid == userId
-        && sessionId == 'active';
+        && sessionId == 'active'
+        && (request.auth.token.email_verified == true
+          || request.auth.token.firebase.sign_in_provider != 'password');
     }
   }
 }

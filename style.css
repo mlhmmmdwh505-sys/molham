@@ -939,6 +939,7 @@ html[data-theme="light"] .guest-skip-button {
 .firebase-provider-button { display: flex; align-items: center; justify-content: center; gap: 12px; width: min(100%, 320px); min-height: 46px; margin: 10px auto; padding: 0 18px; border: 1px solid rgba(255, 255, 255, .22); border-radius: 999px; background: #fff; color: #1f2937; font: 700 14px 'Cairo', sans-serif; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
 .firebase-google-button { margin-top: 22px; }
 .email-login-open-button { margin-top: 10px; }
+.email-provider-icon { display: inline-flex; align-items: center; justify-content: center; font-size: 21px; line-height: 1; }
 @media (hover: hover) and (pointer: fine) { .firebase-provider-button:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0, 0, 0, .25); } }
 .guest-skip-button { display: block; width: min(100%, 320px); min-height: 42px; margin: 0 auto 14px; padding: 0 18px; border: 1px solid rgba(165, 180, 252, .55); border-radius: 999px; background: rgba(99, 102, 241, .12); color: #c7d2fe; font: 700 13px 'Cairo', sans-serif; cursor: pointer; transition: transform .2s ease, background .2s ease; }
 @media (hover: hover) and (pointer: fine) { .guest-skip-button:hover { transform: translateY(-2px); background: rgba(99, 102, 241, .24); } }
@@ -956,6 +957,7 @@ html[data-theme="light"] .guest-skip-button {
 .login-status { margin: 0 0 10px; color: #86efac !important; font-size: 12px !important; }
 .login-status[hidden] { display: none !important; }
 .recovery-hint { margin: 4px 2px 12px; color: var(--text-muted); font-size: 12px; line-height: 1.8; }
+.email-verification-panel { width: min(100%, 340px); margin: 12px auto 14px; }
 .recovery-form input[readonly] { color: #cbd5e1; opacity: .82; }
 .login-error { margin: -4px 0 12px; color: #fda4af !important; font-size: 13px !important; }
 .login-note { font-size: 12px !important; color: var(--text-darker) !important; }
